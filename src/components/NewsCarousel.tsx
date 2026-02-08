@@ -73,13 +73,16 @@ const NewsCarousel = () => {
 
   return (
     <section className="relative px-6 pb-12" style={{ zIndex: 1 }}>
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-4xl mx-auto">
+        <h2 className="font-display text-lg font-bold text-foreground mb-4 text-center">
+          📢 Avisos & Campanhas
+        </h2>
         <div
           className={`relative glass rounded-2xl overflow-hidden bg-gradient-to-r ${item.gradient} transition-all duration-500`}
         >
-          <div className="flex flex-col md:flex-row items-center gap-6">
-            {/* Image */}
-            <div className="w-full md:w-2/5 h-48 md:h-56 overflow-hidden">
+          <div className="flex flex-col sm:flex-row items-center gap-4">
+            {/* Image — compact */}
+            <div className="w-full sm:w-1/3 h-32 sm:h-36 overflow-hidden">
               <img
                 src={item.image}
                 alt={item.title}
@@ -89,11 +92,11 @@ const NewsCarousel = () => {
             </div>
 
             {/* Content */}
-            <div className="flex-1 px-6 py-6 md:py-8 md:pr-14">
-              <h3 className="font-display text-xl md:text-2xl font-bold text-foreground mb-3 transition-all duration-300">
+            <div className="flex-1 px-5 py-4 sm:pr-12">
+              <h3 className="font-display text-base font-bold text-foreground mb-1.5 transition-all duration-300">
                 {item.title}
               </h3>
-              <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
+              <p className="text-xs text-muted-foreground leading-relaxed">
                 {item.description}
               </p>
             </div>
@@ -102,28 +105,28 @@ const NewsCarousel = () => {
           {/* Navigation arrows */}
           <button
             onClick={prev}
-            className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full glass flex items-center justify-center text-foreground hover:text-primary transition-colors"
+            className="absolute left-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full glass flex items-center justify-center text-foreground hover:text-primary transition-colors"
             aria-label="Notícia anterior"
           >
-            <ChevronLeft className="w-4 h-4" />
+            <ChevronLeft className="w-3.5 h-3.5" />
           </button>
           <button
             onClick={next}
-            className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full glass flex items-center justify-center text-foreground hover:text-primary transition-colors"
+            className="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full glass flex items-center justify-center text-foreground hover:text-primary transition-colors"
             aria-label="Próxima notícia"
           >
-            <ChevronRight className="w-4 h-4" />
+            <ChevronRight className="w-3.5 h-3.5" />
           </button>
 
           {/* Dots */}
-          <div className="flex justify-center gap-2 pb-4">
+          <div className="flex justify-center gap-1.5 pb-3">
             {newsItems.map((_, i) => (
               <button
                 key={i}
                 onClick={() => setCurrent(i)}
-                className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
                   i === current
-                    ? "bg-primary w-6"
+                    ? "bg-primary w-4"
                     : "bg-muted-foreground/40 hover:bg-muted-foreground/60"
                 }`}
                 aria-label={`Ir para notícia ${i + 1}`}
