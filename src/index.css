@@ -2,95 +2,53 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap');
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    --background: 216 30% 8%;
+    --foreground: 210 40% 96%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card: 216 28% 12%;
+    --card-foreground: 210 40% 96%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover: 216 28% 10%;
+    --popover-foreground: 210 40% 96%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 210 100% 56%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 216 25% 18%;
+    --secondary-foreground: 210 40% 96%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 216 20% 16%;
+    --muted-foreground: 215 20% 55%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 174 72% 56%;
+    --accent-foreground: 216 30% 8%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --border: 216 20% 20%;
+    --input: 216 20% 20%;
+    --ring: 210 100% 56%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
 
-    --sidebar-background: 0 0% 98%;
+    --glass-bg: 216 28% 12%;
+    --glass-border: 216 20% 24%;
+    --glow-primary: 210 100% 56%;
+    --glow-accent: 174 72% 56%;
 
-    --sidebar-foreground: 240 5.3% 26.1%;
-
-    --sidebar-primary: 240 5.9% 10%;
-
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
-  }
-
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-background: 216 28% 10%;
+    --sidebar-foreground: 210 40% 96%;
+    --sidebar-primary: 210 100% 56%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-accent: 216 25% 18%;
+    --sidebar-accent-foreground: 210 40% 96%;
+    --sidebar-border: 216 20% 20%;
+    --sidebar-ring: 210 100% 56%;
   }
 }
 
@@ -100,6 +58,243 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans;
+    font-family: 'Inter', sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Space Grotesk', sans-serif;
+  }
+}
+
+@layer components {
+  /* ===== GLASSMORPHISM ===== */
+  .glass {
+    background: hsla(var(--glass-bg) / 0.6);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid hsla(var(--glass-border) / 0.4);
+  }
+
+  .glass-strong {
+    background: hsla(var(--glass-bg) / 0.85);
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+    border: 1px solid hsla(var(--glass-border) / 0.5);
+  }
+
+  /* ===== MENU BUTTONS (exact spec) ===== */
+  .menu-btn {
+    font-size: 15px;
+    padding: 0.45em 1.6em;
+    border: transparent;
+    box-shadow: 2px 2px 4px rgba(0,0,0,0.4);
+    background: dodgerblue;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .menu-btn:hover {
+    background: linear-gradient(
+      90deg,
+      rgba(30,144,255,1) 0%,
+      rgba(0,212,255,1) 100%
+    );
+  }
+
+  .menu-btn:active {
+    transform: translate(0em, 0.2em);
+  }
+
+  /* ===== LOGIN BUTTON (exact spec) ===== */
+  .login-btn {
+    width: 131px;
+    height: 51px;
+    border-radius: 15px;
+    cursor: pointer;
+    transition: 0.3s ease;
+    background: linear-gradient(
+      to bottom right,
+      #2e8eff 0%,
+      rgba(46, 142, 255, 0) 30%
+    );
+    background-color: rgba(46, 142, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    font-size: 14px;
+    text-decoration: none;
+    border: none;
+  }
+
+  .login-btn:hover {
+    background-color: rgba(46, 142, 255, 0.7);
+    box-shadow: 0 0 10px rgba(46, 142, 255, 0.5);
+  }
+
+  /* ===== DROPDOWN (CSS only) ===== */
+  .nav-dropdown {
+    position: relative;
+  }
+
+  .nav-dropdown .dropdown-content {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%) translateY(8px);
+    min-width: 200px;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.25s ease;
+    pointer-events: none;
+    z-index: 100;
+  }
+
+  .nav-dropdown:hover .dropdown-content {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+    pointer-events: auto;
+  }
+
+  .dropdown-item {
+    display: block;
+    padding: 10px 16px;
+    color: hsl(var(--foreground));
+    text-decoration: none;
+    font-size: 14px;
+    transition: background 0.15s ease;
+    border-radius: 6px;
+  }
+
+  .dropdown-item:hover {
+    background: hsla(var(--primary) / 0.15);
+    color: hsl(var(--primary));
+  }
+
+  /* ===== CHECKBOX (exact spec) ===== */
+  .checkbox-wrapper {
+    --checkbox-size: 25px;
+    --checkbox-color: #00ff88;
+  }
+
+  .checkbox-wrapper input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: var(--checkbox-size);
+    height: var(--checkbox-size);
+    border: 2px solid hsl(var(--muted-foreground));
+    border-radius: 6px;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s ease;
+    background: transparent;
+    flex-shrink: 0;
+  }
+
+  .checkbox-wrapper input[type="checkbox"]:checked {
+    border-color: var(--checkbox-color);
+    background: var(--checkbox-color);
+  }
+
+  .checkbox-wrapper input[type="checkbox"]:checked::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: hsl(var(--background));
+    font-weight: 700;
+    font-size: 14px;
+  }
+
+  /* ===== WEATHER CARD (exact spec) ===== */
+  .weather-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 180px;
+    width: 280px;
+    border-radius: 25px;
+    background: linear-gradient(135deg, hsla(var(--primary) / 0.2), hsla(var(--accent) / 0.1));
+    border: 1px solid hsla(var(--glass-border) / 0.4);
+    backdrop-filter: blur(16px);
+    padding: 20px;
+    justify-content: center;
+    gap: 6px;
+    color: hsl(var(--foreground));
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+  }
+
+  /* ===== CONFETTI ===== */
+  @keyframes confetti-fall {
+    0% { transform: translateY(-100vh) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+  }
+
+  .confetti-piece {
+    position: fixed;
+    width: 10px;
+    height: 10px;
+    top: -10px;
+    z-index: 9999;
+    animation: confetti-fall 3s ease-in-out forwards;
+  }
+
+  /* ===== ANIMATIONS ===== */
+  @keyframes fade-slide-up {
+    0% { opacity: 0; transform: translateY(30px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes pulse-glow {
+    0%, 100% { box-shadow: 0 0 20px hsla(var(--primary) / 0.2); }
+    50% { box-shadow: 0 0 40px hsla(var(--primary) / 0.4); }
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+
+  .animate-fade-slide-up {
+    animation: fade-slide-up 0.8s ease-out forwards;
+  }
+
+  .animate-fade-slide-up-delay {
+    animation: fade-slide-up 0.8s ease-out 0.2s forwards;
+    opacity: 0;
+  }
+
+  .animate-pulse-glow {
+    animation: pulse-glow 3s ease-in-out infinite;
+  }
+
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
+
+  /* ===== SCROLLBAR ===== */
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: hsl(var(--background));
+  }
+  ::-webkit-scrollbar-thumb {
+    background: hsla(var(--primary) / 0.3);
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsla(var(--primary) / 0.5);
   }
 }
