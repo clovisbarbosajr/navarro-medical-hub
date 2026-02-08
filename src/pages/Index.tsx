@@ -5,6 +5,10 @@ import AnnouncementPopup from "@/components/AnnouncementPopup";
 import BirthdayPopup from "@/components/BirthdayPopup";
 import BirthdaySidebar from "@/components/BirthdaySidebar";
 import WeatherCard from "@/components/WeatherCard";
+import RotatingBanner from "@/components/RotatingBanner";
+import QuickLinks from "@/components/QuickLinks";
+import ExtensionsTable from "@/components/ExtensionsTable";
+import EventsCalendar from "@/components/EventsCalendar";
 import Gallery from "@/components/Gallery";
 
 const Index = () => {
@@ -24,6 +28,12 @@ const Index = () => {
       <main className="relative" style={{ zIndex: 1 }}>
         <HeroSection />
 
+        {/* Rotating Banner */}
+        <RotatingBanner />
+
+        {/* Quick Links */}
+        <QuickLinks />
+
         {/* Sidebar + Weather row */}
         <section className="max-w-6xl mx-auto px-6 pb-16 flex flex-col lg:flex-row gap-6 items-start">
           {/* Birthday sidebar - always visible */}
@@ -35,6 +45,12 @@ const Index = () => {
           {/* Weather card */}
           <WeatherCard />
         </section>
+
+        {/* Events Calendar */}
+        <EventsCalendar />
+
+        {/* Extensions / Contacts */}
+        <ExtensionsTable />
 
         {/* Gallery */}
         <Gallery />
