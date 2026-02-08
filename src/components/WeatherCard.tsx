@@ -8,19 +8,19 @@ const WeatherCard = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const hours = time.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
-  const date = time.toLocaleDateString("pt-BR", {
+  const hours = time.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true });
+  const date = time.toLocaleDateString("en-US", {
     weekday: "long",
-    day: "numeric",
     month: "long",
+    day: "numeric",
   });
 
   return (
     <div className="weather-card animate-float">
-      <p className="text-3xl font-display font-bold text-foreground">☀️ 28°C</p>
+      <p className="text-3xl font-display font-bold text-foreground">☀️ 82°F</p>
       <p className="text-lg font-semibold text-foreground mt-1">{hours}</p>
-      <p className="text-sm text-muted-foreground capitalize mt-1">{date}</p>
-      <p className="text-xs text-muted-foreground mt-2">São Paulo, SP</p>
+      <p className="text-sm text-muted-foreground mt-1">{date}</p>
+      <p className="text-xs text-muted-foreground mt-2">Florida, USA</p>
     </div>
   );
 };
