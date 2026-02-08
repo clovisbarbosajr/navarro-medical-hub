@@ -61,12 +61,12 @@ const quickLinks = [
 
 const QuickLinks = () => {
   return (
-    <section className="relative px-6 pb-16" style={{ zIndex: 1 }}>
-      <div className="max-w-6xl mx-auto">
-        <h2 className="font-display text-2xl font-bold text-foreground mb-8 text-center">
+    <section className="relative px-6 pb-10" style={{ zIndex: 1 }}>
+      <div className="max-w-5xl mx-auto">
+        <h2 className="font-display text-lg font-bold text-foreground mb-4 text-center">
           🚀 Links Rápidos
         </h2>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-4 sm:grid-cols-4 lg:grid-cols-8 gap-2">
           {quickLinks.map((link) => {
             const Icon = link.icon;
             return (
@@ -75,21 +75,16 @@ const QuickLinks = () => {
                 href={link.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group glass rounded-2xl p-5 flex flex-col items-center text-center gap-3 hover:scale-[1.04] transition-all duration-300 hover:shadow-lg hover:shadow-primary/10"
+                className="group glass rounded-xl p-3 flex flex-col items-center text-center gap-1.5 hover:scale-[1.05] transition-all duration-300 hover:shadow-md hover:shadow-primary/10"
               >
                 <div
-                  className={`w-14 h-14 rounded-xl bg-gradient-to-br ${link.color} flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}
+                  className={`w-10 h-10 rounded-lg bg-gradient-to-br ${link.color} flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}
                 >
-                  <Icon className="w-7 h-7 text-foreground" />
+                  <Icon className="w-5 h-5 text-foreground" />
                 </div>
-                <div>
-                  <p className="font-display font-semibold text-sm text-foreground">
-                    {link.title}
-                  </p>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    {link.description}
-                  </p>
-                </div>
+                <p className="font-display font-semibold text-[10px] text-foreground leading-tight">
+                  {link.title}
+                </p>
               </a>
             );
           })}
