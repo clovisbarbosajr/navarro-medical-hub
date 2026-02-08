@@ -1,10 +1,8 @@
 import FlowFieldBackground from "@/components/FlowFieldBackground";
 import Header from "@/components/Header";
-import HeroSection from "@/components/HeroSection";
 import AnnouncementPopup from "@/components/AnnouncementPopup";
 import BirthdayPopup from "@/components/BirthdayPopup";
 import BirthdaySidebar from "@/components/BirthdaySidebar";
-import WeatherCard from "@/components/WeatherCard";
 import QuickLinks from "@/components/QuickLinks";
 import NewsFeed from "@/components/NewsFeed";
 import NewsCarousel from "@/components/NewsCarousel";
@@ -18,8 +16,8 @@ const Index = () => {
       <BirthdayPopup />
 
       <main className="relative" style={{ zIndex: 1 }}>
-        {/* Hero title — single line */}
-        <section className="max-w-6xl mx-auto px-6 pt-32 pb-6 text-center">
+        {/* Hero title — single line, centered */}
+        <section className="max-w-6xl mx-auto px-6 pt-32 pb-8 text-center">
           <h1 className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-foreground animate-fade-slide-up leading-tight whitespace-nowrap">
             Intranet{" "}
             <span className="text-primary">Navarro Medical</span>
@@ -27,23 +25,18 @@ const Index = () => {
           <div className="mt-6 w-24 h-1 rounded-full bg-gradient-to-r from-primary to-accent animate-fade-slide-up-delay mx-auto" />
         </section>
 
-        {/* Weather centered below title */}
-        <div className="flex justify-center px-6 pb-6">
-          <WeatherCard />
-        </div>
-
-        {/* Fique por dentro — news articles FIRST */}
-        <NewsFeed />
-
-        {/* Carousel LEFT + Birthdays RIGHT */}
+        {/* Two columns: NewsFeed LEFT + Birthdays RIGHT */}
         <section className="max-w-6xl mx-auto px-6 pb-10 flex flex-col lg:flex-row gap-6 items-start">
           <div className="flex-1 min-w-0">
-            <NewsCarousel />
+            <NewsFeed />
           </div>
-          <div className="w-full lg:w-auto flex-shrink-0">
+          <div className="w-full lg:w-72 flex-shrink-0">
             <BirthdaySidebar />
           </div>
         </section>
+
+        {/* Carousel — Avisos & Campanhas */}
+        <NewsCarousel />
 
         {/* Quick Links — last */}
         <QuickLinks />

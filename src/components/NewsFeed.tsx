@@ -56,45 +56,40 @@ const articles = [
 
 const NewsFeed = () => {
   return (
-    <section className="relative px-6 pb-16" style={{ zIndex: 1 }}>
-      <div className="max-w-6xl mx-auto">
-        <h2 className="font-display text-2xl font-bold text-foreground mb-8 text-center">
-          📰 Fique por dentro:
-        </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          {articles.map((article) => (
-            <div
-              key={article.id}
-              className="group glass rounded-2xl overflow-hidden hover:scale-[1.02] transition-all duration-300 hover:shadow-lg hover:shadow-primary/5 cursor-pointer"
-            >
-              <div className="h-40 overflow-hidden">
-                <img
-                  src={article.image}
-                  alt={article.title}
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                  loading="lazy"
-                />
-              </div>
-              <div className="p-4">
-                <span className="inline-block text-[10px] font-semibold uppercase tracking-wider text-primary bg-primary/10 px-2 py-0.5 rounded-full mb-2">
-                  {article.category}
-                </span>
-                <h4 className="font-display font-semibold text-sm text-foreground mb-2 line-clamp-2">
-                  {article.title}
-                </h4>
-                <p className="text-xs text-muted-foreground line-clamp-2 mb-3">
-                  {article.excerpt}
-                </p>
-                <span className="inline-flex items-center gap-1 text-[10px] text-muted-foreground">
-                  <Clock className="w-3 h-3" />
-                  {article.date}
-                </span>
-              </div>
+    <div>
+      <h2 className="font-display text-xl font-bold text-foreground mb-5">
+        📰 Fique por dentro:
+      </h2>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {articles.map((article) => (
+          <div
+            key={article.id}
+            className="group glass rounded-xl overflow-hidden hover:scale-[1.02] transition-all duration-300 hover:shadow-lg hover:shadow-primary/5 cursor-pointer flex flex-row h-28"
+          >
+            <div className="w-28 flex-shrink-0 overflow-hidden">
+              <img
+                src={article.image}
+                alt={article.title}
+                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                loading="lazy"
+              />
             </div>
-          ))}
-        </div>
+            <div className="p-3 flex flex-col justify-center min-w-0">
+              <span className="inline-block text-[9px] font-semibold uppercase tracking-wider text-primary bg-primary/10 px-1.5 py-0.5 rounded-full mb-1 w-fit">
+                {article.category}
+              </span>
+              <h4 className="font-display font-semibold text-xs text-foreground mb-1 line-clamp-2">
+                {article.title}
+              </h4>
+              <span className="inline-flex items-center gap-1 text-[9px] text-muted-foreground">
+                <Clock className="w-2.5 h-2.5" />
+                {article.date}
+              </span>
+            </div>
+          </div>
+        ))}
       </div>
-    </section>
+    </div>
   );
 };
 
