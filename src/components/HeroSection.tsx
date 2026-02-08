@@ -5,9 +5,6 @@ const HeroSection = () => {
         Intranet{" "}
         <span className="text-primary">Navarro Medical</span>
       </h1>
-      <p className="mt-6 text-lg md:text-xl text-muted-foreground max-w-xl animate-fade-slide-up-delay">
-        Central de sistemas, avisos e ferramentas
-      </p>
       <div className="mt-8 w-24 h-1 rounded-full bg-gradient-to-r from-primary to-accent animate-fade-slide-up-delay" />
     </section>
   );

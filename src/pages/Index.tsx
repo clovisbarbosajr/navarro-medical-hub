@@ -5,11 +5,10 @@ import AnnouncementPopup from "@/components/AnnouncementPopup";
 import BirthdayPopup from "@/components/BirthdayPopup";
 import BirthdaySidebar from "@/components/BirthdaySidebar";
 import WeatherCard from "@/components/WeatherCard";
-import RotatingBanner from "@/components/RotatingBanner";
+import NewsCarousel from "@/components/NewsCarousel";
 import QuickLinks from "@/components/QuickLinks";
-import ExtensionsTable from "@/components/ExtensionsTable";
-import EventsCalendar from "@/components/EventsCalendar";
-import Gallery from "@/components/Gallery";
+import NewsFeed from "@/components/NewsFeed";
+import GallerySection from "@/components/GallerySection";
 
 const Index = () => {
   return (
@@ -28,36 +27,33 @@ const Index = () => {
       <main className="relative" style={{ zIndex: 1 }}>
         <HeroSection />
 
-        {/* Rotating Banner */}
-        <RotatingBanner />
+        {/* News Carousel — below hero title */}
+        <NewsCarousel />
 
         {/* Quick Links */}
         <QuickLinks />
 
-        {/* Sidebar + Weather row */}
+        {/* Weather + Birthday sidebar row */}
         <section className="max-w-6xl mx-auto px-6 pb-16 flex flex-col lg:flex-row gap-6 items-start">
-          {/* Birthday sidebar - always visible */}
-          <BirthdaySidebar />
+          {/* Weather card — left */}
+          <WeatherCard />
 
           {/* Center spacer */}
           <div className="flex-1" />
 
-          {/* Weather card */}
-          <WeatherCard />
+          {/* Birthday sidebar — right */}
+          <BirthdaySidebar />
         </section>
 
-        {/* Events Calendar */}
-        <EventsCalendar />
-
-        {/* Extensions / Contacts */}
-        <ExtensionsTable />
+        {/* Fique por dentro — News feed */}
+        <NewsFeed />
 
         {/* Gallery */}
-        <Gallery />
+        <GallerySection />
 
         {/* Footer */}
         <footer className="relative text-center py-8 text-xs text-muted-foreground" style={{ zIndex: 1 }}>
-          © {new Date().getFullYear()} Navarro Medical — Intranet Corporativa
+          © 2026 INWISEPRO — Intranet Corporativa
         </footer>
       </main>
     </div>

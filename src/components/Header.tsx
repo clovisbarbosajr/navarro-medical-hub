@@ -1,13 +1,5 @@
 const menuItems = [
   {
-    label: "Avisos",
-    links: [
-      { text: "Avisos Gerais", href: "http://localhost:8085/announcements" },
-      { text: "Comunicados RH", href: "http://localhost:8085/announcements/rh" },
-      { text: "Plantão Médico", href: "http://localhost:8085/announcements/plantao" },
-    ],
-  },
-  {
     label: "Sistemas",
     links: [
       { text: "Prontuário Eletrônico", href: "http://localhost:8085/systems/prontuario" },
