@@ -18,32 +18,35 @@ const Index = () => {
       <BirthdayPopup />
 
       <main className="relative" style={{ zIndex: 1 }}>
-        {/* Hero + right sidebar (weather + birthdays) */}
-        <section className="max-w-6xl mx-auto px-6 pt-32 pb-10 flex flex-col lg:flex-row gap-8 items-start">
-          {/* Left: Hero title */}
-          <div className="flex-1 text-center lg:text-left pt-8">
-            <h1 className="font-display text-5xl md:text-7xl font-bold text-foreground animate-fade-slide-up leading-tight">
-              Intranet{" "}
-              <span className="text-primary">Navarro Medical</span>
-            </h1>
-            <div className="mt-6 w-24 h-1 rounded-full bg-gradient-to-r from-primary to-accent animate-fade-slide-up-delay mx-auto lg:mx-0" />
-          </div>
+        {/* Hero title — single line */}
+        <section className="max-w-6xl mx-auto px-6 pt-32 pb-6 text-center">
+          <h1 className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-foreground animate-fade-slide-up leading-tight whitespace-nowrap">
+            Intranet{" "}
+            <span className="text-primary">Navarro Medical</span>
+          </h1>
+          <div className="mt-6 w-24 h-1 rounded-full bg-gradient-to-r from-primary to-accent animate-fade-slide-up-delay mx-auto" />
+        </section>
 
-          {/* Right: Weather + Birthdays stacked */}
-          <div className="flex flex-col gap-4 w-full lg:w-auto flex-shrink-0 items-center lg:items-end">
-            <WeatherCard />
+        {/* Weather centered below title */}
+        <div className="flex justify-center px-6 pb-6">
+          <WeatherCard />
+        </div>
+
+        {/* Fique por dentro — news articles FIRST */}
+        <NewsFeed />
+
+        {/* Carousel LEFT + Birthdays RIGHT */}
+        <section className="max-w-6xl mx-auto px-6 pb-10 flex flex-col lg:flex-row gap-6 items-start">
+          <div className="flex-1 min-w-0">
+            <NewsCarousel />
+          </div>
+          <div className="w-full lg:w-auto flex-shrink-0">
             <BirthdaySidebar />
           </div>
         </section>
 
-        {/* Quick Links — compact */}
+        {/* Quick Links — last */}
         <QuickLinks />
-
-        {/* Fique por dentro — news articles */}
-        <NewsFeed />
-
-        {/* News Carousel — at the bottom, compact */}
-        <NewsCarousel />
 
         {/* Footer */}
         <footer className="relative text-center py-8 text-xs text-muted-foreground" style={{ zIndex: 1 }}>
