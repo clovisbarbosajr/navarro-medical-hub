@@ -1,3 +1,5 @@
+import WeatherCard from "@/components/WeatherCard";
+
 const menuItems = [
   {
     label: "Sistemas",
@@ -64,15 +66,20 @@ const Header = () => {
           ))}
         </nav>
 
-        {/* Login */}
-        <a
-          href="http://localhost:8085/user/auth/login"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="login-btn"
-        >
-          Login
-        </a>
+        {/* Right side: Weather + Login */}
+        <div className="flex items-center gap-4">
+          <div className="hidden sm:block">
+            <WeatherCard />
+          </div>
+          <a
+            href="http://localhost:8085/user/auth/login"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="login-btn"
+          >
+            Login
+          </a>
+        </div>
       </div>
     </header>
   );

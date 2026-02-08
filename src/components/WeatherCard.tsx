@@ -10,17 +10,20 @@ const WeatherCard = () => {
 
   const hours = time.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true });
   const date = time.toLocaleDateString("en-US", {
-    weekday: "long",
-    month: "long",
+    weekday: "short",
+    month: "short",
     day: "numeric",
   });
 
   return (
-    <div className="weather-card animate-float">
-      <p className="text-3xl font-display font-bold text-foreground">☀️ 82°F</p>
-      <p className="text-lg font-semibold text-foreground mt-1">{hours}</p>
-      <p className="text-sm text-muted-foreground mt-1">{date}</p>
-      <p className="text-xs text-muted-foreground mt-2">Florida, USA</p>
+    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+      <span>☀️ 82°F</span>
+      <span className="opacity-40">|</span>
+      <span>{hours}</span>
+      <span className="opacity-40">|</span>
+      <span>{date}</span>
+      <span className="opacity-40">|</span>
+      <span>Florida, USA</span>
     </div>
   );
 };
