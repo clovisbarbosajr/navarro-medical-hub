@@ -1,5 +1,4 @@
 import WeatherCard from "@/components/WeatherCard";
-import navarroLogo from "@/assets/navarro-logo.png";
 
 const menuItems = [
   {
@@ -34,8 +33,13 @@ const Header = () => {
     <header className="fixed top-0 left-0 right-0 glass-strong" style={{ zIndex: 50 }}>
       <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
         {/* Logo */}
-        <div className="flex items-center gap-2">
-          <img src={navarroLogo} alt="Navarro Medical Centers" className="h-10 w-auto" />
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center font-display font-bold text-primary-foreground text-sm">
+            N
+          </div>
+          <span className="font-display font-bold text-lg text-foreground tracking-tight">
+            Navarro Medical
+          </span>
         </div>
 
         {/* Menu */}
