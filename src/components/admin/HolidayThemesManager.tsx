@@ -63,6 +63,7 @@ const HolidayThemesManager = () => {
         activation_start: editing.activation_start,
         activation_end: editing.activation_end,
         enabled: editing.enabled,
+        background_type: editing.background_type || null,
       })
       .eq("id", editing.id);
 
@@ -117,6 +118,26 @@ const HolidayThemesManager = () => {
                   onChange={(e) => setEditing({ ...editing, activation_end: e.target.value })}
                   className="w-full h-10 rounded-xl border border-input bg-secondary/50 px-3 text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
                 />
+              </div>
+              <div>
+                <label className="text-sm text-muted-foreground mb-1 block">Fundo animado</label>
+                <select
+                  value={editing.background_type || ""}
+                  onChange={(e) => setEditing({ ...editing, background_type: e.target.value || null })}
+                  className="w-full h-10 rounded-xl border border-input bg-secondary/50 px-3 text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                >
+                  <option value="">Nenhum (padrão)</option>
+                  <option value="hearts">❤ Corações</option>
+                  <option value="snowflakes">❄ Flocos de neve</option>
+                  <option value="fireworks">🎆 Fogos</option>
+                  <option value="flowers">🌸 Flores</option>
+                  <option value="stars">⭐ Estrelas</option>
+                  <option value="balloons">🎈 Balões</option>
+                  <option value="confetti">🎊 Confete</option>
+                  <option value="christmas">🎄 Natal</option>
+                  <option value="halloween">🎃 Halloween</option>
+                  <option value="easter">🐰 Páscoa</option>
+                </select>
               </div>
               <div className="flex gap-3">
                 <button onClick={handleSave} className="menu-btn flex-1 text-sm">Salvar</button>

@@ -114,6 +114,7 @@ export type Database = {
         Row: {
           activation_end: string
           activation_start: string
+          background_type: string | null
           created_at: string
           created_by: string | null
           css_overrides: Json
@@ -131,6 +132,7 @@ export type Database = {
         Insert: {
           activation_end: string
           activation_start: string
+          background_type?: string | null
           created_at?: string
           created_by?: string | null
           css_overrides?: Json
@@ -148,6 +150,7 @@ export type Database = {
         Update: {
           activation_end?: string
           activation_start?: string
+          background_type?: string | null
           created_at?: string
           created_by?: string | null
           css_overrides?: Json

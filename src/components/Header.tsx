@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import WeatherCard from "@/components/WeatherCard";
 import IframeOverlay from "@/components/IframeOverlay";
 import BudgetAssistantPopup from "@/components/BudgetAssistantPopup";
+import navarroLogo from "@/assets/navarro-heart-logo.png";
 import type { MenuLink } from "@/types/database";
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -61,9 +62,7 @@ const Header = () => {
       <header className="fixed top-0 left-0 right-0 glass-strong" style={{ zIndex: 50 }}>
         <div className="max-w-7xl mx-auto px-4 md:px-6 h-14 md:h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center font-display font-bold text-primary-foreground text-sm">
-              N
-            </div>
+            <img src={navarroLogo} alt="Navarro Medical" className="w-8 h-8 rounded-lg object-contain" />
             <span className="font-display font-bold text-base md:text-lg text-foreground tracking-tight">
               Navarro Medical
             </span>
