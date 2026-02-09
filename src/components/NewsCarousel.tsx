@@ -1,75 +1,58 @@
 import { useState, useEffect, useCallback } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
-/**
- * NEWS CAROUSEL — Carrossel de Notícias
- *
- * INTEGRAÇÃO BACKEND (HumHub):
- * Substituir o array `newsItems` por dados vindos da API.
- * Endpoint sugerido: GET /api/v1/news
- *
- * Estrutura JSON esperada:
- * [
- *   {
- *     "id": 1,
- *     "title": "Título da notícia",
- *     "description": "Texto curto da notícia",
- *     "image": "https://url-da-imagem.jpg",
- *     "gradient": "from-blue-600/30 to-cyan-500/10"
- *   }
- * ]
- *
- * O carrossel adiciona automaticamente novos itens quando
- * o array de dados cresce (novas notícias do admin).
- */
-const newsItems = [
-  {
-    id: 1,
-    title: "🏥 Semana de Segurança do Paciente",
-    description: "De 10 a 14 de fevereiro. Participe das atividades e treinamentos.",
-    image: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&h=400&fit=crop",
-    gradient: "from-blue-600/30 to-cyan-500/10",
-  },
-  {
-    id: 2,
-    title: "⚠️ Manutenção Programada — Sistemas",
-    description: "O sistema de prontuário ficará indisponível dia 15/02 das 22h às 06h.",
-    image: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=800&h=400&fit=crop",
-    gradient: "from-amber-600/30 to-orange-500/10",
-  },
-  {
-    id: 3,
-    title: "💉 Campanha de Vacinação Interna",
-    description: "Vacine-se contra a gripe! Posto médico, 8h às 17h.",
-    image: "https://images.unsplash.com/photo-1582750433449-648ed127bb54?w=800&h=400&fit=crop",
-    gradient: "from-emerald-600/30 to-green-500/10",
-  },
-  {
-    id: 4,
-    title: "🎓 Inscrições Abertas — Treinamento BLS",
-    description: "Curso de Basic Life Support. Vagas limitadas, inscreva-se já!",
-    image: "https://images.unsplash.com/photo-1551076805-e1869033e561?w=800&h=400&fit=crop",
-    gradient: "from-purple-600/30 to-violet-500/10",
-  },
+interface NewsRow {
+  id: string;
+  title: string;
+  excerpt: string | null;
+  image_url: string | null;
+}
+
+const GRADIENTS = [
+  "from-blue-600/30 to-cyan-500/10",
+  "from-amber-600/30 to-orange-500/10",
+  "from-emerald-600/30 to-green-500/10",
+  "from-purple-600/30 to-violet-500/10",
+  "from-rose-600/30 to-pink-500/10",
 ];
 
 const NewsCarousel = () => {
+  const [items, setItems] = useState<NewsRow[]>([]);
   const [current, setCurrent] = useState(0);
 
-  const next = useCallback(() => {
-    setCurrent((prev) => (prev + 1) % newsItems.length);
+  useEffect(() => {
+    const fetchNews = async () => {
+      const { data } = await (supabase as any)
+        .from("news")
+        .select("id, title, excerpt, image_url")
+        .order("published_at", { ascending: false })
+        .limit(10);
+      if (data) setItems(data);
+    };
+    fetchNews();
   }, []);
+
+  const next = useCallback(() => {
+    if (items.length === 0) return;
+    setCurrent((prev) => (prev + 1) % items.length);
+  }, [items.length]);
 
   const prev = useCallback(() => {
-    setCurrent((prev) => (prev - 1 + newsItems.length) % newsItems.length);
-  }, []);
+    if (items.length === 0) return;
+    setCurrent((prev) => (prev - 1 + items.length) % items.length);
+  }, [items.length]);
 
   useEffect(() => {
+    if (items.length === 0) return;
     const interval = setInterval(next, 6000);
     return () => clearInterval(interval);
-  }, [next]);
+  }, [next, items.length]);
 
-  const item = newsItems[current];
+  if (items.length === 0) return null;
+
+  const item = items[current];
+  const gradient = GRADIENTS[current % GRADIENTS.length];
 
   return (
     <section className="relative px-4 md:px-6 pb-8 md:pb-10" style={{ zIndex: 1 }}>
@@ -78,31 +61,31 @@ const NewsCarousel = () => {
           📢 Avisos & Campanhas
         </h2>
         <div
-          className={`relative glass rounded-2xl overflow-hidden bg-gradient-to-r ${item.gradient} transition-all duration-500`}
+          className={`relative glass rounded-2xl overflow-hidden bg-gradient-to-r ${gradient} transition-all duration-500`}
         >
           <div className="flex flex-col sm:flex-row items-center gap-4">
-            {/* Image — compact */}
-            <div className="w-full sm:w-1/3 h-32 sm:h-36 overflow-hidden">
-              <img
-                src={item.image}
-                alt={item.title}
-                className="w-full h-full object-cover"
-                loading="lazy"
-              />
-            </div>
-
-            {/* Content */}
+            {item.image_url && (
+              <div className="w-full sm:w-1/3 h-32 sm:h-36 overflow-hidden">
+                <img
+                  src={item.image_url}
+                  alt={item.title}
+                  className="w-full h-full object-cover"
+                  loading="lazy"
+                />
+              </div>
+            )}
             <div className="flex-1 px-5 py-4 sm:pr-12">
               <h3 className="font-display text-base font-bold text-foreground mb-1.5 transition-all duration-300">
                 {item.title}
               </h3>
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                {item.description}
-              </p>
+              {item.excerpt && (
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  {item.excerpt}
+                </p>
+              )}
             </div>
           </div>
 
-          {/* Navigation arrows */}
           <button
             onClick={prev}
             className="absolute left-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full glass flex items-center justify-center text-foreground hover:text-primary transition-colors"
@@ -118,9 +101,8 @@ const NewsCarousel = () => {
             <ChevronRight className="w-3.5 h-3.5" />
           </button>
 
-          {/* Dots */}
           <div className="flex justify-center gap-1.5 pb-3">
-            {newsItems.map((_, i) => (
+            {items.map((_, i) => (
               <button
                 key={i}
                 onClick={() => setCurrent(i)}

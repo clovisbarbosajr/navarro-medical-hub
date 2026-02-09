@@ -1,33 +1,44 @@
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import WeatherCard from "@/components/WeatherCard";
+import type { MenuLink } from "@/types/database";
 
-const menuItems = [
-  {
-    label: "Sistemas",
-    links: [
-      { text: "Prontuário Eletrônico", href: "http://localhost:8085/systems/prontuario" },
-      { text: "Agendamento", href: "http://localhost:8085/systems/agendamento" },
-      { text: "Laboratório", href: "http://localhost:8085/systems/lab" },
-      { text: "Farmácia", href: "http://localhost:8085/systems/farmacia" },
-    ],
-  },
-  {
-    label: "Ferramentas",
-    links: [
-      { text: "Calculadoras Médicas", href: "http://localhost:8085/tools/calculadoras" },
-      { text: "Protocolos", href: "http://localhost:8085/tools/protocolos" },
-      { text: "Documentos", href: "http://localhost:8085/tools/documentos" },
-      { text: "Google Drive", href: "https://drive.google.com" },
-    ],
-  },
-  {
-    label: "Helpdesk",
-    links: [
-      { text: "Abrir Chamado", href: "http://localhost:8085/helpdesk/new" },
-    ],
-  },
-];
+const CATEGORY_LABELS: Record<string, string> = {
+  sistemas: "Sistemas",
+  ferramentas: "Ferramentas",
+  helpdesk: "Helpdesk",
+};
+
+const CATEGORY_ORDER = ["sistemas", "ferramentas", "helpdesk"];
 
 const Header = () => {
+  const [links, setLinks] = useState<MenuLink[]>([]);
+
+  useEffect(() => {
+    const fetch = async () => {
+      const { data } = await (supabase as any)
+        .from("menu_links")
+        .select("*")
+        .order("sort_order", { ascending: true });
+      if (data) setLinks(data);
+    };
+    fetch();
+  }, []);
+
+  // Group by category
+  const grouped: Record<string, MenuLink[]> = {};
+  links.forEach((l) => {
+    if (!grouped[l.category]) grouped[l.category] = [];
+    grouped[l.category].push(l);
+  });
+
+  const menuItems = CATEGORY_ORDER
+    .filter((cat) => grouped[cat]?.length)
+    .map((cat) => ({
+      label: CATEGORY_LABELS[cat] || cat,
+      links: grouped[cat],
+    }));
+
   return (
     <header className="fixed top-0 left-0 right-0 glass-strong" style={{ zIndex: 50 }}>
       <div className="max-w-7xl mx-auto px-4 md:px-6 h-14 md:h-16 flex items-center justify-between">
@@ -51,13 +62,13 @@ const Header = () => {
               <div className="dropdown-content glass-strong rounded-xl p-2 shadow-2xl">
                 {item.links.map((link) => (
                   <a
-                    key={link.text}
+                    key={link.id}
                     href={link.href}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="dropdown-item"
                   >
-                    {link.text}
+                    {link.label}
                   </a>
                 ))}
               </div>

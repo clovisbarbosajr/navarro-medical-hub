@@ -1,60 +1,35 @@
+import { useState, useEffect } from "react";
 import { Clock } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
 
-/**
- * NEWS FEED — "Fique por dentro"
- *
- * INTEGRAÇÃO BACKEND (HumHub):
- * Substituir o array `articles` por dados vindos da API.
- * Endpoint sugerido: GET /api/v1/articles?limit=6
- *
- * Estrutura JSON esperada:
- * [
- *   {
- *     "id": 1,
- *     "title": "Título do artigo",
- *     "excerpt": "Resumo curto do artigo",
- *     "image": "https://url-da-imagem.jpg",
- *     "date": "05 Feb 2026",
- *     "category": "Saúde"
- *   }
- * ]
- */
-const articles = [
-  {
-    id: 1,
-    title: "Novo protocolo de higienização das mãos",
-    excerpt: "Conheça as novas diretrizes de higienização baseadas nas recomendações da OMS.",
-    image: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=400&h=300&fit=crop",
-    date: "05 Feb 2026",
-    category: "Saúde",
-  },
-  {
-    id: 2,
-    title: "Resultados da pesquisa de clima organizacional",
-    excerpt: "Confira os resultados e as ações planejadas para melhorar o ambiente de trabalho.",
-    image: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=400&h=300&fit=crop",
-    date: "03 Feb 2026",
-    category: "RH",
-  },
-  {
-    id: 3,
-    title: "Treinamento de emergência — próxima turma",
-    excerpt: "Inscrições abertas para o próximo treinamento de atendimento a emergências.",
-    image: "https://images.unsplash.com/photo-1551076805-e1869033e561?w=400&h=300&fit=crop",
-    date: "01 Feb 2026",
-    category: "Treinamento",
-  },
-  {
-    id: 4,
-    title: "Inauguração da nova ala pediátrica",
-    excerpt: "A nova ala será inaugurada no dia 20 de fevereiro com capacidade ampliada.",
-    image: "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=400&h=300&fit=crop",
-    date: "28 Jan 2026",
-    category: "Institucional",
-  },
-];
+interface NewsRow {
+  id: string;
+  title: string;
+  excerpt: string | null;
+  image_url: string | null;
+  category: string;
+  published_at: string;
+}
 
 const NewsFeed = () => {
+  const [articles, setArticles] = useState<NewsRow[]>([]);
+
+  useEffect(() => {
+    const fetchNews = async () => {
+      const { data } = await (supabase as any)
+        .from("news")
+        .select("id, title, excerpt, image_url, category, published_at")
+        .order("published_at", { ascending: false })
+        .limit(6);
+      if (data) setArticles(data);
+    };
+    fetchNews();
+  }, []);
+
+  if (articles.length === 0) return null;
+
   return (
     <div>
       <h2 className="font-display text-xl font-bold text-foreground mb-5">
@@ -66,14 +41,16 @@ const NewsFeed = () => {
             key={article.id}
             className="group glass rounded-xl overflow-hidden hover:scale-[1.02] transition-all duration-300 hover:shadow-lg hover:shadow-primary/5 cursor-pointer flex flex-row h-28"
           >
-            <div className="w-28 flex-shrink-0 overflow-hidden">
-              <img
-                src={article.image}
-                alt={article.title}
-                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                loading="lazy"
-              />
-            </div>
+            {article.image_url && (
+              <div className="w-28 flex-shrink-0 overflow-hidden">
+                <img
+                  src={article.image_url}
+                  alt={article.title}
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                  loading="lazy"
+                />
+              </div>
+            )}
             <div className="p-3 flex flex-col justify-center min-w-0">
               <span className="inline-block text-[9px] font-semibold uppercase tracking-wider text-accent-foreground bg-accent/20 px-1.5 py-0.5 rounded-full mb-1 w-fit">
                 {article.category}
@@ -83,7 +60,7 @@ const NewsFeed = () => {
               </h4>
               <span className="inline-flex items-center gap-1 text-[9px] text-muted-foreground">
                 <Clock className="w-2.5 h-2.5" />
-                {article.date}
+                {format(new Date(article.published_at), "dd MMM yyyy", { locale: ptBR })}
               </span>
             </div>
           </div>

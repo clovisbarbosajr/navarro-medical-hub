@@ -1,65 +1,56 @@
-import { FileText, Calendar, FlaskConical, Pill, Stethoscope, HeadsetIcon, BookOpen, Shield } from "lucide-react";
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { FileText, Calendar, FlaskConical, Pill, Stethoscope, HeadsetIcon, BookOpen, Shield, ExternalLink } from "lucide-react";
+import type { MenuLink } from "@/types/database";
 
-const quickLinks = [
-  {
-    icon: FileText,
-    title: "Prontuário Eletrônico",
-    description: "Acesse prontuários e históricos",
-    href: "http://localhost:8085/systems/prontuario",
-    color: "from-blue-500/20 to-blue-600/5",
-  },
-  {
-    icon: Calendar,
-    title: "Agendamento",
-    description: "Consultas e procedimentos",
-    href: "http://localhost:8085/systems/agendamento",
-    color: "from-emerald-500/20 to-emerald-600/5",
-  },
-  {
-    icon: FlaskConical,
-    title: "Laboratório",
-    description: "Resultados e solicitações",
-    href: "http://localhost:8085/systems/lab",
-    color: "from-purple-500/20 to-purple-600/5",
-  },
-  {
-    icon: Pill,
-    title: "Farmácia",
-    description: "Estoque e dispensação",
-    href: "http://localhost:8085/systems/farmacia",
-    color: "from-orange-500/20 to-orange-600/5",
-  },
-  {
-    icon: Stethoscope,
-    title: "Calculadoras Médicas",
-    description: "IMC, dosagem e mais",
-    href: "http://localhost:8085/tools/calculadoras",
-    color: "from-rose-500/20 to-rose-600/5",
-  },
-  {
-    icon: BookOpen,
-    title: "Protocolos",
-    description: "Protocolos e diretrizes",
-    href: "http://localhost:8085/tools/protocolos",
-    color: "from-cyan-500/20 to-cyan-600/5",
-  },
-  {
-    icon: HeadsetIcon,
-    title: "Helpdesk",
-    description: "Abra um chamado de TI",
-    href: "http://localhost:8085/helpdesk/new",
-    color: "from-yellow-500/20 to-yellow-600/5",
-  },
-  {
-    icon: Shield,
-    title: "Documentos",
-    description: "Normas e regulamentos",
-    href: "http://localhost:8085/tools/documentos",
-    color: "from-indigo-500/20 to-indigo-600/5",
-  },
+const ICON_MAP: Record<string, any> = {
+  "prontuário": FileText,
+  "agendamento": Calendar,
+  "laboratório": FlaskConical,
+  "farmácia": Pill,
+  "calculadora": Stethoscope,
+  "protocolo": BookOpen,
+  "helpdesk": HeadsetIcon,
+  "chamado": HeadsetIcon,
+  "documento": Shield,
+};
+
+const COLOR_CYCLE = [
+  "from-blue-500/20 to-blue-600/5",
+  "from-emerald-500/20 to-emerald-600/5",
+  "from-purple-500/20 to-purple-600/5",
+  "from-orange-500/20 to-orange-600/5",
+  "from-rose-500/20 to-rose-600/5",
+  "from-cyan-500/20 to-cyan-600/5",
+  "from-yellow-500/20 to-yellow-600/5",
+  "from-indigo-500/20 to-indigo-600/5",
 ];
 
+function getIcon(label: string) {
+  const lower = label.toLowerCase();
+  for (const [key, Icon] of Object.entries(ICON_MAP)) {
+    if (lower.includes(key)) return Icon;
+  }
+  return ExternalLink;
+}
+
 const QuickLinks = () => {
+  const [links, setLinks] = useState<MenuLink[]>([]);
+
+  useEffect(() => {
+    const fetch = async () => {
+      const { data } = await (supabase as any)
+        .from("menu_links")
+        .select("*")
+        .order("category", { ascending: true })
+        .order("sort_order", { ascending: true });
+      if (data) setLinks(data);
+    };
+    fetch();
+  }, []);
+
+  if (links.length === 0) return null;
+
   return (
     <section className="relative px-4 md:px-6 pb-10" style={{ zIndex: 1 }}>
       <div className="max-w-5xl mx-auto">
@@ -67,23 +58,24 @@ const QuickLinks = () => {
           🚀 Links Rápidos
         </h2>
         <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2">
-          {quickLinks.map((link) => {
-            const Icon = link.icon;
+          {links.map((link, i) => {
+            const Icon = getIcon(link.label);
+            const color = COLOR_CYCLE[i % COLOR_CYCLE.length];
             return (
               <a
-                key={link.title}
+                key={link.id}
                 href={link.href}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="group glass rounded-xl p-3 flex flex-col items-center text-center gap-1.5 hover:scale-[1.05] transition-all duration-300 hover:shadow-md hover:shadow-primary/10"
               >
                 <div
-                  className={`w-10 h-10 rounded-lg bg-gradient-to-br ${link.color} flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}
+                  className={`w-10 h-10 rounded-lg bg-gradient-to-br ${color} flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}
                 >
                   <Icon className="w-5 h-5 text-foreground" />
                 </div>
                 <p className="font-display font-semibold text-[10px] text-foreground leading-tight">
-                  {link.title}
+                  {link.label}
                 </p>
               </a>
             );
