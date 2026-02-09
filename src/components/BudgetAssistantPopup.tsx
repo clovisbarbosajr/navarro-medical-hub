@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { X, Send, Bot, User, Trash2, Sparkles, Shield } from "lucide-react";
+import { X, Send, Bot, User, Trash2, Sparkles, Paperclip } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -21,6 +21,7 @@ const BudgetAssistantPopup = ({ open, onClose }: BudgetAssistantPopupProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -296,12 +297,43 @@ const BudgetAssistantPopup = ({ open, onClose }: BudgetAssistantPopupProps) => {
         {/* Input area */}
         <div className="px-4 pb-4 pt-2 border-t border-border/50">
           <div className="flex gap-2 items-end">
+            {isEditor && (
+              <>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".csv,.txt,.json,.xlsx,.xls"
+                  className="hidden"
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    try {
+                      const text = await file.text();
+                      const preview = text.length > 3000 ? text.slice(0, 3000) + "\n...(arquivo truncado)" : text;
+                      setInput(`📎 Arquivo: ${file.name}\n\n${preview}`);
+                      textareaRef.current?.focus();
+                    } catch {
+                      setInput(`❌ Não foi possível ler o arquivo "${file.name}".`);
+                    }
+                    e.target.value = "";
+                  }}
+                />
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isLoading}
+                  className="w-10 h-10 rounded-xl border border-input bg-secondary/30 flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-primary/50 disabled:opacity-40 transition-colors flex-shrink-0"
+                  title="Anexar arquivo (CSV, TXT, JSON)"
+                >
+                  <Paperclip className="w-4 h-4" />
+                </button>
+              </>
+            )}
             <textarea
               ref={textareaRef}
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Cole os procedimentos ou faça uma pergunta..."
+              placeholder={isEditor ? "Cole procedimentos, anexe arquivo ou faça uma pergunta..." : "Cole os procedimentos ou faça uma pergunta..."}
               rows={2}
               className="flex-1 resize-none rounded-xl border border-input bg-secondary/30 px-3 py-2.5 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 disabled:opacity-50"
               disabled={isLoading}
