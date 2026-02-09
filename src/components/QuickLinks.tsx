@@ -75,8 +75,8 @@ const QuickLinks = () => {
                 <a
                   key={link.id}
                   href={link.href}
-                  target={link.open_mode === "iframe" ? undefined : "_blank"}
-                  rel={link.open_mode === "iframe" ? undefined : "noopener noreferrer"}
+                  target={link.open_mode === "new_tab" ? "_blank" : undefined}
+                  rel={link.open_mode === "new_tab" ? "noopener noreferrer" : undefined}
                   onClick={(e) => handleClick(e, link)}
                   className="group glass rounded-xl p-3 flex flex-col items-center text-center gap-1.5 hover:scale-[1.05] transition-all duration-300 hover:shadow-md hover:shadow-primary/10"
                 >

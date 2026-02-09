@@ -71,8 +71,8 @@ const Header = () => {
                     <a
                       key={link.id}
                       href={link.href}
-                      target={link.open_mode === "iframe" ? undefined : "_blank"}
-                      rel={link.open_mode === "iframe" ? undefined : "noopener noreferrer"}
+                      target={link.open_mode === "new_tab" ? "_blank" : undefined}
+                      rel={link.open_mode === "new_tab" ? "noopener noreferrer" : undefined}
                       onClick={(e) => handleLinkClick(e, link)}
                       className="dropdown-item"
                     >
