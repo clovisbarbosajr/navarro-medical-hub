@@ -26,8 +26,8 @@ const FlowFieldBackground = () => {
     let mouseY = -1000;
     const particles: Particle[] = [];
     const PARTICLE_COUNT = 40;
-    const TRAIL_LENGTH = 20;
-    const TRAIL_OPACITY = 0.12;
+    const TRAIL_LENGTH = 8;
+    const TRAIL_OPACITY = 0.04;
     const MOUSE_RADIUS = 150;
 
     const resize = () => {
@@ -71,7 +71,7 @@ const FlowFieldBackground = () => {
 
     const animate = () => {
       time += 0.0004;
-      ctx.fillStyle = "rgba(13, 17, 28, 0.04)";
+      ctx.fillStyle = "rgba(13, 17, 28, 0.15)";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       for (let i = 0; i < particles.length; i++) {
@@ -117,7 +117,7 @@ const FlowFieldBackground = () => {
         const lifeAlpha = 1 - Math.abs(2 * (p.life / p.maxLife) - 1);
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        ctx.fillStyle = `hsla(174, 72%, 56%, ${lifeAlpha * 0.35})`;
+        ctx.fillStyle = `hsla(174, 72%, 56%, ${lifeAlpha * 0.15})`;
         ctx.fill();
 
         if (
