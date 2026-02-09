@@ -1,11 +1,5 @@
 import { useState, useEffect } from "react";
-
-// Mock — replace with HumHub data
-const birthdayPerson = {
-  name: "Dra. Mariana Oliveira",
-  photo: "https://i.pravatar.cc/200?img=5",
-  enabled: true,
-};
+import { supabase } from "@/integrations/supabase/client";
 
 const CONFETTI_COLORS = ["#ff6b6b", "#ffd93d", "#6bcb77", "#4d96ff", "#ff6bcb", "#00d2ff"];
 
@@ -42,22 +36,38 @@ const Confetti = () => {
 
 const BirthdayPopup = () => {
   const [visible, setVisible] = useState(false);
+  const [person, setPerson] = useState<{ name: string; photo_url: string | null } | null>(null);
 
   useEffect(() => {
-    if (!birthdayPerson.enabled) return;
-    // Show once per session
-    const key = "navarro_birthday_popup_shown";
-    if (!sessionStorage.getItem(key)) {
-      setVisible(true);
-    }
+    const fetchBirthday = async () => {
+      const today = new Date();
+      const month = today.getMonth() + 1;
+      const day = today.getDate();
+
+      // Find someone whose birth_date has today's month and day
+      const { data, error } = await (supabase as any)
+        .from("birthdays")
+        .select("name, photo_url, birth_date");
+
+      if (!error && data) {
+        const match = data.find((b: any) => {
+          const d = new Date(b.birth_date + "T00:00:00");
+          return d.getMonth() + 1 === month && d.getDate() === day;
+        });
+        if (match) {
+          setPerson(match);
+          setVisible(true);
+        }
+      }
+    };
+    fetchBirthday();
   }, []);
 
   const handleClose = () => {
-    sessionStorage.setItem("navarro_birthday_popup_shown", "true");
     setVisible(false);
   };
 
-  if (!visible) return null;
+  if (!visible || !person) return null;
 
   return (
     <div className="fixed inset-0 flex items-center justify-center p-4" style={{ zIndex: 70 }}>
@@ -70,16 +80,18 @@ const BirthdayPopup = () => {
         >
           ×
         </button>
-        <img
-          src={birthdayPerson.photo}
-          alt={birthdayPerson.name}
-          className="w-28 h-28 rounded-full mx-auto mb-6 object-cover ring-4 ring-primary/40 shadow-lg"
-        />
+        {person.photo_url && (
+          <img
+            src={person.photo_url}
+            alt={person.name}
+            className="w-28 h-28 rounded-full mx-auto mb-6 object-cover ring-4 ring-accent/40 shadow-lg"
+          />
+        )}
         <p className="text-4xl mb-3">🎉</p>
         <h2 className="font-display text-2xl font-bold text-foreground mb-2">
           Happy Birthday!
         </h2>
-        <p className="text-primary font-semibold text-lg mb-1">{birthdayPerson.name}</p>
+        <p className="text-accent font-semibold text-lg mb-1">{person.name}</p>
         <p className="text-muted-foreground text-sm">
           Desejamos muita saúde e felicidades! 🎂
         </p>
