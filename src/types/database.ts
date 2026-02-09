@@ -81,6 +81,9 @@ export interface HolidayTheme {
   activation_start: string;
   activation_end: string;
   enabled: boolean;
+  is_professional_date: boolean;
+  suggested_message: string | null;
+  image_bank_url: string | null;
   created_by: string | null;
   created_at: string;
   updated_at: string;

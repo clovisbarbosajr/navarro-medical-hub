@@ -122,7 +122,10 @@ export type Database = {
           enabled: boolean
           holiday_date: string
           id: string
+          image_bank_url: string | null
+          is_professional_date: boolean
           name: string
+          suggested_message: string | null
           updated_at: string
         }
         Insert: {
@@ -136,7 +139,10 @@ export type Database = {
           enabled?: boolean
           holiday_date: string
           id?: string
+          image_bank_url?: string | null
+          is_professional_date?: boolean
           name: string
+          suggested_message?: string | null
           updated_at?: string
         }
         Update: {
@@ -150,7 +156,10 @@ export type Database = {
           enabled?: boolean
           holiday_date?: string
           id?: string
+          image_bank_url?: string | null
+          is_professional_date?: boolean
           name?: string
+          suggested_message?: string | null
           updated_at?: string
         }
         Relationships: []
