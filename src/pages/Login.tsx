@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useAuth, getRememberedUser, setRememberedUser, clearRememberedUser } from "@/contexts/AuthContext";
 import FlowFieldBackground from "@/components/FlowFieldBackground";
-import { Eye, EyeOff, Lock, User, Shield } from "lucide-react";
+import { Eye, EyeOff, Lock, User, Shield, ArrowLeft } from "lucide-react";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -24,7 +24,6 @@ const Login = () => {
     }
   }, []);
 
-  // Redirect if already logged in
   useEffect(() => {
     if (!loading && user) {
       navigate("/dashboard", { replace: true });
@@ -56,6 +55,16 @@ const Login = () => {
   return (
     <div className="min-h-screen relative overflow-hidden flex items-center justify-center">
       <FlowFieldBackground />
+
+      {/* Back to home */}
+      <Link
+        to="/"
+        className="fixed top-6 left-6 flex items-center gap-2 px-4 py-2 rounded-full glass-strong text-foreground hover:text-primary transition-colors text-sm font-medium"
+        style={{ zIndex: 20 }}
+      >
+        <ArrowLeft className="w-4 h-4" />
+        Voltar à Intranet
+      </Link>
 
       {/* Login Card */}
       <div

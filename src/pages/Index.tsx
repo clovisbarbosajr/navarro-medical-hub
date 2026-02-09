@@ -6,8 +6,12 @@ import BirthdaySidebar from "@/components/BirthdaySidebar";
 import QuickLinks from "@/components/QuickLinks";
 import NewsFeed from "@/components/NewsFeed";
 import NewsCarousel from "@/components/NewsCarousel";
+import GallerySection from "@/components/GallerySection";
+import useActiveTheme from "@/hooks/useActiveTheme";
 
 const Index = () => {
+  const activeTheme = useActiveTheme();
+
   return (
     <div className="min-h-screen relative overflow-x-hidden">
       <FlowFieldBackground />
@@ -15,9 +19,21 @@ const Index = () => {
       <AnnouncementPopup />
       <BirthdayPopup />
 
+      {/* Theme banner */}
+      {activeTheme && (
+        <div className="fixed top-16 left-0 right-0 text-center py-2 glass-strong animate-fade-slide-up" style={{ zIndex: 49 }}>
+          <span className="text-sm font-medium text-foreground">
+            {activeTheme.emoji} {activeTheme.name}
+            {activeTheme.description && (
+              <span className="text-muted-foreground ml-2 text-xs">— {activeTheme.description}</span>
+            )}
+          </span>
+        </div>
+      )}
+
       <main className="relative" style={{ zIndex: 1 }}>
-        {/* Hero title — single line, centered */}
-        <section className="max-w-6xl mx-auto px-6 pt-32 pb-8 text-center">
+        {/* Hero title */}
+        <section className={`max-w-6xl mx-auto px-6 ${activeTheme ? "pt-40" : "pt-32"} pb-8 text-center`}>
           <h1 className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-foreground animate-fade-slide-up leading-tight whitespace-nowrap">
             Intranet{" "}
             <span className="text-primary">Navarro Medical</span>
@@ -37,6 +53,9 @@ const Index = () => {
 
         {/* Carousel — Avisos & Campanhas */}
         <NewsCarousel />
+
+        {/* Gallery */}
+        <GallerySection />
 
         {/* Quick Links — last */}
         <QuickLinks />

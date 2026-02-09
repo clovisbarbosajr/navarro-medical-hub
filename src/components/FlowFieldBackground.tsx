@@ -25,9 +25,9 @@ const FlowFieldBackground = () => {
     let mouseX = -1000;
     let mouseY = -1000;
     const particles: Particle[] = [];
-    const PARTICLE_COUNT = 80;
-    const TRAIL_LENGTH = 25;
-    const TRAIL_OPACITY = 0.2;
+    const PARTICLE_COUNT = 40;
+    const TRAIL_LENGTH = 20;
+    const TRAIL_OPACITY = 0.12;
     const MOUSE_RADIUS = 150;
 
     const resize = () => {
@@ -43,7 +43,6 @@ const FlowFieldBackground = () => {
     };
     window.addEventListener("mousemove", onMouseMove);
 
-    // Simplex-like noise
     const noise = (x: number, y: number, t: number) => {
       return (
         Math.sin(x * 0.01 + t) * Math.cos(y * 0.012 + t * 0.8) +
@@ -57,8 +56,8 @@ const FlowFieldBackground = () => {
       vx: 0,
       vy: 0,
       life: 0,
-      maxLife: 400 + Math.random() * 500,
-      size: 0.8 + Math.random() * 1.5,
+      maxLife: 600 + Math.random() * 800,
+      size: 0.6 + Math.random() * 1.0,
       trail: [],
     });
 
@@ -71,41 +70,36 @@ const FlowFieldBackground = () => {
     let time = 0;
 
     const animate = () => {
-      time += 0.0015;
-      ctx.fillStyle = "rgba(13, 17, 28, 0.05)";
+      time += 0.0004;
+      ctx.fillStyle = "rgba(13, 17, 28, 0.04)";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       for (let i = 0; i < particles.length; i++) {
         const p = particles[i];
 
-        // Flow field
         const angle = noise(p.x, p.y, time) * Math.PI * 2;
-        p.vx += Math.cos(angle) * 0.1;
-        p.vy += Math.sin(angle) * 0.1;
+        p.vx += Math.cos(angle) * 0.04;
+        p.vy += Math.sin(angle) * 0.04;
 
-        // Mouse interaction - gentle repulsion
         const dx = p.x - mouseX;
         const dy = p.y - mouseY;
         const dist = Math.sqrt(dx * dx + dy * dy);
         if (dist < MOUSE_RADIUS && dist > 0) {
-          const force = (1 - dist / MOUSE_RADIUS) * 0.8;
+          const force = (1 - dist / MOUSE_RADIUS) * 0.3;
           p.vx += (dx / dist) * force;
           p.vy += (dy / dist) * force;
         }
 
-        // Friction
-        p.vx *= 0.96;
-        p.vy *= 0.96;
+        p.vx *= 0.97;
+        p.vy *= 0.97;
 
         p.x += p.vx;
         p.y += p.vy;
         p.life++;
 
-        // Trail
         p.trail.push({ x: p.x, y: p.y });
         if (p.trail.length > TRAIL_LENGTH) p.trail.shift();
 
-        // Draw trail
         if (p.trail.length > 1) {
           const lifeRatio = 1 - Math.abs(2 * (p.life / p.maxLife) - 1);
           for (let j = 1; j < p.trail.length; j++) {
@@ -120,14 +114,12 @@ const FlowFieldBackground = () => {
           }
         }
 
-        // Draw particle
         const lifeAlpha = 1 - Math.abs(2 * (p.life / p.maxLife) - 1);
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        ctx.fillStyle = `hsla(174, 72%, 56%, ${lifeAlpha * 0.6})`;
+        ctx.fillStyle = `hsla(174, 72%, 56%, ${lifeAlpha * 0.35})`;
         ctx.fill();
 
-        // Reset
         if (
           p.life >= p.maxLife ||
           p.x < -50 || p.x > canvas.width + 50 ||
