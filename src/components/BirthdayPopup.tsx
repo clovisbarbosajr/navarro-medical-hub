@@ -36,62 +36,73 @@ const Confetti = () => {
 
 const BirthdayPopup = () => {
   const [visible, setVisible] = useState(false);
-  const [person, setPerson] = useState<{ name: string; photo_url: string | null } | null>(null);
+  const [people, setPeople] = useState<{ name: string; photo_url: string | null }[]>([]);
 
   useEffect(() => {
-    const fetchBirthday = async () => {
+    const key = "navarro_birthday_popup_shown";
+    if (sessionStorage.getItem(key)) return;
+
+    const fetchBirthdays = async () => {
       const today = new Date();
       const month = today.getMonth() + 1;
       const day = today.getDate();
 
-      // Find someone whose birth_date has today's month and day
       const { data, error } = await (supabase as any)
         .from("birthdays")
         .select("name, photo_url, birth_date");
 
       if (!error && data) {
-        const match = data.find((b: any) => {
+        const matches = data.filter((b: any) => {
           const d = new Date(b.birth_date + "T00:00:00");
           return d.getMonth() + 1 === month && d.getDate() === day;
         });
-        if (match) {
-          setPerson(match);
+        if (matches.length > 0) {
+          setPeople(matches);
           setVisible(true);
         }
       }
     };
-    fetchBirthday();
+    fetchBirthdays();
   }, []);
 
   const handleClose = () => {
+    sessionStorage.setItem("navarro_birthday_popup_shown", "true");
     setVisible(false);
   };
 
-  if (!visible || !person) return null;
+  if (!visible || people.length === 0) return null;
 
   return (
     <div className="fixed inset-0 flex items-center justify-center p-4" style={{ zIndex: 70 }}>
       <div className="absolute inset-0 bg-background/70 backdrop-blur-sm" />
       <Confetti />
-      <div className="relative glass-strong rounded-3xl p-10 max-w-sm w-full text-center shadow-2xl animate-fade-slide-up">
+      <div className="relative glass-strong rounded-3xl p-10 max-w-md w-full text-center shadow-2xl animate-fade-slide-up">
         <button
           onClick={handleClose}
           className="absolute top-4 right-4 w-8 h-8 rounded-full bg-secondary flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-secondary/80 transition-colors text-lg"
         >
           ×
         </button>
-        {person.photo_url && (
-          <img
-            src={person.photo_url}
-            alt={person.name}
-            className="w-28 h-28 rounded-full mx-auto mb-6 object-cover ring-4 ring-accent/40 shadow-lg"
-          />
-        )}
-        <p className="text-4xl mb-3">🎉</p>
-        <h2 className="font-display text-2xl font-bold text-foreground mb-2">
+        <p className="text-4xl mb-4">🎉</p>
+        <h2 className="font-display text-2xl font-bold text-foreground mb-6">
           Happy Birthday!
         </h2>
-        <p className="text-accent font-semibold text-lg mb-1">{person.name}</p>
+
+        <div className="flex items-center justify-center gap-6 flex-wrap mb-4">
+          {people.map((person) => (
+            <div key={person.name} className="flex flex-col items-center gap-2">
+              {person.photo_url && (
+                <img
+                  src={person.photo_url}
+                  alt={person.name}
+                  className="w-24 h-24 rounded-full object-cover ring-4 ring-accent/40 shadow-lg"
+                />
+              )}
+              <p className="text-accent font-semibold text-sm">{person.name}</p>
+            </div>
+          ))}
+        </div>
+
         <p className="text-muted-foreground text-sm">
           Desejamos muita saúde e felicidades! 🎂
         </p>

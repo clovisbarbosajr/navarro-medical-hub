@@ -1,12 +1,17 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
+const STORAGE_KEY = "navarro_announcement_dismissed";
+
 const AnnouncementPopup = () => {
   const [visible, setVisible] = useState(false);
   const [checked, setChecked] = useState(false);
   const [announcement, setAnnouncement] = useState<{ id: string; title: string; body: string } | null>(null);
 
   useEffect(() => {
+    const dismissed = sessionStorage.getItem(STORAGE_KEY);
+    if (dismissed) return;
+
     const fetchAnnouncement = async () => {
       const today = new Date().toISOString().split("T")[0];
       const { data, error } = await (supabase as any)
@@ -27,6 +32,7 @@ const AnnouncementPopup = () => {
 
   const handleDismiss = () => {
     if (!checked) return;
+    sessionStorage.setItem(STORAGE_KEY, "true");
     setVisible(false);
   };
 
