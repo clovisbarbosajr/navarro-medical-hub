@@ -213,7 +213,7 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { messages } = await req.json();
+    const { messages, file } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
 
@@ -344,10 +344,59 @@ IMPORTANTE:
 - Se o usuário não especificar o código de um procedimento, procure pelo nome na base acima.`;
     }
 
-    const aiMessages = [
+    // Build AI messages, handling file attachments
+    const aiMessages: any[] = [
       { role: "system", content: systemPrompt },
-      ...messages,
     ];
+
+    for (const msg of messages) {
+      if (msg.role === "user" && file && msg === messages[messages.length - 1]) {
+        // Last user message with file attachment
+        const isImage = file.mimeType?.startsWith("image/");
+        if (isImage) {
+          // Send image as multimodal content
+          aiMessages.push({
+            role: "user",
+            content: [
+              { type: "text", text: msg.content + `\n\n[Arquivo anexado: ${file.name}]` },
+              { type: "image_url", image_url: { url: `data:${file.mimeType};base64,${file.base64}` } },
+            ],
+          });
+        } else {
+          // For PDF, Excel, Word, etc. — decode base64 and try to extract text
+          let extractedText = "";
+          try {
+            // Try to decode as text first (works for some formats)
+            const bytes = Uint8Array.from(atob(file.base64), c => c.charCodeAt(0));
+            const decoder = new TextDecoder("utf-8", { fatal: true });
+            extractedText = decoder.decode(bytes);
+            if (extractedText.length > 5000) {
+              extractedText = extractedText.slice(0, 5000) + "\n...(conteúdo truncado)";
+            }
+          } catch {
+            // Binary file that can't be decoded as text — send as image to leverage Gemini's doc processing
+            if (file.mimeType === "application/pdf") {
+              // Send PDF as inline data for Gemini to read
+              aiMessages.push({
+                role: "user",
+                content: [
+                  { type: "text", text: msg.content + `\n\n[Arquivo PDF anexado: ${file.name}. Extraia o conteúdo e processe conforme solicitado.]` },
+                  { type: "image_url", image_url: { url: `data:${file.mimeType};base64,${file.base64}` } },
+                ],
+              });
+              continue;
+            }
+            extractedText = `[Arquivo binário: ${file.name} (${file.mimeType}). Não foi possível extrair o texto automaticamente. Informe ao admin que formatos como CSV, TXT e JSON oferecem melhor suporte para extração de dados. Para imagens e PDFs, o processamento visual está disponível.]`;
+          }
+          aiMessages.push({
+            role: "user",
+            content: msg.content + `\n\n📎 Conteúdo do arquivo "${file.name}":\n${extractedText}`,
+          });
+        }
+      } else {
+        aiMessages.push(msg);
+      }
+    }
 
     // If admin, use tool calling (non-streaming first to handle tools)
     if (isEditor) {

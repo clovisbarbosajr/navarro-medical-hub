@@ -6,6 +6,12 @@ import { supabase } from "@/integrations/supabase/client";
 
 type Msg = { role: "user" | "assistant"; content: string };
 
+interface PendingFile {
+  name: string;
+  mimeType: string;
+  base64: string;
+}
+
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/budget-assistant`;
 
 interface BudgetAssistantPopupProps {
@@ -18,6 +24,7 @@ const BudgetAssistantPopup = ({ open, onClose }: BudgetAssistantPopupProps) => {
   const isEditor = role === "admin" || role === "manager";
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
+  const [pendingFile, setPendingFile] = useState<PendingFile | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -36,6 +43,7 @@ const BudgetAssistantPopup = ({ open, onClose }: BudgetAssistantPopupProps) => {
   const handleClear = () => {
     setMessages([]);
     setInput("");
+    setPendingFile(null);
   };
 
   const handleClose = () => {
@@ -45,12 +53,18 @@ const BudgetAssistantPopup = ({ open, onClose }: BudgetAssistantPopupProps) => {
 
   const send = async () => {
     const trimmed = input.trim();
-    if (!trimmed || isLoading) return;
+    if ((!trimmed && !pendingFile) || isLoading) return;
 
-    const userMsg: Msg = { role: "user", content: trimmed };
+    const displayContent = pendingFile 
+      ? `📎 ${pendingFile.name}${trimmed ? `\n${trimmed}` : ""}` 
+      : trimmed;
+    const userMsg: Msg = { role: "user", content: displayContent };
     const newMessages = [...messages, userMsg];
     setMessages(newMessages);
+    
+    const fileToSend = pendingFile;
     setInput("");
+    setPendingFile(null);
     setIsLoading(true);
 
     let assistantSoFar = "";
@@ -70,10 +84,15 @@ const BudgetAssistantPopup = ({ open, onClose }: BudgetAssistantPopupProps) => {
         headers["Authorization"] = `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`;
       }
 
+      const body: any = { messages: newMessages };
+      if (fileToSend) {
+        body.file = fileToSend;
+      }
+
       const resp = await fetch(CHAT_URL, {
         method: "POST",
         headers,
-        body: JSON.stringify({ messages: newMessages }),
+        body: JSON.stringify(body),
       });
 
       if (!resp.ok || !resp.body) {
@@ -297,21 +316,55 @@ const BudgetAssistantPopup = ({ open, onClose }: BudgetAssistantPopupProps) => {
 
         {/* Input area */}
         <div className="px-4 pb-4 pt-2 border-t border-border/50">
+          {pendingFile && (
+            <div className="flex items-center gap-2 mb-2 px-2 py-1.5 rounded-lg bg-primary/10 border border-primary/20 text-xs">
+              <Paperclip className="w-3 h-3 text-primary flex-shrink-0" />
+              <span className="truncate text-foreground">{pendingFile.name}</span>
+              <button onClick={() => setPendingFile(null)} className="ml-auto text-muted-foreground hover:text-destructive">
+                <X className="w-3 h-3" />
+              </button>
+            </div>
+          )}
           <div className="flex gap-2 items-end">
             {isEditor && (
               <>
                 <input
                   ref={fileInputRef}
                   type="file"
-                  accept=".csv,.txt,.json,.xlsx,.xls"
+                  accept=".csv,.txt,.json,.xlsx,.xls,.pdf,.doc,.docx,.jpg,.jpeg,.png,.webp,.gif"
                   className="hidden"
                   onChange={async (e) => {
                     const file = e.target.files?.[0];
                     if (!file) return;
                     try {
-                      const text = await file.text();
-                      const preview = text.length > 3000 ? text.slice(0, 3000) + "\n...(arquivo truncado)" : text;
-                      setInput(`📎 Arquivo: ${file.name}\n\n${preview}`);
+                      const MAX_SIZE = 10 * 1024 * 1024; // 10MB
+                      if (file.size > MAX_SIZE) {
+                        setInput(`❌ Arquivo muito grande (máx 10MB). Tamanho: ${(file.size / 1024 / 1024).toFixed(1)}MB`);
+                        e.target.value = "";
+                        return;
+                      }
+
+                      const isText = /\.(csv|txt|json)$/i.test(file.name);
+                      if (isText) {
+                        const text = await file.text();
+                        const preview = text.length > 3000 ? text.slice(0, 3000) + "\n...(arquivo truncado)" : text;
+                        setInput(`📎 Arquivo: ${file.name}\n\n${preview}`);
+                      } else {
+                        // Read as base64 for binary files
+                        const buffer = await file.arrayBuffer();
+                        const bytes = new Uint8Array(buffer);
+                        let binary = "";
+                        for (let i = 0; i < bytes.length; i++) {
+                          binary += String.fromCharCode(bytes[i]);
+                        }
+                        const base64 = btoa(binary);
+                        setPendingFile({
+                          name: file.name,
+                          mimeType: file.type || "application/octet-stream",
+                          base64,
+                        });
+                        setInput(`Analise e processe este arquivo`);
+                      }
                       textareaRef.current?.focus();
                     } catch {
                       setInput(`❌ Não foi possível ler o arquivo "${file.name}".`);
@@ -323,7 +376,7 @@ const BudgetAssistantPopup = ({ open, onClose }: BudgetAssistantPopupProps) => {
                   onClick={() => fileInputRef.current?.click()}
                   disabled={isLoading}
                   className="w-10 h-10 rounded-xl border border-input bg-secondary/30 flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-primary/50 disabled:opacity-40 transition-colors flex-shrink-0"
-                  title="Anexar arquivo (CSV, TXT, JSON)"
+                  title="Anexar arquivo (PDF, Excel, Word, Imagem, CSV, TXT)"
                 >
                   <Paperclip className="w-4 h-4" />
                 </button>
@@ -341,7 +394,7 @@ const BudgetAssistantPopup = ({ open, onClose }: BudgetAssistantPopupProps) => {
             />
             <button
               onClick={send}
-              disabled={!input.trim() || isLoading}
+              disabled={(!input.trim() && !pendingFile) || isLoading}
               className="w-10 h-10 rounded-xl bg-primary text-primary-foreground flex items-center justify-center hover:bg-primary/90 disabled:opacity-40 transition-colors flex-shrink-0"
             >
               <Send className="w-4 h-4" />
