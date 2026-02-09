@@ -86,6 +86,7 @@ export interface HolidayTheme {
   suggested_message: string | null;
   image_bank_url: string | null;
   background_type: string | null;
+  background_image_url: string | null;
   created_by: string | null;
   created_at: string;
   updated_at: string;
