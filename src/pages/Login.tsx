@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth, getRememberedUser, setRememberedUser, clearRememberedUser } from "@/contexts/AuthContext";
 import FlowFieldBackground from "@/components/FlowFieldBackground";
-import { Eye, EyeOff, Lock, User, Shield, ArrowLeft } from "lucide-react";
+import { Eye, EyeOff, Lock, User, ArrowLeft } from "lucide-react";
+import navarroLogo from "@/assets/navarro-heart-logo.png";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -76,8 +77,8 @@ const Login = () => {
         <div className="glass-strong rounded-3xl p-8 sm:p-10 shadow-2xl animate-pulse-glow">
           {/* Header */}
           <div className="text-center mb-8">
-            <div className="w-16 h-16 rounded-2xl bg-primary/20 border border-primary/30 flex items-center justify-center mx-auto mb-4">
-              <Shield className="w-8 h-8 text-primary" />
+            <div className="w-16 h-16 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center mx-auto mb-4 overflow-hidden">
+              <img src={navarroLogo} alt="Navarro Medical" className="w-12 h-12 object-contain" />
             </div>
             <h1 className="font-display text-2xl font-bold text-foreground mb-1">
               Navarro Medical
