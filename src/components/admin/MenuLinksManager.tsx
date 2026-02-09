@@ -136,6 +136,7 @@ const MenuLinksManager = () => {
                   className="w-full h-10 rounded-xl border border-input bg-secondary/50 px-3 text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 appearance-none"
                 >
                   <option value="new_tab">Nova aba</option>
+                  <option value="same_tab">Mesma aba (redireciona)</option>
                   <option value="iframe">Na mesma página (iframe)</option>
                 </select>
               </div>
