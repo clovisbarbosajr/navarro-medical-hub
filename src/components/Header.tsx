@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import WeatherCard from "@/components/WeatherCard";
 import IframeOverlay from "@/components/IframeOverlay";
+import BudgetAssistantPopup from "@/components/BudgetAssistantPopup";
 import type { MenuLink } from "@/types/database";
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -12,9 +13,12 @@ const CATEGORY_LABELS: Record<string, string> = {
 
 const CATEGORY_ORDER = ["sistemas", "ferramentas", "helpdesk"];
 
+const BUDGET_ASSISTANT_LABEL = "IA NAVARRO";
+
 const Header = () => {
   const [links, setLinks] = useState<MenuLink[]>([]);
   const [iframeLink, setIframeLink] = useState<MenuLink | null>(null);
+  const [budgetOpen, setBudgetOpen] = useState(false);
 
   useEffect(() => {
     const fetch = async () => {
@@ -41,6 +45,11 @@ const Header = () => {
     }));
 
   const handleLinkClick = (e: React.MouseEvent, link: MenuLink) => {
+    if (link.label.toUpperCase().includes(BUDGET_ASSISTANT_LABEL)) {
+      e.preventDefault();
+      setBudgetOpen(true);
+      return;
+    }
     if (link.open_mode === "iframe") {
       e.preventDefault();
       setIframeLink(link);
@@ -100,6 +109,8 @@ const Header = () => {
           onClose={() => setIframeLink(null)}
         />
       )}
+
+      <BudgetAssistantPopup open={budgetOpen} onClose={() => setBudgetOpen(false)} />
     </>
   );
 };

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { FileText, Calendar, FlaskConical, Pill, Stethoscope, HeadsetIcon, BookOpen, Shield, ExternalLink } from "lucide-react";
 import IframeOverlay from "@/components/IframeOverlay";
+import BudgetAssistantPopup from "@/components/BudgetAssistantPopup";
 import type { MenuLink } from "@/types/database";
 
 const ICON_MAP: Record<string, any> = {
@@ -35,9 +36,12 @@ function getIcon(label: string) {
   return ExternalLink;
 }
 
+const BUDGET_ASSISTANT_LABEL = "IA NAVARRO";
+
 const QuickLinks = () => {
   const [links, setLinks] = useState<MenuLink[]>([]);
   const [iframeLink, setIframeLink] = useState<MenuLink | null>(null);
+  const [budgetOpen, setBudgetOpen] = useState(false);
 
   useEffect(() => {
     const fetch = async () => {
@@ -54,6 +58,11 @@ const QuickLinks = () => {
   if (links.length === 0) return null;
 
   const handleClick = (e: React.MouseEvent, link: MenuLink) => {
+    if (link.label.toUpperCase().includes(BUDGET_ASSISTANT_LABEL)) {
+      e.preventDefault();
+      setBudgetOpen(true);
+      return;
+    }
     if (link.open_mode === "iframe") {
       e.preventDefault();
       setIframeLink(link);
@@ -102,6 +111,8 @@ const QuickLinks = () => {
           onClose={() => setIframeLink(null)}
         />
       )}
+
+      <BudgetAssistantPopup open={budgetOpen} onClose={() => setBudgetOpen(false)} />
     </>
   );
 };

@@ -236,6 +236,39 @@ export type Database = {
         }
         Relationships: []
       }
+      procedures: {
+        Row: {
+          category: string | null
+          code: string
+          created_at: string
+          id: string
+          name: string
+          package_name: string | null
+          price: number
+          updated_at: string
+        }
+        Insert: {
+          category?: string | null
+          code: string
+          created_at?: string
+          id?: string
+          name: string
+          package_name?: string | null
+          price: number
+          updated_at?: string
+        }
+        Update: {
+          category?: string | null
+          code?: string
+          created_at?: string
+          id?: string
+          name?: string
+          package_name?: string | null
+          price?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       site_settings: {
         Row: {
           id: string
