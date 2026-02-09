@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect } from "react";
-import { X, Send, Bot, User, Trash2, Sparkles } from "lucide-react";
+import { X, Send, Bot, User, Trash2, Sparkles, Shield } from "lucide-react";
 import ReactMarkdown from "react-markdown";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 
 type Msg = { role: "user" | "assistant"; content: string };
 
@@ -12,6 +14,8 @@ interface BudgetAssistantPopupProps {
 }
 
 const BudgetAssistantPopup = ({ open, onClose }: BudgetAssistantPopupProps) => {
+  const { user, role } = useAuth();
+  const isEditor = role === "admin" || role === "manager";
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -51,12 +55,23 @@ const BudgetAssistantPopup = ({ open, onClose }: BudgetAssistantPopupProps) => {
     let assistantSoFar = "";
 
     try {
+      // Get auth token if user is logged in
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+      };
+
+      if (user) {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.access_token) {
+          headers["Authorization"] = `Bearer ${session.access_token}`;
+        }
+      } else {
+        headers["Authorization"] = `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`;
+      }
+
       const resp = await fetch(CHAT_URL, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-        },
+        headers,
         body: JSON.stringify({ messages: newMessages }),
       });
 
@@ -170,7 +185,9 @@ const BudgetAssistantPopup = ({ open, onClose }: BudgetAssistantPopupProps) => {
             </div>
             <div>
               <h3 className="font-display font-bold text-white text-sm">Clovis (menino do computador) — Assistente Virtual</h3>
-              <p className="text-white/70 text-[10px]">Cole seus procedimentos ou pergunte sobre valores</p>
+              <p className="text-white/70 text-[10px]">
+                {isEditor ? "🔧 Modo Admin — você pode editar procedimentos" : "Cole seus procedimentos ou pergunte sobre valores"}
+              </p>
             </div>
           </div>
           <div className="flex items-center gap-1">
@@ -211,8 +228,10 @@ const BudgetAssistantPopup = ({ open, onClose }: BudgetAssistantPopupProps) => {
                   "Consulta Dr Denise",
                   "Pacote Annual Private",
                   "Consulta Dr Ana Pinon",
-                  "Pacote Hormone Female",
-                  "Pacote PRE-OP",
+                  ...(isEditor ? [
+                    "🔧 Listar todos os procedimentos",
+                    "🔧 Alterar valor de procedimento",
+                  ] : []),
                 ].map((s) => (
                   <button
                     key={s}
