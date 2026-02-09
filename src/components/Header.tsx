@@ -72,9 +72,7 @@ const Header = () => {
             <WeatherCard />
           </div>
           <a
-            href="http://localhost:8085/user/auth/login"
-            target="_blank"
-            rel="noopener noreferrer"
+            href="/login"
             className="login-btn"
           >
             Login
