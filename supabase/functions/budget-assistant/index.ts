@@ -12,7 +12,7 @@ const TOOLS = [
     type: "function",
     function: {
       name: "update_procedure",
-      description: "Atualiza o nome ou preço de um procedimento existente na base de dados. Use quando o admin pedir para alterar um valor ou nome.",
+      description: "Atualiza o nome ou preço de um procedimento existente na base de dados.",
       parameters: {
         type: "object",
         properties: {
@@ -55,6 +55,55 @@ const TOOLS = [
           code: { type: "string", description: "Código do procedimento a ser removido" },
         },
         required: ["code"],
+        additionalProperties: false,
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "save_knowledge",
+      description: "Salva informações gerais na base de conhecimento (seguros, políticas, dados diversos). Use quando o admin colar ou enviar dados que NÃO são procedimentos médicos. Pode ser usado para QUALQUER tipo de informação que o admin queira armazenar.",
+      parameters: {
+        type: "object",
+        properties: {
+          category: { type: "string", description: "Categoria da informação (ex: seguros, politicas, horarios, contatos)" },
+          title: { type: "string", description: "Título descritivo da informação" },
+          content: { type: "string", description: "Conteúdo completo da informação a ser salva" },
+        },
+        required: ["category", "title", "content"],
+        additionalProperties: false,
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "update_knowledge",
+      description: "Atualiza uma entrada existente na base de conhecimento pelo ID.",
+      parameters: {
+        type: "object",
+        properties: {
+          id: { type: "string", description: "ID da entrada a ser atualizada" },
+          title: { type: "string", description: "Novo título (opcional)" },
+          content: { type: "string", description: "Novo conteúdo (opcional)" },
+        },
+        required: ["id"],
+        additionalProperties: false,
+      },
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "delete_knowledge",
+      description: "Remove uma entrada da base de conhecimento pelo ID.",
+      parameters: {
+        type: "object",
+        properties: {
+          id: { type: "string", description: "ID da entrada a ser removida" },
+        },
+        required: ["id"],
         additionalProperties: false,
       },
     },
@@ -115,6 +164,48 @@ async function executeTool(supabase: any, name: string, args: any): Promise<stri
     return `✅ Procedimento "${data[0].name}" (${args.code}) removido com sucesso.`;
   }
 
+  if (name === "save_knowledge") {
+    const { error } = await supabase
+      .from("knowledge_base")
+      .insert({
+        category: args.category,
+        title: args.title,
+        content: args.content,
+      });
+
+    if (error) return `Erro ao salvar: ${error.message}`;
+    return `✅ Informação "${args.title}" salva na categoria "${args.category}" com sucesso.`;
+  }
+
+  if (name === "update_knowledge") {
+    const updates: any = {};
+    if (args.title) updates.title = args.title;
+    if (args.content) updates.content = args.content;
+    if (Object.keys(updates).length === 0) return "Nenhum campo para atualizar.";
+
+    const { data, error } = await supabase
+      .from("knowledge_base")
+      .update(updates)
+      .eq("id", args.id)
+      .select();
+
+    if (error) return `Erro ao atualizar: ${error.message}`;
+    if (!data || data.length === 0) return `Entrada não encontrada.`;
+    return `✅ Informação "${data[0].title}" atualizada com sucesso.`;
+  }
+
+  if (name === "delete_knowledge") {
+    const { data, error } = await supabase
+      .from("knowledge_base")
+      .delete()
+      .eq("id", args.id)
+      .select();
+
+    if (error) return `Erro ao remover: ${error.message}`;
+    if (!data || data.length === 0) return `Entrada não encontrada.`;
+    return `✅ Informação "${data[0].title}" removida com sucesso.`;
+  }
+
   return "Ferramenta desconhecida.";
 }
 
@@ -144,15 +235,22 @@ serve(async (req) => {
       } catch { /* not logged in, that's fine */ }
     }
 
-    // Fetch procedures
-    const { data: procedures } = await supabase
-      .from("procedures")
-      .select("code, name, price, category, package_name")
-      .order("name");
+    // Fetch procedures and knowledge base
+    const [procResult, kbResult] = await Promise.all([
+      supabase.from("procedures").select("code, name, price, category, package_name").order("name"),
+      supabase.from("knowledge_base").select("id, category, title, content").order("category"),
+    ]);
 
-    const proceduresList = (procedures || [])
+    const procedures = procResult.data || [];
+    const knowledge = kbResult.data || [];
+
+    const proceduresList = procedures
       .map((p: any) => `${p.code} | ${p.name} | $${p.price}${p.package_name ? ` | Pacote: ${p.package_name}` : ""} | Cat: ${p.category}`)
       .join("\n");
+
+    const knowledgeList = knowledge.length > 0
+      ? knowledge.map((k: any) => `[ID: ${k.id}] [${k.category}] ${k.title}:\n${k.content}`).join("\n\n")
+      : "(vazio)";
 
     let systemPrompt = `Você é o Clovis (menino do computador), assistente virtual de orçamentos da Navarro Medical.
 
@@ -213,21 +311,37 @@ PACOTES DISPONÍVEIS (preços totais do pacote):
 - Private Gastrointestinal: $1,299.09
 - Private Diabetes: $538.89
 
-Quando o usuário colar uma lista, faça o matching inteligente considerando variações de nome e código. Apresente o resultado de forma clara e organizada.`;
+Quando o usuário colar uma lista, faça o matching inteligente considerando variações de nome e código. Apresente o resultado de forma clara e organizada.
+
+BASE DE CONHECIMENTO (informações gerais):
+${knowledgeList}
+
+Quando perguntarem sobre seguros, convênios, horários, contatos ou qualquer informação que esteja na base de conhecimento acima, responda com base nela.`;
 
     if (isEditor) {
       systemPrompt += `
 
 🔧 MODO ADMINISTRADOR ATIVO:
-Você tem permissão para ALTERAR a base de dados de procedimentos. O usuário pode pedir para:
+Você tem permissão para ALTERAR a base de dados. O usuário pode pedir para:
+
+📋 PROCEDIMENTOS:
 - Atualizar o preço de um procedimento (use a ferramenta update_procedure)
 - Alterar o nome de um procedimento (use a ferramenta update_procedure)
 - Adicionar um novo procedimento (use a ferramenta add_procedure)
 - Remover um procedimento (use a ferramenta delete_procedure)
 
-Quando o usuário pedir para alterar algo, use a ferramenta correspondente. Confirme a alteração feita ao usuário.
-Se o usuário não especificar o código, procure o procedimento pelo nome na base acima e use o código correto.
-SEMPRE confirme o que vai ser alterado antes de executar (ex: "Vou alterar o preço do procedimento X de $Y para $Z. Confirma?"). Se o usuário confirmar, execute a ferramenta.`;
+📚 BASE DE CONHECIMENTO (seguros, políticas, horários, contatos, qualquer informação):
+- Salvar novas informações (use a ferramenta save_knowledge) — categorize adequadamente
+- Atualizar informações existentes (use a ferramenta update_knowledge)
+- Remover informações (use a ferramenta delete_knowledge)
+
+IMPORTANTE:
+- Quando o admin colar QUALQUER tipo de dado (seguros, tabelas, listas, informações diversas), use save_knowledge para armazenar.
+- Se o dado colado for claramente procedimentos médicos com códigos e preços, use add_procedure.
+- Para qualquer outro tipo de dado, use save_knowledge com uma categoria adequada.
+- Quando o admin enviar um arquivo anexado (texto com 📎), analise o conteúdo e salve na categoria correta.
+- Confirme antes de executar alterações. Se o usuário confirmar, execute.
+- Se o usuário não especificar o código de um procedimento, procure pelo nome na base acima.`;
     }
 
     const aiMessages = [
