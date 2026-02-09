@@ -15,8 +15,8 @@ const sidebarItems: SidebarItem[] = [
   { id: "birthdays", label: "Aniversariantes", icon: Cake, roles: ["admin", "manager"] },
   { id: "gallery", label: "Campanhas", icon: Image, roles: ["admin", "manager"] },
   { id: "themes", label: "Temas", icon: Palette, roles: ["admin", "manager"] },
-  { id: "menu-links", label: "Menu & Links", icon: Link2, roles: ["admin"] },
-  { id: "settings", label: "Configurações", icon: Settings, roles: ["admin"] },
+  { id: "menu-links", label: "Menu & Links", icon: Link2, roles: ["admin", "manager"] },
+  { id: "settings", label: "Configurações", icon: Settings, roles: ["admin", "manager"] },
 ];
 
 interface DashboardSidebarProps {
