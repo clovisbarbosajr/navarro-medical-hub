@@ -38,6 +38,7 @@ const MenuLinksManager = () => {
       label: editing.label,
       href: editing.href,
       sort_order: editing.sort_order ?? 0,
+      open_mode: editing.open_mode ?? "new_tab",
       created_by: user?.id,
     };
 
@@ -78,7 +79,7 @@ const MenuLinksManager = () => {
       <div className="flex items-center justify-between mb-6">
         <h2 className="font-display text-xl font-bold text-foreground">🔗 Menu & Links</h2>
         <button
-          onClick={() => setEditing({ label: "", href: "", category: "sistemas" as any, sort_order: 0 })}
+          onClick={() => setEditing({ label: "", href: "", category: "sistemas" as any, sort_order: 0, open_mode: "new_tab" as any })}
           className="menu-btn flex items-center gap-2 text-sm"
         >
           <Plus className="w-4 h-4" /> Novo Link
@@ -126,6 +127,17 @@ const MenuLinksManager = () => {
                   className="w-full h-10 rounded-xl border border-input bg-secondary/50 px-3 text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
                   placeholder="https://..."
                 />
+              </div>
+              <div>
+                <label className="text-sm text-muted-foreground mb-1 block">Abrir como</label>
+                <select
+                  value={editing.open_mode || "new_tab"}
+                  onChange={(e) => setEditing({ ...editing, open_mode: e.target.value as any })}
+                  className="w-full h-10 rounded-xl border border-input bg-secondary/50 px-3 text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 appearance-none"
+                >
+                  <option value="new_tab">Nova aba</option>
+                  <option value="iframe">Na mesma página (iframe)</option>
+                </select>
               </div>
               <div>
                 <label className="text-sm text-muted-foreground mb-1 block">Ordem</label>

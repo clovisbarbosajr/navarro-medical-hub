@@ -59,6 +59,7 @@ export interface MenuLink {
   label: string;
   href: string;
   sort_order: number;
+  open_mode: "new_tab" | "iframe";
   created_by: string | null;
   created_at: string;
   updated_at: string;
