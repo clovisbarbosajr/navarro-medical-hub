@@ -33,16 +33,16 @@ const Index = () => {
 
       <main className="relative" style={{ zIndex: 1 }}>
         {/* Hero title */}
-        <section className={`max-w-6xl mx-auto px-6 ${activeTheme ? "pt-40" : "pt-32"} pb-8 text-center`}>
-          <h1 className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-foreground animate-fade-slide-up leading-tight whitespace-nowrap">
+        <section className={`max-w-6xl mx-auto px-4 md:px-6 ${activeTheme ? "pt-28 md:pt-40" : "pt-20 md:pt-32"} pb-6 md:pb-8 text-center`}>
+          <h1 className="font-display text-2xl sm:text-4xl md:text-6xl lg:text-7xl font-bold text-foreground animate-fade-slide-up leading-tight md:whitespace-nowrap">
             Intranet{" "}
             <span className="text-primary">Navarro Medical</span>
           </h1>
-          <div className="mt-6 w-24 h-1 rounded-full bg-gradient-to-r from-primary to-accent animate-fade-slide-up-delay mx-auto" />
+          <div className="mt-4 md:mt-6 w-16 md:w-24 h-1 rounded-full bg-gradient-to-r from-primary to-accent animate-fade-slide-up-delay mx-auto" />
         </section>
 
         {/* Two columns: NewsFeed LEFT + Birthdays RIGHT */}
-        <section className="max-w-6xl mx-auto px-6 pb-10 flex flex-col lg:flex-row gap-6 items-start">
+        <section className="max-w-6xl mx-auto px-4 md:px-6 pb-8 md:pb-10 flex flex-col lg:flex-row gap-6 items-start">
           <div className="flex-1 min-w-0">
             <NewsFeed />
           </div>
