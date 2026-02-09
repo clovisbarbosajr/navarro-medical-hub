@@ -14,68 +14,80 @@ interface FloatingItem {
   rotationSpeed: number;
   opacity: number;
   char: string;
+  swayOffset: number;
+  swaySpeed: number;
 }
 
-const THEME_CONFIG: Record<string, { chars: string[]; color1: string; color2: string; count: number }> = {
+const THEME_CONFIG: Record<string, { chars: string[]; bgColor: string; glowColor: string; count: number; drift: "up" | "down" | "mixed" }> = {
   hearts: {
-    chars: ["❤", "💕", "💖", "♥", "Love", "💗"],
-    color1: "rgba(220, 40, 80, 0.12)",
-    color2: "rgba(255, 105, 135, 0.08)",
-    count: 30,
+    chars: ["❤", "💕", "💖", "♥", "Love", "💗", "💘", "💝"],
+    bgColor: "rgba(40, 10, 20, 1)",
+    glowColor: "rgba(180, 40, 70, 0.08)",
+    count: 45,
+    drift: "up",
   },
   snowflakes: {
-    chars: ["❄", "❅", "❆", "✧", "⋆"],
-    color1: "rgba(180, 220, 255, 0.15)",
-    color2: "rgba(200, 230, 255, 0.08)",
-    count: 35,
+    chars: ["❄", "❅", "❆", "✧", "⋆", "✦"],
+    bgColor: "rgba(10, 18, 35, 1)",
+    glowColor: "rgba(150, 200, 255, 0.06)",
+    count: 50,
+    drift: "down",
   },
   fireworks: {
-    chars: ["✦", "✧", "⭐", "🎆", "✨", "🎇"],
-    color1: "rgba(255, 200, 50, 0.1)",
-    color2: "rgba(255, 120, 50, 0.06)",
-    count: 25,
+    chars: ["✦", "✧", "⭐", "🎆", "✨", "🎇", "💥"],
+    bgColor: "rgba(15, 10, 25, 1)",
+    glowColor: "rgba(255, 200, 50, 0.06)",
+    count: 35,
+    drift: "up",
   },
   flowers: {
-    chars: ["🌸", "🌺", "🌼", "🌷", "🌻", "💐"],
-    color1: "rgba(255, 150, 200, 0.1)",
-    color2: "rgba(200, 230, 150, 0.06)",
-    count: 25,
+    chars: ["🌸", "🌺", "🌼", "🌷", "🌻", "💐", "🌹"],
+    bgColor: "rgba(20, 12, 18, 1)",
+    glowColor: "rgba(255, 150, 200, 0.06)",
+    count: 35,
+    drift: "down",
   },
   stars: {
-    chars: ["⭐", "✨", "🌟", "💫", "⋆", "✧"],
-    color1: "rgba(255, 220, 100, 0.1)",
-    color2: "rgba(180, 180, 255, 0.06)",
-    count: 30,
+    chars: ["⭐", "✨", "🌟", "💫", "⋆", "✧", "✦"],
+    bgColor: "rgba(8, 10, 25, 1)",
+    glowColor: "rgba(255, 220, 100, 0.05)",
+    count: 45,
+    drift: "mixed",
   },
   balloons: {
-    chars: ["🎈", "🎉", "🎊", "🥳", "🎀"],
-    color1: "rgba(255, 100, 100, 0.08)",
-    color2: "rgba(100, 200, 255, 0.06)",
-    count: 20,
+    chars: ["🎈", "🎉", "🎊", "🥳", "🎀", "🎁"],
+    bgColor: "rgba(15, 12, 25, 1)",
+    glowColor: "rgba(255, 100, 100, 0.05)",
+    count: 30,
+    drift: "up",
   },
   confetti: {
-    chars: ["🎊", "🎉", "✨", "⭐", "🎀", "🎶"],
-    color1: "rgba(255, 180, 50, 0.08)",
-    color2: "rgba(100, 200, 100, 0.06)",
-    count: 30,
+    chars: ["🎊", "🎉", "✨", "⭐", "🎀", "🎶", "🎵"],
+    bgColor: "rgba(15, 12, 20, 1)",
+    glowColor: "rgba(255, 180, 50, 0.05)",
+    count: 40,
+    drift: "down",
   },
   christmas: {
-    chars: ["🎄", "🎅", "⭐", "❄", "🎁", "🔔"],
-    color1: "rgba(200, 50, 50, 0.1)",
-    color2: "rgba(50, 150, 50, 0.08)",
-    count: 25,
+    chars: ["🎄", "🎅", "⭐", "❄", "🎁", "🔔", "🦌"],
+    bgColor: "rgba(12, 15, 10, 1)",
+    glowColor: "rgba(200, 50, 50, 0.06)",
+    count: 35,
+    drift: "down",
   },
   halloween: {
-    chars: ["🎃", "👻", "🦇", "🕷", "🕸", "💀"],
-    color1: "rgba(255, 150, 0, 0.08)",
-    color2: "rgba(100, 0, 150, 0.06)",
-    count: 20,
+    chars: ["🎃", "👻", "🦇", "🕷", "🕸", "💀", "🌙"],
+    bgColor: "rgba(15, 8, 20, 1)",
+    glowColor: "rgba(255, 150, 0, 0.05)",
+    count: 30,
+    drift: "mixed",
   },
   easter: {
-    chars: ["🐰", "🥚", "🌷", "🐣", "🌸"],
-    color1: "rgba(200, 180, 255, 0.1)",
-    color2: "rgba(255, 220, 150, 0.06)",
-    count: 25,
+    chars: ["🐰", "🥚", "🌷", "🐣", "🌸", "🦋"],
+    bgColor: "rgba(15, 12, 22, 1)",
+    glowColor: "rgba(200, 180, 255, 0.06)",
+    count: 35,
+    drift: "down",
   },
 };
 
@@ -91,6 +103,7 @@ const ThemedBackground = ({ type }: ThemedBackgroundProps) => {
 
     const config = THEME_CONFIG[type] || THEME_CONFIG.stars;
     let animationId: number;
+    let time = 0;
 
     const resize = () => {
       canvas.width = window.innerWidth;
@@ -102,44 +115,62 @@ const ThemedBackground = ({ type }: ThemedBackgroundProps) => {
     const items: FloatingItem[] = [];
 
     for (let i = 0; i < config.count; i++) {
+      const baseVy = config.drift === "up" ? -(0.2 + Math.random() * 0.4)
+        : config.drift === "down" ? (0.15 + Math.random() * 0.35)
+        : (Math.random() - 0.5) * 0.5;
+
       items.push({
         x: Math.random() * canvas.width,
         y: Math.random() * canvas.height,
-        vx: (Math.random() - 0.5) * 0.3,
-        vy: -0.15 - Math.random() * 0.3,
-        size: 12 + Math.random() * 20,
+        vx: (Math.random() - 0.5) * 0.2,
+        vy: baseVy,
+        size: 14 + Math.random() * 22,
         rotation: Math.random() * Math.PI * 2,
-        rotationSpeed: (Math.random() - 0.5) * 0.01,
-        opacity: 0.08 + Math.random() * 0.12,
+        rotationSpeed: (Math.random() - 0.5) * 0.008,
+        opacity: 0.12 + Math.random() * 0.18,
         char: config.chars[Math.floor(Math.random() * config.chars.length)],
+        swayOffset: Math.random() * Math.PI * 2,
+        swaySpeed: 0.005 + Math.random() * 0.01,
       });
     }
 
     const animate = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      time += 1;
 
-      // Subtle radial gradient overlay
-      const gradient = ctx.createRadialGradient(
-        canvas.width / 2, canvas.height / 2, 0,
-        canvas.width / 2, canvas.height / 2, canvas.width * 0.7
-      );
-      gradient.addColorStop(0, config.color1);
-      gradient.addColorStop(1, config.color2);
-      ctx.fillStyle = gradient;
+      // Draw solid dark background (covers the page bg)
+      ctx.fillStyle = config.bgColor;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+      // Subtle glow spots
+      for (let g = 0; g < 3; g++) {
+        const gx = canvas.width * (0.2 + g * 0.3);
+        const gy = canvas.height * (0.3 + Math.sin(time * 0.003 + g) * 0.1);
+        const gradient = ctx.createRadialGradient(gx, gy, 0, gx, gy, canvas.width * 0.35);
+        gradient.addColorStop(0, config.glowColor);
+        gradient.addColorStop(1, "rgba(0,0,0,0)");
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+      }
+
+      // Draw floating items
       for (const item of items) {
-        item.x += item.vx;
+        // Sway movement
+        const sway = Math.sin(time * item.swaySpeed + item.swayOffset) * 0.5;
+        item.x += item.vx + sway;
         item.y += item.vy;
         item.rotation += item.rotationSpeed;
 
         // Wrap around
-        if (item.y < -item.size) {
-          item.y = canvas.height + item.size;
+        if (item.y < -item.size * 2) {
+          item.y = canvas.height + item.size * 2;
           item.x = Math.random() * canvas.width;
         }
-        if (item.x < -item.size) item.x = canvas.width + item.size;
-        if (item.x > canvas.width + item.size) item.x = -item.size;
+        if (item.y > canvas.height + item.size * 2) {
+          item.y = -item.size * 2;
+          item.x = Math.random() * canvas.width;
+        }
+        if (item.x < -item.size * 2) item.x = canvas.width + item.size;
+        if (item.x > canvas.width + item.size * 2) item.x = -item.size;
 
         ctx.save();
         ctx.translate(item.x, item.y);
@@ -166,7 +197,7 @@ const ThemedBackground = ({ type }: ThemedBackgroundProps) => {
   return (
     <canvas
       ref={canvasRef}
-      className="fixed inset-0 w-full h-full pointer-events-none"
+      className="fixed inset-0 w-full h-full"
       style={{ zIndex: 0 }}
     />
   );
