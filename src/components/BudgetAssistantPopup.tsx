@@ -169,7 +169,7 @@ const BudgetAssistantPopup = ({ open, onClose }: BudgetAssistantPopupProps) => {
               <Sparkles className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h3 className="font-display font-bold text-white text-sm">Ana — Assistente de Orçamentos</h3>
+              <h3 className="font-display font-bold text-white text-sm">Clovis Jr — Assistente Virtual</h3>
               <p className="text-white/70 text-[10px]">Cole seus procedimentos ou pergunte sobre valores</p>
             </div>
           </div>
@@ -200,7 +200,7 @@ const BudgetAssistantPopup = ({ open, onClose }: BudgetAssistantPopupProps) => {
                 <Bot className="w-8 h-8 text-primary" />
               </div>
               <div>
-                <p className="font-display font-semibold text-foreground text-sm">Olá! Sou a Ana 👋</p>
+                <p className="font-display font-semibold text-foreground text-sm">Olá! Sou o Clovis Jr 👋</p>
                 <p className="text-muted-foreground text-xs mt-1 max-w-sm">
                   Cole a lista de procedimentos do paciente e eu calculo o orçamento. Você também pode perguntar sobre valores de consultas e exames.
                 </p>
@@ -210,6 +210,9 @@ const BudgetAssistantPopup = ({ open, onClose }: BudgetAssistantPopupProps) => {
                   "Quanto custa a consulta geral?",
                   "Consulta Dr Denise",
                   "Pacote Annual Private",
+                  "Consulta Dr Ana Pinon",
+                  "Pacote Hormone Female",
+                  "Pacote PRE-OP",
                 ].map((s) => (
                   <button
                     key={s}
