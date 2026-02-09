@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import FlowFieldBackground from "@/components/FlowFieldBackground";
+import BudgetAssistantPopup from "@/components/BudgetAssistantPopup";
 import DashboardSidebar from "@/components/admin/DashboardSidebar";
 import UpcomingDatesAlert from "@/components/admin/UpcomingDatesAlert";
 import NewsManager from "@/components/admin/NewsManager";
@@ -20,6 +21,7 @@ const Dashboard = () => {
   const { role } = useAuth();
   const [activeSection, setActiveSection] = useState("news");
   const [announcementPrefill, setAnnouncementPrefill] = useState<AnnouncementPrefill | null>(null);
+  const [clovisOpen, setClovisOpen] = useState(false);
 
   const handleCreateAnnouncement = (title: string, body: string) => {
     setAnnouncementPrefill({ title, body });
@@ -74,6 +76,17 @@ const Dashboard = () => {
           {renderSection()}
         </div>
       </main>
+
+      {/* Clovis FAB */}
+      <button
+        onClick={() => setClovisOpen(true)}
+        className="fixed bottom-6 right-6 w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 flex items-center justify-center transition-all hover:scale-105 z-50"
+        title="Clovis — Assistente de Orçamentos (Modo Admin)"
+      >
+        <span className="text-2xl">🤖</span>
+      </button>
+
+      <BudgetAssistantPopup open={clovisOpen} onClose={() => setClovisOpen(false)} />
     </div>
   );
 };
