@@ -89,7 +89,7 @@
     padding: 0.45em 1.6em;
     border: transparent;
     box-shadow: 2px 2px 4px rgba(0,0,0,0.4);
-    background: dodgerblue;
+    background: linear-gradient(135deg, hsl(231, 52%, 42%), hsl(140, 45%, 38%));
     color: white;
     border-radius: 4px;
     cursor: pointer;
@@ -102,11 +102,8 @@
   }
 
   .menu-btn:hover {
-    background: linear-gradient(
-      90deg,
-      rgba(30,144,255,1) 0%,
-      rgba(0,212,255,1) 100%
-    );
+    background: linear-gradient(135deg, hsl(140, 45%, 38%), hsl(231, 52%, 48%));
+    box-shadow: 0 0 12px hsla(140, 45%, 40%, 0.3);
   }
 
   .menu-btn:active {
@@ -122,10 +119,10 @@
     transition: 0.3s ease;
     background: linear-gradient(
       to bottom right,
-      #2e8eff 0%,
-      rgba(46, 142, 255, 0) 30%
+      hsl(140, 45%, 40%) 0%,
+      hsla(140, 45%, 40%, 0) 30%
     );
-    background-color: rgba(46, 142, 255, 0.2);
+    background-color: hsla(140, 45%, 40%, 0.2);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -137,8 +134,8 @@
   }
 
   .login-btn:hover {
-    background-color: rgba(46, 142, 255, 0.7);
-    box-shadow: 0 0 10px rgba(46, 142, 255, 0.5);
+    background-color: hsla(140, 45%, 40%, 0.5);
+    box-shadow: 0 0 10px hsla(140, 45%, 40%, 0.4);
   }
 
   /* ===== DROPDOWN (CSS only) ===== */
@@ -225,7 +222,7 @@
     height: 180px;
     width: 280px;
     border-radius: 25px;
-    background: linear-gradient(135deg, hsla(var(--primary) / 0.2), hsla(var(--accent) / 0.1));
+    background: linear-gradient(135deg, hsla(231, 52%, 42% / 0.2), hsla(140, 45%, 40% / 0.15));
     border: 1px solid hsla(var(--glass-border) / 0.4);
     backdrop-filter: blur(16px);
     padding: 20px;

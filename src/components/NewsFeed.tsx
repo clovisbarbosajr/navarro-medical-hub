@@ -75,7 +75,7 @@ const NewsFeed = () => {
               />
             </div>
             <div className="p-3 flex flex-col justify-center min-w-0">
-              <span className="inline-block text-[9px] font-semibold uppercase tracking-wider text-primary bg-primary/10 px-1.5 py-0.5 rounded-full mb-1 w-fit">
+              <span className="inline-block text-[9px] font-semibold uppercase tracking-wider text-accent-foreground bg-accent/20 px-1.5 py-0.5 rounded-full mb-1 w-fit">
                 {article.category}
               </span>
               <h4 className="font-display font-semibold text-xs text-foreground mb-1 line-clamp-2">

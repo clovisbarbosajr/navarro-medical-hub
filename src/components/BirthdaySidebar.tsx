@@ -26,7 +26,7 @@ const BirthdaySidebar = () => {
             <img
               src={person.photo}
               alt={person.name}
-              className="w-10 h-10 rounded-full object-cover ring-2 ring-primary/30"
+              className="w-10 h-10 rounded-full object-cover ring-2 ring-accent/40"
             />
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-foreground truncate">{person.name}</p>
