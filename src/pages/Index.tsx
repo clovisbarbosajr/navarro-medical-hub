@@ -16,7 +16,12 @@ const Index = () => {
 
   return (
     <div className="min-h-screen relative overflow-x-hidden">
-      {activeTheme?.background_type ? (
+      {activeTheme?.background_image_url ? (
+        <div
+          className="fixed inset-0 w-full h-full pointer-events-none bg-cover bg-center bg-no-repeat opacity-15"
+          style={{ zIndex: 0, backgroundImage: `url(${activeTheme.background_image_url})` }}
+        />
+      ) : activeTheme?.background_type ? (
         <ThemedBackground type={activeTheme.background_type} />
       ) : (
         <FlowFieldBackground />

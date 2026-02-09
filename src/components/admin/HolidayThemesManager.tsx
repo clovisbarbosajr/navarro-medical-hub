@@ -1,8 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import type { HolidayTheme } from "@/types/database";
-import { Pencil, ToggleLeft, ToggleRight, Palette, Stethoscope, ExternalLink } from "lucide-react";
+import { Pencil, ToggleLeft, ToggleRight, Palette, Stethoscope, ExternalLink, Upload, X, Image } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const HolidayThemesManager = () => {
@@ -11,6 +11,8 @@ const HolidayThemesManager = () => {
   const [items, setItems] = useState<HolidayTheme[]>([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<Partial<HolidayTheme> | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const fetchItems = async () => {
     const { data, error } = await (supabase as any)
@@ -64,6 +66,7 @@ const HolidayThemesManager = () => {
         activation_end: editing.activation_end,
         enabled: editing.enabled,
         background_type: editing.background_type || null,
+        background_image_url: editing.background_image_url || null,
       })
       .eq("id", editing.id);
 
@@ -138,6 +141,64 @@ const HolidayThemesManager = () => {
                   <option value="halloween">🎃 Halloween</option>
                   <option value="easter">🐰 Páscoa</option>
                 </select>
+              </div>
+              <div>
+                <label className="text-sm text-muted-foreground mb-1 block">Imagem de fundo (sobrescreve animação)</label>
+                {editing.background_image_url ? (
+                  <div className="flex items-center gap-2">
+                    <div className="flex-1 h-20 rounded-xl border border-input bg-secondary/50 overflow-hidden">
+                      <img src={editing.background_image_url} alt="Fundo" className="w-full h-full object-cover" />
+                    </div>
+                    <button
+                      onClick={() => setEditing({ ...editing, background_image_url: null })}
+                      className="w-8 h-8 rounded-lg border border-input bg-secondary/50 flex items-center justify-center text-destructive hover:bg-destructive/10 transition-colors"
+                      title="Remover imagem"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={uploading}
+                    className="w-full h-10 rounded-xl border border-dashed border-input bg-secondary/50 text-muted-foreground text-sm hover:bg-secondary transition-colors flex items-center justify-center gap-2"
+                  >
+                    {uploading ? (
+                      <span className="animate-pulse">Enviando...</span>
+                    ) : (
+                      <>
+                        <Upload className="w-3.5 h-3.5" />
+                        Upload de imagem
+                      </>
+                    )}
+                  </button>
+                )}
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (!file || !editing?.id) return;
+                    setUploading(true);
+                    const ext = file.name.split(".").pop();
+                    const path = `theme-backgrounds/${editing.id}.${ext}`;
+                    const { error: uploadError } = await supabase.storage
+                      .from("media")
+                      .upload(path, file, { upsert: true });
+                    if (uploadError) {
+                      toast({ title: "Erro no upload", description: uploadError.message, variant: "destructive" });
+                    } else {
+                      const { data: urlData } = supabase.storage.from("media").getPublicUrl(path);
+                      setEditing({ ...editing, background_image_url: urlData.publicUrl + "?t=" + Date.now() });
+                      toast({ title: "Imagem enviada!" });
+                    }
+                    setUploading(false);
+                    e.target.value = "";
+                  }}
+                />
+                <p className="text-[9px] text-muted-foreground mt-1">Se enviar uma imagem, ela substitui o fundo animado</p>
               </div>
               <div className="flex gap-3">
                 <button onClick={handleSave} className="menu-btn flex-1 text-sm">Salvar</button>
