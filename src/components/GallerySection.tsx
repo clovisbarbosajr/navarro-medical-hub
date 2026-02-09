@@ -1,93 +1,51 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { X, ChevronLeft, ChevronRight, Images } from "lucide-react";
-
-/**
- * GALLERY SECTION — "📸 Galeria"
- *
- * INTEGRAÇÃO BACKEND (HumHub):
- * Substituir o array `galleries` por dados vindos da API.
- * Endpoint sugerido: GET /api/v1/galleries
- *
- * Estrutura JSON esperada:
- * [
- *   {
- *     "id": 1,
- *     "title": "Nome do álbum",
- *     "cover": "https://url-da-capa.jpg",
- *     "photos": [
- *       "https://url-foto-1.jpg",
- *       "https://url-foto-2.jpg"
- *     ]
- *   }
- * ]
- *
- * As fotos são enviadas via upload pelo administrador
- * através do painel administrativo do HumHub.
- */
-const galleries = [
-  {
-    id: 1,
-    title: "Confraternização Fim de Ano 2025",
-    cover: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=600&h=400&fit=crop",
-    photos: [
-      "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=1200&h=800&fit=crop",
-      "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=1200&h=800&fit=crop",
-      "https://images.unsplash.com/photo-1582750433449-648ed127bb54?w=1200&h=800&fit=crop",
-    ],
-  },
-  {
-    id: 2,
-    title: "Semana da Enfermagem",
-    cover: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=600&h=400&fit=crop",
-    photos: [
-      "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=1200&h=800&fit=crop",
-      "https://images.unsplash.com/photo-1551076805-e1869033e561?w=1200&h=800&fit=crop",
-    ],
-  },
-  {
-    id: 3,
-    title: "Dia do Médico",
-    cover: "https://images.unsplash.com/photo-1551076805-e1869033e561?w=600&h=400&fit=crop",
-    photos: [
-      "https://images.unsplash.com/photo-1551076805-e1869033e561?w=1200&h=800&fit=crop",
-      "https://images.unsplash.com/photo-1631217868264-e5b90bb7e133?w=1200&h=800&fit=crop",
-      "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=1200&h=800&fit=crop",
-    ],
-  },
-  {
-    id: 4,
-    title: "Workshop de Inovação",
-    cover: "https://images.unsplash.com/photo-1631217868264-e5b90bb7e133?w=600&h=400&fit=crop",
-    photos: [
-      "https://images.unsplash.com/photo-1631217868264-e5b90bb7e133?w=1200&h=800&fit=crop",
-      "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=1200&h=800&fit=crop",
-    ],
-  },
-];
+import { supabase } from "@/integrations/supabase/client";
+import type { GalleryImage } from "@/types/database";
 
 const GallerySection = () => {
-  const [openGallery, setOpenGallery] = useState<typeof galleries[0] | null>(null);
-  const [currentPhoto, setCurrentPhoto] = useState(0);
+  const [images, setImages] = useState<GalleryImage[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [viewerIndex, setViewerIndex] = useState<number | null>(null);
 
-  const openViewer = (gallery: typeof galleries[0]) => {
-    setOpenGallery(gallery);
-    setCurrentPhoto(0);
-  };
+  useEffect(() => {
+    const fetchImages = async () => {
+      const { data, error } = await (supabase as any)
+        .from("gallery_images")
+        .select("*")
+        .order("sort_order", { ascending: true });
+      if (!error && data) setImages(data);
+      setLoading(false);
+    };
+    fetchImages();
+  }, []);
 
-  const closeViewer = () => {
-    setOpenGallery(null);
-    setCurrentPhoto(0);
-  };
+  const openViewer = (index: number) => setViewerIndex(index);
+  const closeViewer = () => setViewerIndex(null);
 
   const nextPhoto = () => {
-    if (!openGallery) return;
-    setCurrentPhoto((prev) => (prev + 1) % openGallery.photos.length);
+    if (viewerIndex === null) return;
+    setViewerIndex((prev) => ((prev ?? 0) + 1) % images.length);
   };
 
   const prevPhoto = () => {
-    if (!openGallery) return;
-    setCurrentPhoto((prev) => (prev - 1 + openGallery.photos.length) % openGallery.photos.length);
+    if (viewerIndex === null) return;
+    setViewerIndex((prev) => ((prev ?? 0) - 1 + images.length) % images.length);
   };
+
+  // Keyboard navigation
+  useEffect(() => {
+    if (viewerIndex === null) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") closeViewer();
+      if (e.key === "ArrowRight") nextPhoto();
+      if (e.key === "ArrowLeft") prevPhoto();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [viewerIndex, images.length]);
+
+  if (loading || images.length === 0) return null;
 
   return (
     <>
@@ -97,61 +55,66 @@ const GallerySection = () => {
             📸 Galeria
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            {galleries.map((gallery) => (
+            {images.map((img, i) => (
               <div
-                key={gallery.id}
-                onClick={() => openViewer(gallery)}
+                key={img.id}
+                onClick={() => openViewer(i)}
                 className="group relative overflow-hidden rounded-2xl glass cursor-pointer hover:scale-[1.02] transition-transform duration-300"
               >
-                {/* Cover thumbnail */}
                 <img
-                  src={gallery.cover}
-                  alt={gallery.title}
+                  src={img.image_url}
+                  alt={img.title}
                   className="w-full h-52 object-cover group-hover:scale-110 transition-transform duration-500"
                   loading="lazy"
                 />
-                {/* Overlay */}
                 <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/20 to-transparent flex flex-col justify-end p-4">
-                  <p className="text-sm font-display font-semibold text-foreground">{gallery.title}</p>
-                  <span className="inline-flex items-center gap-1 text-[10px] text-muted-foreground mt-1">
-                    <Images className="w-3 h-3" />
-                    {gallery.photos.length} fotos
-                  </span>
+                  <p className="text-sm font-display font-semibold text-foreground">{img.title}</p>
+                  {img.description && (
+                    <span className="text-[10px] text-muted-foreground mt-0.5 line-clamp-1">
+                      {img.description}
+                    </span>
+                  )}
                 </div>
               </div>
             ))}
           </div>
+          <p className="text-center text-[10px] text-muted-foreground mt-4">
+            <Images className="w-3 h-3 inline mr-1" />
+            {images.length} {images.length === 1 ? "imagem" : "imagens"} na galeria
+          </p>
         </div>
       </section>
 
       {/* Lightbox viewer */}
-      {openGallery && (
+      {viewerIndex !== null && images[viewerIndex] && (
         <div className="fixed inset-0 flex items-center justify-center p-4" style={{ zIndex: 80 }}>
           <div className="absolute inset-0 bg-background/80 backdrop-blur-md" onClick={closeViewer} />
           <div className="relative max-w-4xl w-full">
-            {/* Close button */}
+            {/* Close button — prominent */}
             <button
               onClick={closeViewer}
-              className="absolute -top-12 right-0 w-10 h-10 rounded-full glass flex items-center justify-center text-foreground hover:text-primary transition-colors z-10"
+              className="absolute -top-14 right-0 flex items-center gap-2 px-4 py-2 rounded-full glass-strong text-foreground hover:text-primary transition-colors z-10"
+              title="Fechar (Esc)"
             >
               <X className="w-5 h-5" />
+              <span className="text-sm font-medium">Fechar</span>
             </button>
 
             {/* Title */}
-            <h3 className="absolute -top-12 left-0 font-display font-bold text-foreground text-lg">
-              {openGallery.title}
+            <h3 className="absolute -top-14 left-0 font-display font-bold text-foreground text-lg truncate max-w-[60%]">
+              {images[viewerIndex].title}
             </h3>
 
             {/* Photo */}
             <div className="relative rounded-2xl overflow-hidden glass">
               <img
-                src={openGallery.photos[currentPhoto]}
-                alt={`${openGallery.title} — foto ${currentPhoto + 1}`}
+                src={images[viewerIndex].image_url}
+                alt={images[viewerIndex].title}
                 className="w-full h-[60vh] object-cover"
               />
 
               {/* Arrows */}
-              {openGallery.photos.length > 1 && (
+              {images.length > 1 && (
                 <>
                   <button
                     onClick={prevPhoto}
@@ -170,26 +133,35 @@ const GallerySection = () => {
 
               {/* Counter */}
               <div className="absolute bottom-4 left-1/2 -translate-x-1/2 glass rounded-full px-4 py-1.5 text-xs font-semibold text-foreground">
-                {currentPhoto + 1} / {openGallery.photos.length}
+                {viewerIndex + 1} / {images.length}
               </div>
             </div>
 
             {/* Thumbnails */}
-            <div className="flex gap-2 mt-4 justify-center">
-              {openGallery.photos.map((photo, i) => (
-                <button
-                  key={i}
-                  onClick={() => setCurrentPhoto(i)}
-                  className={`w-16 h-12 rounded-lg overflow-hidden transition-all duration-200 ${
-                    i === currentPhoto
-                      ? "ring-2 ring-primary scale-105"
-                      : "opacity-50 hover:opacity-80"
-                  }`}
-                >
-                  <img src={photo} alt="" className="w-full h-full object-cover" />
-                </button>
-              ))}
-            </div>
+            {images.length > 1 && (
+              <div className="flex gap-2 mt-4 justify-center overflow-x-auto pb-2">
+                {images.map((img, i) => (
+                  <button
+                    key={img.id}
+                    onClick={() => setViewerIndex(i)}
+                    className={`w-16 h-12 rounded-lg overflow-hidden transition-all duration-200 flex-shrink-0 ${
+                      i === viewerIndex
+                        ? "ring-2 ring-primary scale-105"
+                        : "opacity-50 hover:opacity-80"
+                    }`}
+                  >
+                    <img src={img.image_url} alt="" className="w-full h-full object-cover" />
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* Description */}
+            {images[viewerIndex].description && (
+              <p className="text-center text-sm text-muted-foreground mt-3">
+                {images[viewerIndex].description}
+              </p>
+            )}
           </div>
         </div>
       )}

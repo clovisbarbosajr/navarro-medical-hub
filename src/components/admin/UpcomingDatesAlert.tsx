@@ -1,13 +1,17 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { HolidayTheme } from "@/types/database";
-import { CalendarClock, MessageSquarePlus, Palette, ExternalLink, X } from "lucide-react";
+import { CalendarClock, MessageSquarePlus, Palette, ExternalLink, X, PlusCircle } from "lucide-react";
 
 interface UpcomingDate extends HolidayTheme {
   days_until: number;
 }
 
-const UpcomingDatesAlert = () => {
+interface Props {
+  onCreateAnnouncement?: (title: string, body: string) => void;
+}
+
+const UpcomingDatesAlert = ({ onCreateAnnouncement }: Props) => {
   const [upcoming, setUpcoming] = useState<UpcomingDate[]>([]);
   const [dismissed, setDismissed] = useState<string[]>([]);
 
@@ -91,12 +95,10 @@ const UpcomingDatesAlert = () => {
                 </div>
 
                 {item.is_professional_date && (
-                  <>
-                    <div className="flex items-center gap-1 text-[10px] px-2 py-1 rounded-lg bg-accent/10 text-accent">
-                      <MessageSquarePlus className="w-3 h-3" />
-                      <span>Criar aviso com mensagem especial</span>
-                    </div>
-                  </>
+                  <div className="flex items-center gap-1 text-[10px] px-2 py-1 rounded-lg bg-accent/10 text-accent">
+                    <MessageSquarePlus className="w-3 h-3" />
+                    <span>Criar aviso com mensagem especial</span>
+                  </div>
                 )}
               </div>
 
@@ -109,6 +111,20 @@ const UpcomingDatesAlert = () => {
                   <p className="text-xs text-foreground/80 italic leading-relaxed">
                     "{item.suggested_message}"
                   </p>
+                  {onCreateAnnouncement && (
+                    <button
+                      onClick={() =>
+                        onCreateAnnouncement(
+                          `${item.emoji} ${item.name}`,
+                          item.suggested_message || ""
+                        )
+                      }
+                      className="mt-2 menu-btn flex items-center gap-1.5 text-xs !py-1.5 !px-3"
+                    >
+                      <PlusCircle className="w-3.5 h-3.5" />
+                      Criar Aviso com esta mensagem
+                    </button>
+                  )}
                 </div>
               )}
 

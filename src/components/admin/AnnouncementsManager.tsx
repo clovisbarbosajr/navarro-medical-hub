@@ -5,7 +5,12 @@ import type { Announcement } from "@/types/database";
 import { Plus, Pencil, Trash2, X, Save, ToggleLeft, ToggleRight, CalendarDays } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
-const AnnouncementsManager = () => {
+interface Props {
+  prefill?: { title: string; body: string } | null;
+  onPrefillConsumed?: () => void;
+}
+
+const AnnouncementsManager = ({ prefill, onPrefillConsumed }: Props) => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [items, setItems] = useState<Announcement[]>([]);
@@ -22,6 +27,19 @@ const AnnouncementsManager = () => {
   };
 
   useEffect(() => { fetchItems(); }, []);
+
+  // Handle prefill from holiday suggestion
+  useEffect(() => {
+    if (prefill && !loading) {
+      setEditing({
+        title: prefill.title,
+        body: prefill.body,
+        enabled: true,
+        end_date: null,
+      });
+      onPrefillConsumed?.();
+    }
+  }, [prefill, loading]);
 
   const handleSave = async () => {
     if (!editing?.title || !editing?.body) return;

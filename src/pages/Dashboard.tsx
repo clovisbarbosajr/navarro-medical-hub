@@ -11,21 +11,38 @@ import HolidayThemesManager from "@/components/admin/HolidayThemesManager";
 import MenuLinksManager from "@/components/admin/MenuLinksManager";
 import SiteSettingsManager from "@/components/admin/SiteSettingsManager";
 
-const sectionComponents: Record<string, React.FC> = {
-  news: NewsManager,
-  announcements: AnnouncementsManager,
-  birthdays: BirthdaysManager,
-  gallery: GalleryManager,
-  themes: HolidayThemesManager,
-  "menu-links": MenuLinksManager,
-  settings: SiteSettingsManager,
-};
+interface AnnouncementPrefill {
+  title: string;
+  body: string;
+}
 
 const Dashboard = () => {
   const { role } = useAuth();
   const [activeSection, setActiveSection] = useState("news");
+  const [announcementPrefill, setAnnouncementPrefill] = useState<AnnouncementPrefill | null>(null);
 
-  const ActiveComponent = sectionComponents[activeSection];
+  const handleCreateAnnouncement = (title: string, body: string) => {
+    setAnnouncementPrefill({ title, body });
+    setActiveSection("announcements");
+  };
+
+  const renderSection = () => {
+    switch (activeSection) {
+      case "news": return <NewsManager />;
+      case "announcements": return (
+        <AnnouncementsManager
+          prefill={announcementPrefill}
+          onPrefillConsumed={() => setAnnouncementPrefill(null)}
+        />
+      );
+      case "birthdays": return <BirthdaysManager />;
+      case "gallery": return <GalleryManager />;
+      case "themes": return <HolidayThemesManager />;
+      case "menu-links": return <MenuLinksManager />;
+      case "settings": return <SiteSettingsManager />;
+      default: return null;
+    }
+  };
 
   return (
     <div className="min-h-screen relative overflow-hidden flex">
@@ -51,10 +68,10 @@ const Dashboard = () => {
           </div>
 
           {/* Upcoming Dates Alert */}
-          <UpcomingDatesAlert />
+          <UpcomingDatesAlert onCreateAnnouncement={handleCreateAnnouncement} />
 
           {/* Active Section */}
-          {ActiveComponent ? <ActiveComponent /> : null}
+          {renderSection()}
         </div>
       </main>
     </div>
