@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import type { HolidayTheme } from "@/types/database";
-import { Pencil, ToggleLeft, ToggleRight, Palette } from "lucide-react";
+import { Pencil, ToggleLeft, ToggleRight, Palette, Stethoscope, ExternalLink } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const HolidayThemesManager = () => {
@@ -156,12 +156,39 @@ const HolidayThemesManager = () => {
 
               <div className="flex items-start justify-between mb-2">
                 <div>
-                  <p className="font-display font-semibold text-sm text-foreground">
-                    {item.emoji} {item.name}
-                  </p>
+                  <div className="flex items-center gap-1.5">
+                    <p className="font-display font-semibold text-sm text-foreground">
+                      {item.emoji} {item.name}
+                    </p>
+                    {item.is_professional_date && (
+                      <span className="text-[8px] px-1.5 py-0.5 rounded-full bg-accent/20 text-accent font-medium flex items-center gap-0.5">
+                        <Stethoscope className="w-2.5 h-2.5" />
+                        Profissional
+                      </span>
+                    )}
+                  </div>
                   <p className="text-xs text-muted-foreground">{item.description}</p>
                 </div>
               </div>
+
+              {/* Suggested message preview */}
+              {item.is_professional_date && item.suggested_message && (
+                <div className="text-[9px] text-muted-foreground/70 italic mb-2 line-clamp-2">
+                  💡 "{item.suggested_message}"
+                </div>
+              )}
+
+              {item.is_professional_date && item.image_bank_url && (
+                <a
+                  href={item.image_bank_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 text-[9px] text-primary hover:text-primary/80 transition-colors mb-2"
+                >
+                  <ExternalLink className="w-2.5 h-2.5" />
+                  Imagens gratuitas
+                </a>
+              )}
 
               <div className="text-[10px] text-muted-foreground mb-3 space-y-0.5">
                 <p>📅 Feriado: {new Date(item.holiday_date).toLocaleDateString("pt-BR")}</p>
