@@ -49,12 +49,12 @@ const GallerySection = () => {
 
   return (
     <>
-      <section className="relative px-6 pb-20" style={{ zIndex: 1 }}>
+      <section className="relative px-4 md:px-6 pb-14 md:pb-20" style={{ zIndex: 1 }}>
         <div className="max-w-6xl mx-auto">
-          <h2 className="font-display text-2xl font-bold text-foreground mb-8 text-center">
+          <h2 className="font-display text-xl md:text-2xl font-bold text-foreground mb-6 md:mb-8 text-center">
             📸 Galeria
           </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-5">
             {images.map((img, i) => (
               <div
                 key={img.id}

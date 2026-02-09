@@ -72,7 +72,7 @@ const NewsCarousel = () => {
   const item = newsItems[current];
 
   return (
-    <section className="relative px-6 pb-10" style={{ zIndex: 1 }}>
+    <section className="relative px-4 md:px-6 pb-8 md:pb-10" style={{ zIndex: 1 }}>
       <div className="max-w-6xl mx-auto">
         <h2 className="font-display text-lg font-bold text-foreground mb-4 text-center">
           📢 Avisos & Campanhas

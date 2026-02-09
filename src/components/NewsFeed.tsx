@@ -60,7 +60,7 @@ const NewsFeed = () => {
       <h2 className="font-display text-xl font-bold text-foreground mb-5">
         📰 Fique por dentro:
       </h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
         {articles.map((article) => (
           <div
             key={article.id}

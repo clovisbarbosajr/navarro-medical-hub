@@ -61,12 +61,12 @@ const quickLinks = [
 
 const QuickLinks = () => {
   return (
-    <section className="relative px-6 pb-10" style={{ zIndex: 1 }}>
+    <section className="relative px-4 md:px-6 pb-10" style={{ zIndex: 1 }}>
       <div className="max-w-5xl mx-auto">
-        <h2 className="font-display text-lg font-bold text-foreground mb-4 text-center">
+        <h2 className="font-display text-base md:text-lg font-bold text-foreground mb-4 text-center">
           🚀 Links Rápidos
         </h2>
-        <div className="grid grid-cols-4 sm:grid-cols-4 lg:grid-cols-8 gap-2">
+        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2">
           {quickLinks.map((link) => {
             const Icon = link.icon;
             return (
