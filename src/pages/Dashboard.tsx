@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import FlowFieldBackground from "@/components/FlowFieldBackground";
 import DashboardSidebar from "@/components/admin/DashboardSidebar";
+import UpcomingDatesAlert from "@/components/admin/UpcomingDatesAlert";
 import NewsManager from "@/components/admin/NewsManager";
 import AnnouncementsManager from "@/components/admin/AnnouncementsManager";
 import BirthdaysManager from "@/components/admin/BirthdaysManager";
@@ -48,6 +49,9 @@ const Dashboard = () => {
                 : "Gerencie notícias, avisos, aniversariantes, campanhas e temas."}
             </p>
           </div>
+
+          {/* Upcoming Dates Alert */}
+          <UpcomingDatesAlert />
 
           {/* Active Section */}
           {ActiveComponent ? <ActiveComponent /> : null}
