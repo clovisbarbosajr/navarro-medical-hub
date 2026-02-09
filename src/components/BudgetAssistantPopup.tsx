@@ -230,8 +230,9 @@ const BudgetAssistantPopup = ({ open, onClose }: BudgetAssistantPopupProps) => {
                   "Pacote Annual Private",
                   "Consulta Dr Ana Pinon",
                   ...(isEditor ? [
-                    "🔧 Listar todos os procedimentos",
                     "🔧 Alterar valor de procedimento",
+                    "📚 Adicionar informação à base",
+                    "Quais seguros aceitamos?",
                   ] : []),
                 ].map((s) => (
                   <button
