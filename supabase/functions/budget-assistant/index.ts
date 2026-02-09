@@ -29,7 +29,7 @@ serve(async (req) => {
       .map((p: any) => `${p.code} | ${p.name} | $${p.price}${p.package_name ? ` | Pacote: ${p.package_name}` : ""} | Cat: ${p.category}`)
       .join("\n");
 
-    const systemPrompt = `Você é o Clovis Jr, assistente virtual de orçamentos da Navarro Medical.
+    const systemPrompt = `Você é o Clovis (menino do computador), assistente virtual de orçamentos da Navarro Medical.
 
 REGRAS IMPORTANTES:
 1. Responda SEMPRE em português do Brasil
