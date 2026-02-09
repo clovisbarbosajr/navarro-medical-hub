@@ -16,14 +16,13 @@ const menuItems = [
       { text: "Calculadoras Médicas", href: "http://localhost:8085/tools/calculadoras" },
       { text: "Protocolos", href: "http://localhost:8085/tools/protocolos" },
       { text: "Documentos", href: "http://localhost:8085/tools/documentos" },
+      { text: "Google Drive", href: "https://drive.google.com" },
     ],
   },
   {
     label: "Helpdesk",
     links: [
       { text: "Abrir Chamado", href: "http://localhost:8085/helpdesk/new" },
-      { text: "Meus Chamados", href: "http://localhost:8085/helpdesk/my" },
-      { text: "FAQ", href: "http://localhost:8085/helpdesk/faq" },
     ],
   },
 ];
