@@ -1,1 +1,4 @@
 project_id = "voukdugahnaudxcdhbgm"
+
+[functions.budget-assistant]
+verify_jwt = false
