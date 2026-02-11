@@ -3,6 +3,8 @@ import { supabase } from "@/integrations/supabase/client";
 import type { SiteSetting } from "@/types/database";
 import { Save, Plus, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
+import { Switch } from "@/components/ui/switch";
 
 const DEFAULT_SETTINGS = [
   { key: "site_title", label: "Título do Site", placeholder: "Navarro Medical" },
@@ -13,6 +15,7 @@ const DEFAULT_SETTINGS = [
 
 const SiteSettingsManager = () => {
   const { toast } = useToast();
+  const { role } = useAuth();
   const [settings, setSettings] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
   const [customKey, setCustomKey] = useState("");
@@ -84,6 +87,28 @@ const SiteSettingsManager = () => {
   return (
     <div>
       <h2 className="font-display text-xl font-bold text-foreground mb-6">⚙️ Configurações do Site</h2>
+
+      {/* Maintenance Mode Toggle — Admin only */}
+      {role === "admin" && (
+        <div className="glass rounded-xl p-4 mb-6 border border-amber-500/30 bg-amber-500/5">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-semibold text-foreground">🚧 Modo Manutenção</p>
+              <p className="text-xs text-muted-foreground mt-1">
+                Quando ativado, a página pública exibe uma tela de manutenção. Login e dashboard continuam funcionando.
+              </p>
+            </div>
+            <Switch
+              checked={settings["maintenance_mode"] === "true"}
+              onCheckedChange={async (checked) => {
+                const val = checked ? "true" : "false";
+                setSettings((prev) => ({ ...prev, maintenance_mode: val }));
+                await handleSave("maintenance_mode", val);
+              }}
+            />
+          </div>
+        </div>
+      )}
 
       {/* Default Settings */}
       <div className="space-y-4 mb-8">
