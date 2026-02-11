@@ -15,23 +15,52 @@ import navarroLogo from "@/assets/navarro-heart-logo.png";
 
 const Index = () => {
   const activeTheme = useActiveTheme();
-  const [maintenance, setMaintenance] = useState<boolean | null>(null);
+  const [blocked, setBlocked] = useState<boolean | null>(null);
 
   useEffect(() => {
     const check = async () => {
-      const { data } = await (supabase as any)
-        .from("site_settings")
-        .select("value")
-        .eq("key", "maintenance_mode")
-        .single();
-      setMaintenance(data?.value === "true");
+      // Fetch maintenance mode and allowed IPs in parallel
+      const [maintRes, ipsRes] = await Promise.all([
+        (supabase as any).from("site_settings").select("value").eq("key", "maintenance_mode").single(),
+        (supabase as any).from("site_settings").select("value").eq("key", "allowed_ips").single(),
+      ]);
+
+      const maintenanceOn = maintRes.data?.value === "true";
+      const allowedIps = (ipsRes.data?.value || "").split(",").map((ip: string) => ip.trim()).filter(Boolean);
+
+      // If no restrictions at all, allow
+      if (!maintenanceOn && allowedIps.length === 0) {
+        setBlocked(false);
+        return;
+      }
+
+      // If maintenance is on (no IP list), block everyone
+      if (maintenanceOn && allowedIps.length === 0) {
+        setBlocked(true);
+        return;
+      }
+
+      // If there are allowed IPs, check visitor IP
+      if (allowedIps.length > 0) {
+        try {
+          const res = await fetch("https://api.ipify.org?format=json");
+          const { ip } = await res.json();
+          setBlocked(!allowedIps.includes(ip));
+        } catch {
+          // If can't detect IP, allow access (fail open)
+          setBlocked(false);
+        }
+        return;
+      }
+
+      setBlocked(false);
     };
     check();
   }, []);
 
-  if (maintenance === null) return null;
+  if (blocked === null) return null;
 
-  if (maintenance) {
+  if (blocked) {
     return (
       <div className="min-h-screen relative overflow-hidden flex items-center justify-center">
         <FlowFieldBackground />
