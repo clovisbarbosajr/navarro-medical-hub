@@ -4,6 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import type { Announcement } from "@/types/database";
 import { Plus, Pencil, Trash2, X, Save, ToggleLeft, ToggleRight, CalendarDays } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { logAction } from "@/lib/auditLog";
 
 interface Props {
   prefill?: { title: string; body: string } | null;
@@ -62,6 +63,7 @@ const AnnouncementsManager = ({ prefill, onPrefillConsumed }: Props) => {
     if (error) {
       toast({ title: "Erro", description: error.message, variant: "destructive" });
     } else {
+      await logAction(editing.id ? "editou" : "criou", "aviso", editing.title);
       toast({ title: editing.id ? "Atualizado!" : "Criado!" });
       setEditing(null);
       fetchItems();
@@ -74,14 +76,21 @@ const AnnouncementsManager = ({ prefill, onPrefillConsumed }: Props) => {
       .update({ enabled: !item.enabled })
       .eq("id", item.id);
     if (error) toast({ title: "Erro", description: error.message, variant: "destructive" });
-    else fetchItems();
+    else {
+      await logAction(item.enabled ? "desativou" : "ativou", "aviso", item.title);
+      fetchItems();
+    }
   };
 
   const handleDelete = async (id: string) => {
     if (!confirm("Excluir este aviso?")) return;
+    const item = items.find(i => i.id === id);
     const { error } = await (supabase as any).from("announcements").delete().eq("id", id);
     if (error) toast({ title: "Erro", description: error.message, variant: "destructive" });
-    else fetchItems();
+    else {
+      await logAction("deletou", "aviso", item?.title);
+      fetchItems();
+    }
   };
 
   if (loading) return <div className="text-muted-foreground p-4">Carregando...</div>;
