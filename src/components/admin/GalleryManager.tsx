@@ -5,6 +5,7 @@ import { resizeAndUpload } from "@/lib/imageResize";
 import type { GalleryImage } from "@/types/database";
 import { Plus, Pencil, Trash2, X, Save, ImageIcon } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { logAction } from "@/lib/auditLog";
 
 const GalleryManager = () => {
   const { user } = useAuth();
@@ -49,6 +50,7 @@ const GalleryManager = () => {
     if (error) {
       toast({ title: "Erro", description: error.message, variant: "destructive" });
     } else {
+      await logAction(editing.id ? "editou" : "criou", "campanha", editing.title);
       toast({ title: editing.id ? "Atualizado!" : "Criado!" });
       setEditing(null);
       fetchItems();
@@ -57,9 +59,13 @@ const GalleryManager = () => {
 
   const handleDelete = async (id: string) => {
     if (!confirm("Excluir esta imagem?")) return;
+    const item = items.find(i => i.id === id);
     const { error } = await (supabase as any).from("gallery_images").delete().eq("id", id);
     if (error) toast({ title: "Erro", description: error.message, variant: "destructive" });
-    else fetchItems();
+    else {
+      await logAction("deletou", "campanha", item?.title);
+      fetchItems();
+    }
   };
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {

@@ -5,6 +5,7 @@ import BudgetAssistantPopup from "@/components/BudgetAssistantPopup";
 import DashboardSidebar from "@/components/admin/DashboardSidebar";
 import UpcomingDatesAlert from "@/components/admin/UpcomingDatesAlert";
 import NewsManager from "@/components/admin/NewsManager";
+import AuditLogViewer from "@/components/admin/AuditLogViewer";
 import AnnouncementsManager from "@/components/admin/AnnouncementsManager";
 import BirthdaysManager from "@/components/admin/BirthdaysManager";
 import GalleryManager from "@/components/admin/GalleryManager";
@@ -42,6 +43,7 @@ const Dashboard = () => {
       case "themes": return <HolidayThemesManager />;
       case "menu-links": return <MenuLinksManager />;
       case "settings": return <SiteSettingsManager />;
+      case "audit-log": return <AuditLogViewer />;
       default: return null;
     }
   };

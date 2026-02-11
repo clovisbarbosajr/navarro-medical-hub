@@ -5,6 +5,7 @@ import { resizeAndUpload } from "@/lib/imageResize";
 import type { Birthday } from "@/types/database";
 import { Plus, Pencil, Trash2, X, Save, ImageIcon } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { logAction } from "@/lib/auditLog";
 
 const BirthdaysManager = () => {
   const { user } = useAuth();
@@ -45,6 +46,7 @@ const BirthdaysManager = () => {
     if (error) {
       toast({ title: "Erro", description: error.message, variant: "destructive" });
     } else {
+      await logAction(editing.id ? "editou" : "criou", "aniversariante", editing.name);
       toast({ title: editing.id ? "Atualizado!" : "Cadastrado!" });
       setEditing(null);
       fetchItems();
@@ -53,9 +55,13 @@ const BirthdaysManager = () => {
 
   const handleDelete = async (id: string) => {
     if (!confirm("Excluir este aniversariante?")) return;
+    const item = items.find(i => i.id === id);
     const { error } = await (supabase as any).from("birthdays").delete().eq("id", id);
     if (error) toast({ title: "Erro", description: error.message, variant: "destructive" });
-    else fetchItems();
+    else {
+      await logAction("deletou", "aniversariante", item?.name);
+      fetchItems();
+    }
   };
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
