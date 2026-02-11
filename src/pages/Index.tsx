@@ -64,17 +64,51 @@ const Index = () => {
     return (
       <div className="min-h-screen relative overflow-hidden flex items-center justify-center">
         <FlowFieldBackground />
-        <div className="relative z-10 text-center px-6 max-w-lg">
-          <div className="glass-strong rounded-3xl p-10 shadow-2xl">
-            <img src={navarroLogo} alt="Navarro Medical" className="w-20 h-20 mx-auto mb-6 object-contain" />
-            <h1 className="font-display text-3xl font-bold text-foreground mb-3">
-              Em Manutenção
+
+        {/* Decorative gradient orbs */}
+        <div className="absolute top-1/4 -left-32 w-96 h-96 rounded-full bg-primary/10 blur-3xl pointer-events-none" />
+        <div className="absolute bottom-1/4 -right-32 w-80 h-80 rounded-full bg-accent/10 blur-3xl pointer-events-none" />
+
+        <div className="relative z-10 text-center px-6 max-w-xl">
+          <div className="glass-strong rounded-3xl p-10 sm:p-14 shadow-2xl border border-border/30">
+            {/* Logo */}
+            <div className="w-20 h-20 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center mx-auto mb-8">
+              <img src={navarroLogo} alt="Navarro Medical" className="w-14 h-14 object-contain" />
+            </div>
+
+            {/* Shield icon */}
+            <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-6">
+              <svg className="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+              </svg>
+            </div>
+
+            {/* Portuguese */}
+            <h1 className="font-display text-2xl sm:text-3xl font-bold text-foreground mb-2">
+              Acesso Restrito
             </h1>
             <p className="text-muted-foreground text-sm leading-relaxed mb-6">
-              A intranet está temporariamente indisponível para manutenção programada.
-              Voltaremos em breve!
+              Por segurança e proteção dos dados, esta página só é acessível de dentro da empresa.
             </p>
-            <div className="w-16 h-1 rounded-full bg-gradient-to-r from-primary to-accent mx-auto" />
+
+            {/* Divider */}
+            <div className="w-16 h-px bg-border mx-auto mb-6" />
+
+            {/* English */}
+            <h2 className="font-display text-lg sm:text-xl font-semibold text-foreground/80 mb-2">
+              Restricted Access
+            </h2>
+            <p className="text-muted-foreground/80 text-xs leading-relaxed mb-8">
+              For security and data protection, this page is only accessible from within the company network.
+            </p>
+
+            {/* Gradient bar */}
+            <div className="w-20 h-1 rounded-full bg-gradient-to-r from-primary to-accent mx-auto mb-6" />
+
+            {/* Footer */}
+            <p className="text-xs text-muted-foreground/60">
+              Navarro Medical Group — Intranet Corporativa
+            </p>
           </div>
         </div>
       </div>
