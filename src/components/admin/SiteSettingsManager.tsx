@@ -82,7 +82,8 @@ const SiteSettingsManager = () => {
   if (loading) return <div className="text-muted-foreground p-4">Carregando...</div>;
 
   const defaultKeys = DEFAULT_SETTINGS.map((s) => s.key);
-  const customSettings = Object.entries(settings).filter(([key]) => !defaultKeys.includes(key));
+  const hiddenKeys = [...defaultKeys, "maintenance_mode", "allowed_ips"];
+  const customSettings = Object.entries(settings).filter(([key]) => !hiddenKeys.includes(key));
 
   return (
     <div>
@@ -90,12 +91,12 @@ const SiteSettingsManager = () => {
 
       {/* Maintenance Mode Toggle — Admin only */}
       {role === "admin" && (
-        <div className="glass rounded-xl p-4 mb-6 border border-amber-500/30 bg-amber-500/5">
+        <div className="glass rounded-xl p-4 mb-6 border border-amber-500/30">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-semibold text-foreground">🚧 Modo Manutenção</p>
               <p className="text-xs text-muted-foreground mt-1">
-                Quando ativado, a página pública exibe uma tela de manutenção. Login e dashboard continuam funcionando.
+                Bloqueia a página pública. Login e dashboard continuam funcionando.
               </p>
             </div>
             <Switch
@@ -106,6 +107,30 @@ const SiteSettingsManager = () => {
                 await handleSave("maintenance_mode", val);
               }}
             />
+          </div>
+        </div>
+      )}
+
+      {/* IP Restriction — Admin only */}
+      {role === "admin" && (
+        <div className="glass rounded-xl p-4 mb-6 border border-primary/20">
+          <label className="text-sm font-semibold text-foreground mb-1 block">🔒 IPs Permitidos</label>
+          <p className="text-xs text-muted-foreground mb-3">
+            Apenas esses IPs podem acessar a intranet. Separe por vírgula. Deixe vazio para liberar todos.
+          </p>
+          <div className="flex gap-2">
+            <input
+              value={settings["allowed_ips"] || ""}
+              onChange={(e) => setSettings({ ...settings, allowed_ips: e.target.value })}
+              placeholder="Ex: 45.22.20.255, 201.12.55.80"
+              className="flex-1 h-10 rounded-xl border border-input bg-secondary/50 px-3 text-foreground text-sm font-mono focus:outline-none focus:ring-2 focus:ring-primary/50"
+            />
+            <button
+              onClick={() => handleSave("allowed_ips", settings["allowed_ips"] || "")}
+              className="h-10 px-4 rounded-xl bg-primary/20 text-primary text-sm font-medium hover:bg-primary/30 transition-colors flex items-center gap-1"
+            >
+              <Save className="w-3 h-3" /> Salvar
+            </button>
           </div>
         </div>
       )}
