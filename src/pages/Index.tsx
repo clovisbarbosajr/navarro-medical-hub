@@ -7,6 +7,7 @@ import AnnouncementPopup from "@/components/AnnouncementPopup";
 import BirthdayPopup from "@/components/BirthdayPopup";
 import BirthdaySidebar from "@/components/BirthdaySidebar";
 import QuickLinks from "@/components/QuickLinks";
+import EventsSidebar from "@/components/EventsSidebar";
 import NewsFeed from "@/components/NewsFeed";
 import NewsCarousel from "@/components/NewsCarousel";
 import GallerySection from "@/components/GallerySection";
@@ -171,8 +172,9 @@ const Index = () => {
           <div className="flex-1 min-w-0">
             <NewsFeed />
           </div>
-          <div className="w-full lg:w-72 flex-shrink-0">
+          <div className="w-full lg:w-72 flex-shrink-0 space-y-6">
             <BirthdaySidebar />
+            <EventsSidebar />
           </div>
         </section>
 

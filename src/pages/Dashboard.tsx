@@ -13,6 +13,7 @@ import AnnouncementsManager from "@/components/admin/AnnouncementsManager";
 import BirthdaysManager from "@/components/admin/BirthdaysManager";
 import GalleryManager from "@/components/admin/GalleryManager";
 import AccessLogsViewer from "@/components/admin/AccessLogsViewer";
+import EventsManager from "@/components/admin/EventsManager";
 import HolidayThemesManager from "@/components/admin/HolidayThemesManager";
 import MenuLinksManager from "@/components/admin/MenuLinksManager";
 import SiteSettingsManager from "@/components/admin/SiteSettingsManager";
@@ -45,6 +46,7 @@ const Dashboard = () => {
       );
       case "birthdays": return <BirthdaysManager />;
       case "gallery": return <GalleryManager />;
+      case "events": return <EventsManager />;
       case "themes": return <HolidayThemesManager />;
       case "menu-links": return <MenuLinksManager />;
       case "settings": return <SiteSettingsManager />;
