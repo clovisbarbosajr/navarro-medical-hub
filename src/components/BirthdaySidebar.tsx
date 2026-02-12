@@ -28,7 +28,9 @@ const BirthdaySidebar = () => {
   if (birthdays.length === 0) return null;
 
   return (
-    <div className="glass-strong rounded-2xl p-4 md:p-5 w-full lg:w-72 max-h-[360px] md:max-h-[480px] flex flex-col" style={{ zIndex: 1 }}>
+    <div className={`glass-strong rounded-2xl p-4 md:p-5 w-full lg:w-72 flex flex-col ${
+      birthdays.length <= 1 ? "" : "max-h-[360px] md:max-h-[480px]"
+    }`} style={{ zIndex: 1 }}>
       <h3 className="font-display font-bold text-foreground text-base mb-4 flex items-center gap-2">
         🎂 Aniversariantes — <span className="capitalize">{currentMonth}</span>
       </h3>
