@@ -97,7 +97,7 @@ const Dashboard = () => {
       </main>
 
       {/* Floating Clovis */}
-      <FloatingClovisFab onClick={() => setClovisOpen(true)} />
+      <FloatingClovisFab onClick={() => setClovisOpen(true)} label="Clovis — Assistente de Orçamentos (Modo Admin)" />
 
       <BudgetAssistantPopup open={clovisOpen} onClose={() => setClovisOpen(false)} />
     </div>

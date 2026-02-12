@@ -2,9 +2,10 @@ import { useState, useEffect, useRef } from "react";
 
 interface FloatingClovisFabProps {
   onClick: () => void;
+  label?: string;
 }
 
-const FloatingClovisFab = ({ onClick }: FloatingClovisFabProps) => {
+const FloatingClovisFab = ({ onClick, label = "Clovis — Assistente IA Navarro" }: FloatingClovisFabProps) => {
   const [pos, setPos] = useState({ x: 0, y: 0 });
   const [hovered, setHovered] = useState(false);
   const targetRef = useRef({ x: 0, y: 0 });
@@ -110,7 +111,7 @@ const FloatingClovisFab = ({ onClick }: FloatingClovisFabProps) => {
         top: `${pos.y}px`,
         transition: "transform 0.2s",
       }}
-      title="Clovis — Assistente de Orçamentos (Modo Admin)"
+      title={label}
     >
       <span className="text-2xl group-hover:animate-bounce">🤖</span>
       {/* Glow ring */}
