@@ -14,9 +14,8 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const USERNAME_MAP: Record<string, string> = {
-  Admin: "admin@navarro.med",
-  Manager: "manager@navarro.med",
   Inwise: "inwise@navarro.med",
+  Manager: "manager@navarro.med",
 };
 
 const REMEMBER_KEY = "navarro_remember_user";

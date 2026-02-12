@@ -11,7 +11,7 @@ const Login = () => {
   const navigate = useNavigate();
   const { user, login, loading } = useAuth();
   const activeTheme = useActiveTheme();
-  const [username, setUsername] = useState("Admin");
+  const [username, setUsername] = useState("Inwise");
   const [password, setPassword] = useState("");
   const [remember, setRemember] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -114,7 +114,6 @@ const Login = () => {
                   onChange={(e) => setUsername(e.target.value)}
                   className="w-full h-12 rounded-xl border border-input bg-secondary/50 px-4 text-foreground text-sm appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
                 >
-                  <option value="Admin">🔑 Admin</option>
                   <option value="Inwise">🛡️ Inwise</option>
                   <option value="Manager">📋 Manager</option>
                 </select>
