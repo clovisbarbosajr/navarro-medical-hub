@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import FloatingClovisFab from "@/components/FloatingClovisFab";
+import BudgetAssistantPopup from "@/components/BudgetAssistantPopup";
 import FlowFieldBackground from "@/components/FlowFieldBackground";
 import ThemedBackground from "@/components/ThemedBackground";
 import Header from "@/components/Header";
@@ -17,6 +19,7 @@ import navarroLogo from "@/assets/navarro-heart-logo.png";
 const Index = () => {
   const activeTheme = useActiveTheme();
   const [blocked, setBlocked] = useState<boolean | null>(null);
+  const [clovisOpen, setClovisOpen] = useState(false);
 
   useEffect(() => {
     const check = async () => {
@@ -186,6 +189,9 @@ const Index = () => {
           © 2026 INWISEPRO — Intranet Corporativa
         </footer>
       </main>
+
+      <FloatingClovisFab onClick={() => setClovisOpen(true)} />
+      <BudgetAssistantPopup open={clovisOpen} onClose={() => setClovisOpen(false)} />
     </div>
   );
 };
