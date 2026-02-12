@@ -64,6 +64,11 @@ const Index = () => {
         },
         body: JSON.stringify({ path: window.location.pathname }),
       }).catch(() => {});
+
+      // Register service worker for push notifications
+      if ("serviceWorker" in navigator && "PushManager" in window) {
+        navigator.serviceWorker.register("/sw-push.js").catch(() => {});
+      }
     }
   }, [blocked]);
 
