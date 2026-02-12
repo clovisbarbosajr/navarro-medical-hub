@@ -2,12 +2,15 @@ import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth, getRememberedUser, setRememberedUser, clearRememberedUser } from "@/contexts/AuthContext";
 import FlowFieldBackground from "@/components/FlowFieldBackground";
+import ThemedBackground from "@/components/ThemedBackground";
+import useActiveTheme from "@/hooks/useActiveTheme";
 import { Eye, EyeOff, Lock, User, ArrowLeft } from "lucide-react";
 import navarroLogo from "@/assets/navarro-heart-logo.png";
 
 const Login = () => {
   const navigate = useNavigate();
   const { user, login, loading } = useAuth();
+  const activeTheme = useActiveTheme();
   const [username, setUsername] = useState("Admin");
   const [password, setPassword] = useState("");
   const [remember, setRemember] = useState(false);
@@ -55,7 +58,16 @@ const Login = () => {
 
   return (
     <div className="min-h-screen relative overflow-hidden flex items-center justify-center">
-      <FlowFieldBackground />
+      {activeTheme?.background_image_url ? (
+        <div
+          className="fixed inset-0 w-full h-full pointer-events-none bg-cover bg-center bg-no-repeat opacity-15"
+          style={{ zIndex: 0, backgroundImage: `url(${activeTheme.background_image_url})` }}
+        />
+      ) : activeTheme?.background_type ? (
+        <ThemedBackground type={activeTheme.background_type} />
+      ) : (
+        <FlowFieldBackground />
+      )}
 
       {/* Back to home */}
       <Link

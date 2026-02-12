@@ -1,0 +1,116 @@
+import { useState, useEffect, useRef } from "react";
+
+interface FloatingClovisFabProps {
+  onClick: () => void;
+}
+
+const FloatingClovisFab = ({ onClick }: FloatingClovisFabProps) => {
+  const [pos, setPos] = useState({ x: 0, y: 0 });
+  const targetRef = useRef({ x: 0, y: 0 });
+  const currentRef = useRef({ x: 0, y: 0 });
+  const frameRef = useRef<number>(0);
+  const timerRef = useRef<number>(0);
+
+  const FAB_SIZE = 56;
+  const MARGIN = 24;
+
+  const pickTarget = () => {
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    const maxX = w - FAB_SIZE - MARGIN;
+    const maxY = h - FAB_SIZE - MARGIN;
+
+    // Pick a random edge-ish position (right side or bottom area, visible but not central)
+    const zones = [
+      // right edge
+      { x: maxX, y: MARGIN + Math.random() * (maxY - MARGIN) },
+      // bottom-right
+      { x: maxX - Math.random() * 200, y: maxY },
+      // bottom-left area
+      { x: MARGIN + Math.random() * 200, y: maxY },
+      // right-middle
+      { x: maxX, y: h * 0.3 + Math.random() * (h * 0.4) },
+    ];
+    targetRef.current = zones[Math.floor(Math.random() * zones.length)];
+  };
+
+  useEffect(() => {
+    // Initial position bottom-right
+    const startX = window.innerWidth - FAB_SIZE - MARGIN;
+    const startY = window.innerHeight - FAB_SIZE - MARGIN;
+    currentRef.current = { x: startX, y: startY };
+    setPos({ x: startX, y: startY });
+    
+    pickTarget();
+
+    const animate = () => {
+      const speed = 0.003; // very slow drift
+      const cx = currentRef.current.x;
+      const cy = currentRef.current.y;
+      const tx = targetRef.current.x;
+      const ty = targetRef.current.y;
+
+      const dx = tx - cx;
+      const dy = ty - cy;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+
+      if (dist < 5) {
+        pickTarget();
+      } else {
+        currentRef.current.x += dx * speed;
+        currentRef.current.y += dy * speed;
+      }
+
+      // Add subtle bobbing
+      const bobX = Math.sin(Date.now() * 0.001) * 3;
+      const bobY = Math.cos(Date.now() * 0.0013) * 4;
+
+      setPos({
+        x: currentRef.current.x + bobX,
+        y: currentRef.current.y + bobY,
+      });
+
+      frameRef.current = requestAnimationFrame(animate);
+    };
+
+    frameRef.current = requestAnimationFrame(animate);
+
+    // Pick new target periodically
+    timerRef.current = window.setInterval(pickTarget, 8000);
+
+    const handleResize = () => {
+      const maxX = window.innerWidth - FAB_SIZE - MARGIN;
+      const maxY = window.innerHeight - FAB_SIZE - MARGIN;
+      currentRef.current.x = Math.min(currentRef.current.x, maxX);
+      currentRef.current.y = Math.min(currentRef.current.y, maxY);
+      pickTarget();
+    };
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      cancelAnimationFrame(frameRef.current);
+      clearInterval(timerRef.current);
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
+  return (
+    <button
+      onClick={onClick}
+      className="fixed w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 flex items-center justify-center transition-colors hover:scale-110 group"
+      style={{
+        zIndex: 50,
+        left: `${pos.x}px`,
+        top: `${pos.y}px`,
+        transition: "transform 0.2s",
+      }}
+      title="Clovis — Assistente de Orçamentos (Modo Admin)"
+    >
+      <span className="text-2xl group-hover:animate-bounce">🤖</span>
+      {/* Glow ring */}
+      <span className="absolute inset-0 rounded-full border-2 border-primary/40 animate-ping opacity-30 pointer-events-none" />
+    </button>
+  );
+};
+
+export default FloatingClovisFab;
