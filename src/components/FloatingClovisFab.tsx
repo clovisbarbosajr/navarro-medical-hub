@@ -6,8 +6,10 @@ interface FloatingClovisFabProps {
 
 const FloatingClovisFab = ({ onClick }: FloatingClovisFabProps) => {
   const [pos, setPos] = useState({ x: 0, y: 0 });
+  const [hovered, setHovered] = useState(false);
   const targetRef = useRef({ x: 0, y: 0 });
   const currentRef = useRef({ x: 0, y: 0 });
+  const hoveredRef = useRef(false);
   const frameRef = useRef<number>(0);
   const timerRef = useRef<number>(0);
 
@@ -44,26 +46,28 @@ const FloatingClovisFab = ({ onClick }: FloatingClovisFabProps) => {
     pickTarget();
 
     const animate = () => {
-      const speed = 0.003; // very slow drift
-      const cx = currentRef.current.x;
-      const cy = currentRef.current.y;
-      const tx = targetRef.current.x;
-      const ty = targetRef.current.y;
+      // Skip movement when hovered
+      if (!hoveredRef.current) {
+        const speed = 0.003;
+        const cx = currentRef.current.x;
+        const cy = currentRef.current.y;
+        const tx = targetRef.current.x;
+        const ty = targetRef.current.y;
 
-      const dx = tx - cx;
-      const dy = ty - cy;
-      const dist = Math.sqrt(dx * dx + dy * dy);
+        const dx = tx - cx;
+        const dy = ty - cy;
+        const dist = Math.sqrt(dx * dx + dy * dy);
 
-      if (dist < 5) {
-        pickTarget();
-      } else {
-        currentRef.current.x += dx * speed;
-        currentRef.current.y += dy * speed;
+        if (dist < 5) {
+          pickTarget();
+        } else {
+          currentRef.current.x += dx * speed;
+          currentRef.current.y += dy * speed;
+        }
       }
 
-      // Add subtle bobbing
-      const bobX = Math.sin(Date.now() * 0.001) * 3;
-      const bobY = Math.cos(Date.now() * 0.0013) * 4;
+      const bobX = hoveredRef.current ? 0 : Math.sin(Date.now() * 0.001) * 3;
+      const bobY = hoveredRef.current ? 0 : Math.cos(Date.now() * 0.0013) * 4;
 
       setPos({
         x: currentRef.current.x + bobX,
@@ -97,7 +101,9 @@ const FloatingClovisFab = ({ onClick }: FloatingClovisFabProps) => {
   return (
     <button
       onClick={onClick}
-      className="fixed w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 flex items-center justify-center transition-colors hover:scale-110 group"
+      onMouseEnter={() => { setHovered(true); hoveredRef.current = true; }}
+      onMouseLeave={() => { setHovered(false); hoveredRef.current = false; }}
+      className={`fixed w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 flex items-center justify-center transition-colors hover:scale-110 group ${hovered ? "cursor-pointer" : ""}`}
       style={{
         zIndex: 50,
         left: `${pos.x}px`,
