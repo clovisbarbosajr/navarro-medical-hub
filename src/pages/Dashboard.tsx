@@ -12,6 +12,7 @@ import AuditLogViewer from "@/components/admin/AuditLogViewer";
 import AnnouncementsManager from "@/components/admin/AnnouncementsManager";
 import BirthdaysManager from "@/components/admin/BirthdaysManager";
 import GalleryManager from "@/components/admin/GalleryManager";
+import AccessLogsViewer from "@/components/admin/AccessLogsViewer";
 import HolidayThemesManager from "@/components/admin/HolidayThemesManager";
 import MenuLinksManager from "@/components/admin/MenuLinksManager";
 import SiteSettingsManager from "@/components/admin/SiteSettingsManager";
@@ -48,6 +49,7 @@ const Dashboard = () => {
       case "menu-links": return <MenuLinksManager />;
       case "settings": return <SiteSettingsManager />;
       case "audit-log": return <AuditLogViewer />;
+      case "access-logs": return <AccessLogsViewer />;
       default: return null;
     }
   };

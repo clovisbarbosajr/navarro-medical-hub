@@ -2,3 +2,6 @@ project_id = "voukdugahnaudxcdhbgm"
 
 [functions.budget-assistant]
 verify_jwt = false
+
+[functions.log-access]
+verify_jwt = false
