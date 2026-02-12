@@ -54,7 +54,13 @@ const GallerySection = () => {
           <h2 className="font-display text-xl md:text-2xl font-bold text-foreground mb-6 md:mb-8 text-center">
             📸 Galeria
           </h2>
-          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-5">
+          <div className={`grid gap-3 md:gap-5 ${
+            images.length === 1
+              ? "grid-cols-1 max-w-sm mx-auto"
+              : images.length === 2
+              ? "grid-cols-2 max-w-2xl mx-auto"
+              : "grid-cols-2 sm:grid-cols-2 lg:grid-cols-4"
+          }`}>
             {images.map((img, i) => (
               <div
                 key={img.id}
