@@ -1,7 +1,10 @@
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import FlowFieldBackground from "@/components/FlowFieldBackground";
+import ThemedBackground from "@/components/ThemedBackground";
+import useActiveTheme from "@/hooks/useActiveTheme";
 import BudgetAssistantPopup from "@/components/BudgetAssistantPopup";
+import FloatingClovisFab from "@/components/FloatingClovisFab";
 import DashboardSidebar from "@/components/admin/DashboardSidebar";
 import UpcomingDatesAlert from "@/components/admin/UpcomingDatesAlert";
 import NewsManager from "@/components/admin/NewsManager";
@@ -20,6 +23,7 @@ interface AnnouncementPrefill {
 
 const Dashboard = () => {
   const { role } = useAuth();
+  const activeTheme = useActiveTheme();
   const [activeSection, setActiveSection] = useState("news");
   const [announcementPrefill, setAnnouncementPrefill] = useState<AnnouncementPrefill | null>(null);
   const [clovisOpen, setClovisOpen] = useState(false);
@@ -50,7 +54,16 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen relative overflow-hidden flex">
-      <FlowFieldBackground />
+      {activeTheme?.background_image_url ? (
+        <div
+          className="fixed inset-0 w-full h-full pointer-events-none bg-cover bg-center bg-no-repeat opacity-15"
+          style={{ zIndex: 0, backgroundImage: `url(${activeTheme.background_image_url})` }}
+        />
+      ) : activeTheme?.background_type ? (
+        <ThemedBackground type={activeTheme.background_type} />
+      ) : (
+        <FlowFieldBackground />
+      )}
 
       <DashboardSidebar
         activeSection={activeSection}
@@ -79,14 +92,8 @@ const Dashboard = () => {
         </div>
       </main>
 
-      {/* Clovis FAB */}
-      <button
-        onClick={() => setClovisOpen(true)}
-        className="fixed bottom-6 right-6 w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 flex items-center justify-center transition-all hover:scale-105 z-50"
-        title="Clovis — Assistente de Orçamentos (Modo Admin)"
-      >
-        <span className="text-2xl">🤖</span>
-      </button>
+      {/* Floating Clovis */}
+      <FloatingClovisFab onClick={() => setClovisOpen(true)} />
 
       <BudgetAssistantPopup open={clovisOpen} onClose={() => setClovisOpen(false)} />
     </div>
