@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import WeatherCard from "@/components/WeatherCard";
 import IframeOverlay from "@/components/IframeOverlay";
 import BudgetAssistantPopup from "@/components/BudgetAssistantPopup";
+import NotificationBell from "@/components/NotificationBell";
 import navarroLogo from "@/assets/navarro-heart-logo.png";
 import type { MenuLink } from "@/types/database";
 
@@ -92,8 +93,9 @@ const Header = () => {
             ))}
           </nav>
 
-          <div className="hidden md:flex items-center gap-4">
+          <div className="hidden md:flex items-center gap-3">
             <WeatherCard />
+            <NotificationBell />
             <a href="/login" className="login-btn">
               Login
             </a>
