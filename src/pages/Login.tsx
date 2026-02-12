@@ -115,6 +115,7 @@ const Login = () => {
                   className="w-full h-12 rounded-xl border border-input bg-secondary/50 px-4 text-foreground text-sm appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
                 >
                   <option value="Admin">🔑 Admin</option>
+                  <option value="Inwise">🛡️ Inwise</option>
                   <option value="Manager">📋 Manager</option>
                 </select>
                 <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
