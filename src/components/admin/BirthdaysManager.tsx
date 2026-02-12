@@ -157,7 +157,7 @@ const BirthdaysManager = () => {
       {items.length === 0 ? (
         <p className="text-muted-foreground text-sm text-center py-8">Nenhum aniversariante cadastrado.</p>
       ) : (
-        Object.entries(groupedByMonth).map(([month, people]) => (
+        Object.entries(groupedByMonth).reverse().map(([month, people]) => (
           <div key={month} className="mb-6">
             <h3 className="font-display font-semibold text-sm text-primary capitalize mb-2">📅 {month}</h3>
             <div className="space-y-2">
