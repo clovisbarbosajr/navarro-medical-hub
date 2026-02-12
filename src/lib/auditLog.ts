@@ -1,7 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
 
 type AuditAction = "criou" | "editou" | "deletou" | "ativou" | "desativou";
-type EntityType = "notícia" | "aviso" | "aniversariante" | "campanha" | "tema" | "link" | "configuração";
+type EntityType = "notícia" | "aviso" | "aniversariante" | "campanha" | "tema" | "link" | "configuração" | "evento";
 
 export const logAction = async (
   action: AuditAction,
