@@ -15,6 +15,7 @@ import NewsCarousel from "@/components/NewsCarousel";
 import GallerySection from "@/components/GallerySection";
 import useActiveTheme from "@/hooks/useActiveTheme";
 import navarroLogo from "@/assets/navarro-heart-logo.png";
+import PirateWarningPopup from "@/components/PirateWarningPopup";
 
 const Index = () => {
   const activeTheme = useActiveTheme();
@@ -192,6 +193,7 @@ const Index = () => {
 
       <FloatingClovisFab onClick={() => setClovisOpen(true)} />
       <BudgetAssistantPopup open={clovisOpen} onClose={() => setClovisOpen(false)} />
+      <PirateWarningPopup />
     </div>
   );
 };
