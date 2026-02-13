@@ -19,7 +19,6 @@ const sidebarItems: SidebarItem[] = [
   { id: "menu-links", label: "Menu & Links", icon: Link2, roles: ["admin", "manager"] },
   { id: "settings", label: "Configurações", icon: Settings, roles: ["admin", "manager"] },
   { id: "audit-log", label: "Log de Atividades", icon: ScrollText, roles: ["admin"] },
-  { id: "audit-log", label: "Log de Atividades", icon: ScrollText, roles: ["admin"] },
   { id: "access-logs", label: "Acessos & IPs", icon: Globe, roles: ["admin"] },
 ];
 

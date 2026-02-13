@@ -52,7 +52,6 @@ const Dashboard = () => {
       case "menu-links": return <MenuLinksManager />;
       case "settings": return <SiteSettingsManager />;
       case "audit-log": return <AuditLogViewer />;
-      case "audit-log": return <AuditLogViewer />;
       case "access-logs": return <AccessLogsViewer />;
       default: return null;
     }
