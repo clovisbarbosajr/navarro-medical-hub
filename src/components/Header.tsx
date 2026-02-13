@@ -79,9 +79,9 @@ const Header = ({ onOpenProcedures }: HeaderProps) => {
           <nav className="hidden md:flex items-center gap-3">
             {menuItems.map((item) => (
               <div key={item.label} className="nav-dropdown">
-                <a href="#" className="menu-btn">
+                <button type="button" className="menu-btn">
                   {item.label}
-                </a>
+                </button>
                 <div className="dropdown-content glass-strong rounded-xl p-2 shadow-2xl">
                   {item.links.map((link) => (
                     <a
