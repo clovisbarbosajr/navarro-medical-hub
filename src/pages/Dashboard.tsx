@@ -17,6 +17,7 @@ import EventsManager from "@/components/admin/EventsManager";
 import HolidayThemesManager from "@/components/admin/HolidayThemesManager";
 import MenuLinksManager from "@/components/admin/MenuLinksManager";
 import SiteSettingsManager from "@/components/admin/SiteSettingsManager";
+import DeniseProceduresManager from "@/components/admin/DeniseProceduresManager";
 
 interface AnnouncementPrefill {
   title: string;
@@ -50,6 +51,7 @@ const Dashboard = () => {
       case "themes": return <HolidayThemesManager />;
       case "menu-links": return <MenuLinksManager />;
       case "settings": return <SiteSettingsManager />;
+      case "denise-procedures": return <DeniseProceduresManager />;
       case "audit-log": return <AuditLogViewer />;
       case "access-logs": return <AccessLogsViewer />;
       default: return null;
