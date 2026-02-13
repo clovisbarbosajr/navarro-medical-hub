@@ -204,8 +204,7 @@ const Index = () => {
         <div className="fixed inset-0 bg-background/95 backdrop-blur-sm" style={{ zIndex: 100 }}>
           <div className="h-full overflow-auto">
             <div className="max-w-7xl mx-auto px-4 md:px-6 py-6">
-              <div className="flex items-center justify-between mb-6">
-                <h1 className="font-display text-2xl font-bold text-foreground">📋 Procedimentos</h1>
+              <div className="flex justify-end mb-4">
                 <button
                   onClick={() => setProceduresOpen(false)}
                   className="p-2 rounded-xl hover:bg-secondary/50 text-muted-foreground hover:text-foreground transition-all"
