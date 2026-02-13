@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 import WeatherCard from "@/components/WeatherCard";
 import IframeOverlay from "@/components/IframeOverlay";
 import BudgetAssistantPopup from "@/components/BudgetAssistantPopup";
 import NotificationBell from "@/components/NotificationBell";
 import navarroLogo from "@/assets/navarro-heart-logo.png";
 import type { MenuLink } from "@/types/database";
+import { FileSpreadsheet } from "lucide-react";
 
 const CATEGORY_LABELS: Record<string, string> = {
   sistemas: "Sistemas",
@@ -17,7 +19,12 @@ const CATEGORY_ORDER = ["sistemas", "ferramentas", "helpdesk"];
 
 const BUDGET_ASSISTANT_LABEL = "IA NAVARRO";
 
-const Header = () => {
+interface HeaderProps {
+  onOpenProcedures?: () => void;
+}
+
+const Header = ({ onOpenProcedures }: HeaderProps) => {
+  const { user, role, logout } = useAuth();
   const [links, setLinks] = useState<MenuLink[]>([]);
   const [iframeLink, setIframeLink] = useState<MenuLink | null>(null);
   const [budgetOpen, setBudgetOpen] = useState(false);
@@ -88,6 +95,16 @@ const Header = () => {
                       {link.label}
                     </a>
                   ))}
+                  {/* Show Procedimentos only for admin (Inwise) in Sistemas */}
+                  {item.label === "Sistemas" && user && role === "admin" && onOpenProcedures && (
+                    <button
+                      onClick={onOpenProcedures}
+                      className="dropdown-item w-full text-left flex items-center gap-2"
+                    >
+                      <FileSpreadsheet className="w-3.5 h-3.5" />
+                      Procedimentos
+                    </button>
+                  )}
                 </div>
               </div>
             ))}
@@ -96,9 +113,20 @@ const Header = () => {
           <div className="hidden md:flex items-center gap-3">
             <WeatherCard />
             <NotificationBell />
-            <a href="/login" className="login-btn">
-              Login
-            </a>
+            {user ? (
+              <div className="flex items-center gap-2">
+                <a href="/dashboard" className="login-btn text-xs">
+                  Painel
+                </a>
+                <button onClick={logout} className="login-btn">
+                  Sair
+                </button>
+              </div>
+            ) : (
+              <a href="/login" className="login-btn">
+                Login
+              </a>
+            )}
           </div>
         </div>
       </header>
