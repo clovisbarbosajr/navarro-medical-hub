@@ -30,7 +30,7 @@ const Login = () => {
 
   useEffect(() => {
     if (!loading && user) {
-      navigate("/dashboard", { replace: true });
+      navigate("/", { replace: true });
     }
   }, [user, loading, navigate]);
 
@@ -50,7 +50,7 @@ const Login = () => {
       } else {
         clearRememberedUser();
       }
-      navigate("/dashboard", { replace: true });
+      navigate("/", { replace: true });
     }
   };
 
