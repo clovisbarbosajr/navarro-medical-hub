@@ -137,6 +137,66 @@ export type Database = {
         }
         Relationships: []
       }
+      denise_procedures: {
+        Row: {
+          chart_number: string | null
+          cost: number | null
+          created_at: string
+          denise_paid: boolean | null
+          id: string
+          is_summary_row: boolean | null
+          month_label: string
+          patient_name: string | null
+          percentage: number | null
+          proc_price: number | null
+          procedure_date: string | null
+          procedure_name: string | null
+          sort_order: number
+          square_confirmed: string | null
+          summary_label: string | null
+          summary_value: number | null
+          updated_at: string
+        }
+        Insert: {
+          chart_number?: string | null
+          cost?: number | null
+          created_at?: string
+          denise_paid?: boolean | null
+          id?: string
+          is_summary_row?: boolean | null
+          month_label: string
+          patient_name?: string | null
+          percentage?: number | null
+          proc_price?: number | null
+          procedure_date?: string | null
+          procedure_name?: string | null
+          sort_order?: number
+          square_confirmed?: string | null
+          summary_label?: string | null
+          summary_value?: number | null
+          updated_at?: string
+        }
+        Update: {
+          chart_number?: string | null
+          cost?: number | null
+          created_at?: string
+          denise_paid?: boolean | null
+          id?: string
+          is_summary_row?: boolean | null
+          month_label?: string
+          patient_name?: string | null
+          percentage?: number | null
+          proc_price?: number | null
+          procedure_date?: string | null
+          procedure_name?: string | null
+          sort_order?: number
+          square_confirmed?: string | null
+          summary_label?: string | null
+          summary_value?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       events: {
         Row: {
           color: string | null
