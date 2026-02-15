@@ -6,6 +6,7 @@ import BudgetAssistantPopup from "@/components/BudgetAssistantPopup";
 import FlowFieldBackground from "@/components/FlowFieldBackground";
 import ThemedBackground from "@/components/ThemedBackground";
 import Header from "@/components/Header";
+import IframeOverlay from "@/components/IframeOverlay";
 import AnnouncementPopup from "@/components/AnnouncementPopup";
 import BirthdayPopup from "@/components/BirthdayPopup";
 import BirthdaySidebar from "@/components/BirthdaySidebar";
@@ -26,6 +27,7 @@ const Index = () => {
   const [blocked, setBlocked] = useState<boolean | null>(null);
   const [clovisOpen, setClovisOpen] = useState(false);
   const [proceduresOpen, setProceduresOpen] = useState(false);
+  const [spreadsheetOpen, setSpreadsheetOpen] = useState(false);
 
   useEffect(() => {
     const check = async () => {
@@ -151,7 +153,10 @@ const Index = () => {
       ) : (
         <FlowFieldBackground />
       )}
-      <Header onOpenProcedures={user && role === "admin" ? () => setProceduresOpen(true) : undefined} />
+      <Header
+        onOpenProcedures={user && role === "admin" ? () => setProceduresOpen(true) : undefined}
+        onOpenSpreadsheet={user && role === "admin" ? () => setSpreadsheetOpen(true) : undefined}
+      />
       <AnnouncementPopup />
       <BirthdayPopup />
 
@@ -198,6 +203,14 @@ const Index = () => {
 
       <FloatingClovisFab onClick={() => setClovisOpen(true)} />
       <BudgetAssistantPopup open={clovisOpen} onClose={() => setClovisOpen(false)} />
+
+      {spreadsheetOpen && (
+        <IframeOverlay
+          url="https://docs.google.com/spreadsheets/d/1KLHJxWnDVE20tX5uZas8eiJkIj9_byQtQDWnvAwa1x0/edit?gid=1653401107#gid=1653401107"
+          title="Planilha Denise"
+          onClose={() => setSpreadsheetOpen(false)}
+        />
+      )}
 
       {/* Procedures fullscreen overlay for Inwise */}
       {proceduresOpen && (
