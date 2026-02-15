@@ -95,7 +95,7 @@ const Header = ({ onOpenProcedures }: HeaderProps) => {
                       {link.label}
                     </a>
                   ))}
-                  {/* Show Procedimentos only for admin (Inwise) in Sistemas */}
+                  {/* Show Procedimentos only for admin (Inwise) in Sistemas */} 
                   {item.label === "Sistemas" && user && role === "admin" && onOpenProcedures && (
                     <button
                       onClick={onOpenProcedures}
