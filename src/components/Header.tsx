@@ -21,10 +21,9 @@ const BUDGET_ASSISTANT_LABEL = "IA NAVARRO";
 
 interface HeaderProps {
   onOpenProcedures?: () => void;
-  onOpenSpreadsheet?: () => void;
 }
 
-const Header = ({ onOpenProcedures, onOpenSpreadsheet }: HeaderProps) => {
+const Header = ({ onOpenProcedures }: HeaderProps) => {
   const { user, role, logout } = useAuth();
   const [links, setLinks] = useState<MenuLink[]>([]);
   const [iframeLink, setIframeLink] = useState<MenuLink | null>(null);
@@ -96,28 +95,15 @@ const Header = ({ onOpenProcedures, onOpenSpreadsheet }: HeaderProps) => {
                       {link.label}
                     </a>
                   ))}
-                  {/* Admin-only items in Sistemas */}
-                  {item.label === "Sistemas" && user && role === "admin" && (
-                    <>
-                      {onOpenProcedures && (
-                        <button
-                          onClick={onOpenProcedures}
-                          className="dropdown-item w-full text-left flex items-center gap-2"
-                        >
-                          <FileSpreadsheet className="w-3.5 h-3.5" />
-                          Procedimentos
-                        </button>
-                      )}
-                      {onOpenSpreadsheet && (
-                        <button
-                          onClick={onOpenSpreadsheet}
-                          className="dropdown-item w-full text-left flex items-center gap-2"
-                        >
-                          <FileSpreadsheet className="w-3.5 h-3.5" />
-                          Planilha Denise
-                        </button>
-                      )}
-                    </>
+                  {/* Show Procedimentos only for admin (Inwise) in Sistemas */}
+                  {item.label === "Sistemas" && user && role === "admin" && onOpenProcedures && (
+                    <button
+                      onClick={onOpenProcedures}
+                      className="dropdown-item w-full text-left flex items-center gap-2"
+                    >
+                      <FileSpreadsheet className="w-3.5 h-3.5" />
+                      Procedimentos
+                    </button>
                   )}
                 </div>
               </div>
