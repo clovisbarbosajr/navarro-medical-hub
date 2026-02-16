@@ -17,7 +17,7 @@ const sidebarItems: SidebarItem[] = [
   { id: "events", label: "Eventos", icon: CalendarDays, roles: ["admin", "manager"] },
   { id: "themes", label: "Temas", icon: Palette, roles: ["admin", "manager"] },
   { id: "menu-links", label: "Menu & Links", icon: Link2, roles: ["admin", "manager"] },
-  { id: "settings", label: "Configurações", icon: Settings, roles: ["admin", "manager"] },
+  { id: "settings", label: "Configurações", icon: Settings, roles: ["admin"] },
   { id: "audit-log", label: "Log de Atividades", icon: ScrollText, roles: ["admin"] },
   { id: "access-logs", label: "Acessos & IPs", icon: Globe, roles: ["admin"] },
 ];

@@ -115,7 +115,8 @@ const Login = () => {
                   className="w-full h-12 rounded-xl border border-input bg-secondary/50 px-4 text-foreground text-sm appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
                 >
                   <option value="Inwise">🛡️ Inwise</option>
-                  <option value="Manager">📋 Manager</option>
+                  <option value="Geovana">📋 Geovana Ignácio</option>
+                  <option value="Ligia">📋 Ligia Andreati</option>
                 </select>
                 <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
                   <svg className="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">

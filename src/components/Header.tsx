@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth, PROCEDURES_ALLOWED_EMAILS } from "@/contexts/AuthContext";
 import WeatherCard from "@/components/WeatherCard";
 import IframeOverlay from "@/components/IframeOverlay";
 import BudgetAssistantPopup from "@/components/BudgetAssistantPopup";
@@ -95,8 +95,8 @@ const Header = ({ onOpenProcedures }: HeaderProps) => {
                       {link.label}
                     </a>
                   ))}
-                  {/* Show Procedimentos only for admin (Inwise) in Sistemas */}
-                  {item.label === "Sistemas" && user && role === "admin" && onOpenProcedures && (
+                  {/* Show Procedimentos for Inwise and Ligia in Sistemas */}
+                  {item.label === "Sistemas" && user && PROCEDURES_ALLOWED_EMAILS.includes(user.email || "") && onOpenProcedures && (
                     <button
                       onClick={onOpenProcedures}
                       className="dropdown-item w-full text-left flex items-center gap-2"

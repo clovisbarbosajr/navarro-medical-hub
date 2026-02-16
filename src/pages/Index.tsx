@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth, PROCEDURES_ALLOWED_EMAILS } from "@/contexts/AuthContext";
 import FloatingClovisFab from "@/components/FloatingClovisFab";
 import BudgetAssistantPopup from "@/components/BudgetAssistantPopup";
 import FlowFieldBackground from "@/components/FlowFieldBackground";
@@ -152,7 +152,7 @@ const Index = () => {
       ) : (
         <FlowFieldBackground />
       )}
-      <Header onOpenProcedures={user && role === "admin" ? () => setProceduresOpen(true) : undefined} />
+      <Header onOpenProcedures={user && PROCEDURES_ALLOWED_EMAILS.includes(user.email || "") ? () => setProceduresOpen(true) : undefined} />
       <AnnouncementPopup />
       <BirthdayPopup />
 
