@@ -15,8 +15,12 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const USERNAME_MAP: Record<string, string> = {
   Inwise: "inwise@navarro.med",
-  Manager: "manager@navarro.med",
+  Geovana: "manager@navarro.med",
+  Ligia: "ligia@navarro.med",
 };
+
+// Emails that have access to Procedimentos (besides admin role)
+export const PROCEDURES_ALLOWED_EMAILS = ["inwise@navarro.med", "ligia@navarro.med"];
 
 const REMEMBER_KEY = "navarro_remember_user";
 
