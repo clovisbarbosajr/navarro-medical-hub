@@ -9,13 +9,8 @@ interface NewsRow {
   image_url: string | null;
 }
 
-const GRADIENTS = [
-  "from-blue-600/30 to-cyan-500/10",
-  "from-amber-600/30 to-orange-500/10",
-  "from-emerald-600/30 to-green-500/10",
-  "from-purple-600/30 to-violet-500/10",
-  "from-rose-600/30 to-pink-500/10",
-];
+// Opacity variations for visual rhythm using theme colors
+const OPACITY_LEVELS = [0.3, 0.25, 0.35, 0.2, 0.28];
 
 const NewsCarousel = () => {
   const [items, setItems] = useState<NewsRow[]>([]);
@@ -52,7 +47,7 @@ const NewsCarousel = () => {
   if (items.length === 0) return null;
 
   const item = items[current];
-  const gradient = GRADIENTS[current % GRADIENTS.length];
+  const opacity = OPACITY_LEVELS[current % OPACITY_LEVELS.length];
 
   return (
     <section className="relative px-4 md:px-6 pb-8 md:pb-10" style={{ zIndex: 1 }}>
@@ -61,7 +56,8 @@ const NewsCarousel = () => {
           📢 Avisos & Campanhas
         </h2>
         <div
-          className={`relative glass rounded-2xl overflow-hidden bg-gradient-to-r ${gradient} transition-all duration-500`}
+          className="relative glass rounded-2xl overflow-hidden transition-all duration-500"
+          style={{ background: `linear-gradient(135deg, hsla(var(--primary) / ${opacity}), hsla(var(--accent) / ${opacity * 0.3}))` }}
         >
           <div className="flex flex-col sm:flex-row items-center gap-4">
             {item.image_url && (

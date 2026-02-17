@@ -17,16 +17,8 @@ const ICON_MAP: Record<string, any> = {
   "documento": Shield,
 };
 
-const COLOR_CYCLE = [
-  "from-blue-500/20 to-blue-600/5",
-  "from-emerald-500/20 to-emerald-600/5",
-  "from-purple-500/20 to-purple-600/5",
-  "from-orange-500/20 to-orange-600/5",
-  "from-rose-500/20 to-rose-600/5",
-  "from-cyan-500/20 to-cyan-600/5",
-  "from-yellow-500/20 to-yellow-600/5",
-  "from-indigo-500/20 to-indigo-600/5",
-];
+// Dynamic opacity-based cards using theme primary/accent
+const OPACITY_CYCLE = [0.25, 0.2, 0.18, 0.22, 0.15, 0.2, 0.17, 0.25];
 
 function getIcon(label: string) {
   const lower = label.toLowerCase();
@@ -79,7 +71,8 @@ const QuickLinks = () => {
           <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2">
             {links.map((link, i) => {
               const Icon = getIcon(link.label);
-              const color = COLOR_CYCLE[i % COLOR_CYCLE.length];
+              const opacity = OPACITY_CYCLE[i % OPACITY_CYCLE.length];
+              const useAccent = i % 2 === 1;
               return (
                 <a
                   key={link.id}
@@ -87,10 +80,16 @@ const QuickLinks = () => {
                   target={link.open_mode === "new_tab" ? "_blank" : undefined}
                   rel={link.open_mode === "new_tab" ? "noopener noreferrer" : undefined}
                   onClick={(e) => handleClick(e, link)}
-                  className="group glass rounded-xl p-3 flex flex-col items-center text-center gap-1.5 hover:scale-[1.05] transition-all duration-300 hover:shadow-md hover:shadow-primary/10"
+                  className="group glass rounded-xl p-3 flex flex-col items-center text-center gap-1.5 hover:scale-[1.05] transition-all duration-300 hover:shadow-md"
+                  style={{ boxShadow: `0 0 0 transparent` }}
+                  onMouseEnter={e => (e.currentTarget.style.boxShadow = `0 4px 15px hsla(var(--primary) / 0.15)`)}
+                  onMouseLeave={e => (e.currentTarget.style.boxShadow = `0 0 0 transparent`)}
                 >
                   <div
-                    className={`w-10 h-10 rounded-lg bg-gradient-to-br ${color} flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}
+                    className="w-10 h-10 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300"
+                    style={{
+                      background: `linear-gradient(135deg, hsla(var(--${useAccent ? 'accent' : 'primary'}) / ${opacity}), hsla(var(--${useAccent ? 'primary' : 'accent'}) / ${opacity * 0.3}))`,
+                    }}
                   >
                     <Icon className="w-5 h-5 text-foreground" />
                   </div>
