@@ -1,7 +1,17 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, Trash2, Download, Search, Filter } from "lucide-react";
+import { Plus, Trash2, Download, Search, Filter, Copy, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface Payment {
   id: string;
@@ -19,14 +29,14 @@ interface Payment {
 
 const MONTH_OPTIONS = ["DEZ", "JAN", "FEV", "MAR", "ABR", "MAI", "JUN", "JUL", "AGO", "SET", "OUT", "NOV"];
 
-const UNIT_OPTIONS = ["DEERFIELD", "Orlando", "Tampa", "Fort Myers", "Port St Lucie"];
+const UNIT_OPTIONS = ["DEERFIELD", "Orlando", "Tampa", "Fort Myers", "Port St Lucie", "Jacksonville"];
 
 const STATUS_OPTIONS = ["", "COMPENSADO", "PENDENDE", "VOLTOU"];
 
 const getStatusColor = (status: string) => {
   switch (status) {
     case "COMPENSADO": return "bg-green-600 text-white";
-    case "PENDENDE": return "bg-yellow-500 text-black";
+    case "PENDENDE": return "bg-amber-500 text-black";
     case "VOLTOU": return "bg-red-600 text-white";
     default: return "bg-muted text-muted-foreground";
   }
@@ -45,6 +55,12 @@ const RHPaymentsManager = () => {
   const [editingCell, setEditingCell] = useState<{ id: string; field: string } | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterUnit, setFilterUnit] = useState<string>("all");
+  const [deleteConfirm, setDeleteConfirm] = useState<Payment | null>(null);
+  const [duplicateWeekOpen, setDuplicateWeekOpen] = useState(false);
+  const [dupTargetWeek, setDupTargetWeek] = useState<number>(1);
+  const [dupTargetRef, setDupTargetRef] = useState("");
+  const [dupSourceWeek, setDupSourceWeek] = useState<number | null>(null);
+  const [monthsWithData, setMonthsWithData] = useState<Set<string>>(new Set());
 
   const fetchPayments = async () => {
     setLoading(true);
@@ -63,9 +79,37 @@ const RHPaymentsManager = () => {
     setLoading(false);
   };
 
+  // Fetch which months have data for highlighting
+  const fetchMonthsWithData = async () => {
+    const { data, error } = await (supabase as any)
+      .from("rh_payments")
+      .select("month_label")
+      .limit(1000);
+
+    if (!error && data) {
+      const months = new Set<string>(data.map((r: any) => r.month_label));
+      setMonthsWithData(months);
+    }
+  };
+
   useEffect(() => {
     fetchPayments();
   }, [activeMonth]);
+
+  useEffect(() => {
+    fetchMonthsWithData();
+  }, [payments]);
+
+  // Get distinct weeks in current month for source selection
+  const availableWeeks = useMemo(() => {
+    const weeks = new Map<number, string>();
+    payments.forEach(p => {
+      if (p.week_number && !weeks.has(p.week_number)) {
+        weeks.set(p.week_number, p.week_ref || "");
+      }
+    });
+    return Array.from(weeks.entries()).sort((a, b) => a[0] - b[0]);
+  }, [payments]);
 
   const filteredPayments = useMemo(() => {
     let result = payments;
@@ -137,17 +181,80 @@ const RHPaymentsManager = () => {
     setPayments(prev => [...prev, data]);
   };
 
-  const deleteRow = async (id: string) => {
+  const deleteRow = async () => {
+    if (!deleteConfirm) return;
     const { error } = await (supabase as any)
       .from("rh_payments")
       .delete()
-      .eq("id", id);
+      .eq("id", deleteConfirm.id);
 
     if (error) {
       toast.error("Erro ao remover");
       return;
     }
-    setPayments(prev => prev.filter(p => p.id !== id));
+    setPayments(prev => prev.filter(p => p.id !== deleteConfirm.id));
+    setDeleteConfirm(null);
+    toast.success("Registro removido");
+  };
+
+  // Duplicate week: copies all employee names + units from a source week into a new week
+  const duplicateWeek = async () => {
+    if (!dupTargetRef.trim()) {
+      toast.error("Preencha a semana de referência");
+      return;
+    }
+
+    // Get source rows
+    let sourceRows: Payment[];
+    if (dupSourceWeek !== null) {
+      sourceRows = payments.filter(p => p.week_number === dupSourceWeek);
+    } else {
+      // Get last week's data
+      const lastWeek = availableWeeks.length > 0 ? availableWeeks[availableWeeks.length - 1][0] : null;
+      if (!lastWeek) {
+        toast.error("Nenhuma semana encontrada para copiar");
+        return;
+      }
+      sourceRows = payments.filter(p => p.week_number === lastWeek);
+    }
+
+    if (sourceRows.length === 0) {
+      toast.error("Nenhum funcionário na semana selecionada");
+      return;
+    }
+
+    const maxOrder = payments.length > 0
+      ? Math.max(...payments.map(p => p.sort_order))
+      : 0;
+
+    const newRows = sourceRows.map((p, i) => ({
+      employee_name: p.employee_name,
+      unit: p.unit,
+      month_label: activeMonth,
+      week_number: dupTargetWeek,
+      week_ref: dupTargetRef,
+      check_number: "",
+      delivery_date: "",
+      status: "",
+      obs: "",
+      sort_order: maxOrder + i + 1,
+    }));
+
+    const { data, error } = await (supabase as any)
+      .from("rh_payments")
+      .insert(newRows)
+      .select();
+
+    if (error) {
+      toast.error("Erro ao duplicar semana");
+      console.error(error);
+      return;
+    }
+
+    setPayments(prev => [...prev, ...(data || [])]);
+    setDuplicateWeekOpen(false);
+    setDupTargetRef("");
+    toast.success(`${sourceRows.length} funcionários copiados para Semana ${dupTargetWeek}`);
   };
 
   const exportCSV = () => {
@@ -178,14 +285,23 @@ const RHPaymentsManager = () => {
   };
 
   const EditableCell = ({
-    id, field, value, type = "text", className = "",
+    id, field, value, type = "text", className = "", required = false,
   }: {
-    id: string; field: string; value: any; type?: string; className?: string;
+    id: string; field: string; value: any; type?: string; className?: string; required?: boolean;
   }) => {
     const isEditing = editingCell?.id === id && editingCell?.field === field;
     const [localValue, setLocalValue] = useState(value ?? "");
 
     useEffect(() => { setLocalValue(value ?? ""); }, [value]);
+
+    const handleSave = () => {
+      if (required && !localValue.toString().trim()) {
+        toast.error("Este campo é obrigatório");
+        return;
+      }
+      const parsed = type === "number" ? parseInt(localValue) || null : localValue;
+      updateField(id, field, parsed);
+    };
 
     if (isEditing) {
       return (
@@ -194,15 +310,9 @@ const RHPaymentsManager = () => {
           type={type}
           value={localValue}
           onChange={e => setLocalValue(e.target.value)}
-          onBlur={() => {
-            const parsed = type === "number" ? parseInt(localValue) || null : localValue;
-            updateField(id, field, parsed);
-          }}
+          onBlur={handleSave}
           onKeyDown={e => {
-            if (e.key === "Enter") {
-              const parsed = type === "number" ? parseInt(localValue) || null : localValue;
-              updateField(id, field, parsed);
-            }
+            if (e.key === "Enter") handleSave();
             if (e.key === "Escape") setEditingCell(null);
           }}
           className={`w-full bg-background border border-primary/40 rounded px-1 py-0.5 text-xs text-foreground outline-none focus:ring-1 focus:ring-primary ${className}`}
@@ -210,10 +320,14 @@ const RHPaymentsManager = () => {
       );
     }
 
+    const isEmpty = !value && value !== 0;
+
     return (
       <span
         onClick={() => setEditingCell({ id, field })}
-        className={`cursor-pointer hover:bg-muted/50 px-1 py-0.5 block truncate min-h-[22px] ${className}`}
+        className={`cursor-pointer hover:bg-muted/50 px-1 py-0.5 block truncate min-h-[22px] ${
+          required && isEmpty ? "border border-dashed border-amber-400/50 rounded bg-amber-500/5" : ""
+        } ${className}`}
       >
         {value ?? ""}
       </span>
@@ -266,6 +380,17 @@ const RHPaymentsManager = () => {
             <Download className="w-3.5 h-3.5" /> CSV
           </button>
           <button
+            onClick={() => {
+              setDupSourceWeek(availableWeeks.length > 0 ? availableWeeks[availableWeeks.length - 1][0] : null);
+              setDupTargetWeek((availableWeeks.length > 0 ? availableWeeks[availableWeeks.length - 1][0] : 0) + 1);
+              setDupTargetRef("");
+              setDuplicateWeekOpen(true);
+            }}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg border border-border/40 text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-all"
+          >
+            <Copy className="w-3.5 h-3.5" /> Duplicar Semana
+          </button>
+          <button
             onClick={addRow}
             className="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-all"
           >
@@ -279,7 +404,7 @@ const RHPaymentsManager = () => {
         {[
           { label: "Total", value: stats.total },
           { label: "Compensado", value: stats.compensado, color: "text-green-500" },
-          { label: "Pendente", value: stats.pendente, color: "text-yellow-500" },
+          { label: "Pendente", value: stats.pendente, color: "text-amber-500" },
           { label: "Voltou", value: stats.voltou, color: "text-red-500" },
           { label: "Sem Status", value: stats.semStatus, color: "text-muted-foreground" },
         ].map(c => (
@@ -348,7 +473,7 @@ const RHPaymentsManager = () => {
               {filteredPayments.map(p => (
                 <tr key={p.id} className="border-b border-border/10 hover:bg-secondary/20 transition-colors">
                   <td className="px-2 py-1 border-r border-border/5">
-                    <EditableCell id={p.id} field="employee_name" value={p.employee_name} />
+                    <EditableCell id={p.id} field="employee_name" value={p.employee_name} required />
                   </td>
                   <td className="px-1 py-1 border-r border-border/5">
                     <UnitDropdown id={p.id} value={p.unit} />
@@ -357,7 +482,7 @@ const RHPaymentsManager = () => {
                     <EditableCell id={p.id} field="week_number" value={p.week_number} type="number" className="text-center" />
                   </td>
                   <td className="px-2 py-1 border-r border-border/5">
-                    <EditableCell id={p.id} field="week_ref" value={p.week_ref} />
+                    <EditableCell id={p.id} field="week_ref" value={p.week_ref} required />
                   </td>
                   <td className="px-2 py-1 border-r border-border/5 text-center">
                     <EditableCell id={p.id} field="check_number" value={p.check_number} className="text-center" />
@@ -372,7 +497,10 @@ const RHPaymentsManager = () => {
                     <EditableCell id={p.id} field="obs" value={p.obs} />
                   </td>
                   <td className="px-1 w-6">
-                    <button onClick={() => deleteRow(p.id)} className="text-destructive/30 hover:text-destructive p-0.5 transition-colors">
+                    <button
+                      onClick={() => setDeleteConfirm(p)}
+                      className="text-destructive/30 hover:text-destructive p-0.5 transition-colors"
+                    >
                       <Trash2 className="w-3 h-3" />
                     </button>
                   </td>
@@ -390,22 +518,141 @@ const RHPaymentsManager = () => {
         </div>
       )}
 
-      {/* Month tabs at bottom — Excel style */}
+      {/* Month tabs at bottom — Excel style with highlights */}
       <div className="flex items-center gap-0 bg-secondary/40 border border-border/20 rounded-b-xl overflow-x-auto">
-        {MONTH_OPTIONS.map(m => (
-          <button
-            key={m}
-            onClick={() => setActiveMonth(m)}
-            className={`px-4 py-2 text-xs font-medium whitespace-nowrap border-r border-border/10 transition-all ${
-              activeMonth === m
-                ? "bg-primary/20 text-primary font-bold border-b-2 border-b-primary"
-                : "text-muted-foreground hover:text-foreground hover:bg-secondary/60"
-            }`}
-          >
-            {m}
-          </button>
-        ))}
+        {MONTH_OPTIONS.map(m => {
+          const hasData = monthsWithData.has(m);
+          const isActive = activeMonth === m;
+          return (
+            <button
+              key={m}
+              onClick={() => setActiveMonth(m)}
+              className={`relative px-4 py-2 text-xs font-medium whitespace-nowrap border-r border-border/10 transition-all ${
+                isActive
+                  ? "bg-primary/20 text-primary font-bold border-b-2 border-b-primary"
+                  : hasData
+                    ? "text-foreground font-semibold hover:bg-secondary/60 bg-secondary/30"
+                    : "text-muted-foreground/50 hover:text-muted-foreground hover:bg-secondary/60"
+              }`}
+            >
+              {m}
+              {hasData && !isActive && (
+                <span className="absolute top-1 right-1 w-1.5 h-1.5 bg-primary rounded-full" />
+              )}
+            </button>
+          );
+        })}
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={!!deleteConfirm} onOpenChange={open => !open && setDeleteConfirm(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="w-5 h-5 text-destructive" />
+              Confirmar exclusão
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza que deseja remover{" "}
+              <strong className="text-foreground">
+                {deleteConfirm?.employee_name || "este registro"}
+              </strong>
+              {deleteConfirm?.week_ref && (
+                <> da semana <strong className="text-foreground">{deleteConfirm.week_ref}</strong></>
+              )}
+              ? Esta ação não pode ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={deleteRow}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Duplicate Week Dialog */}
+      <AlertDialog open={duplicateWeekOpen} onOpenChange={setDuplicateWeekOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <Copy className="w-5 h-5 text-primary" />
+              Duplicar Semana — {activeMonth}
+            </AlertDialogTitle>
+            <AlertDialogDescription asChild>
+              <div className="space-y-4 mt-2">
+                <p className="text-sm text-muted-foreground">
+                  Copiar nomes e unidades de uma semana existente para uma nova semana.
+                </p>
+
+                {/* Source week */}
+                <div>
+                  <label className="text-xs font-medium text-foreground block mb-1">
+                    Semana de origem
+                  </label>
+                  {availableWeeks.length > 0 ? (
+                    <select
+                      value={dupSourceWeek ?? ""}
+                      onChange={e => setDupSourceWeek(Number(e.target.value))}
+                      className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm text-foreground"
+                    >
+                      {availableWeeks.map(([week, ref]) => (
+                        <option key={week} value={week}>
+                          Semana {week} {ref ? `(${ref})` : ""}
+                        </option>
+                      ))}
+                    </select>
+                  ) : (
+                    <p className="text-xs text-muted-foreground italic">Nenhuma semana neste mês para duplicar.</p>
+                  )}
+                </div>
+
+                {/* Target week number */}
+                <div>
+                  <label className="text-xs font-medium text-foreground block mb-1">
+                    Número da nova semana
+                  </label>
+                  <input
+                    type="number"
+                    min={1}
+                    max={5}
+                    value={dupTargetWeek}
+                    onChange={e => setDupTargetWeek(Number(e.target.value))}
+                    className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm text-foreground"
+                  />
+                </div>
+
+                {/* Target week ref (required) */}
+                <div>
+                  <label className="text-xs font-medium text-foreground block mb-1">
+                    Semana de referência <span className="text-destructive">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Ex: 03/02 A 03/07"
+                    value={dupTargetRef}
+                    onChange={e => setDupTargetRef(e.target.value)}
+                    className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground"
+                  />
+                </div>
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={duplicateWeek}
+              disabled={!dupTargetRef.trim() || availableWeeks.length === 0}
+            >
+              Duplicar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
