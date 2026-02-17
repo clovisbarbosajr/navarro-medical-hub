@@ -20,7 +20,7 @@ export const useChatAuth = () => {
 };
 
 const nameToEmail = (name: string) => {
-  return name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, ".").replace(/[^a-z0-9.]/g, "") + "@navarro.com";
+  return name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, ".").replace(/[^a-z0-9.]/g, "") + "@navarro.med";
 };
 
 export const ChatAuthProvider = ({ children }: { children: ReactNode }) => {
