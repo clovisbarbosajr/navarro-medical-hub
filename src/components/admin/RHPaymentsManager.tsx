@@ -31,13 +31,12 @@ const MONTH_OPTIONS = ["DEZ", "JAN", "FEV", "MAR", "ABR", "MAI", "JUN", "JUL", "
 
 const UNIT_OPTIONS = ["DEERFIELD", "Orlando", "Tampa", "Fort Myers", "Port St Lucie", "Jacksonville"];
 
-const STATUS_OPTIONS = ["", "COMPENSADO", "PENDENDE", "VOLTOU"];
+const STATUS_OPTIONS = ["", "COMPENSADO", "PENDENDE"];
 
 const getStatusColor = (status: string) => {
   switch (status) {
     case "COMPENSADO": return "bg-green-600 text-white";
     case "PENDENDE": return "bg-amber-500 text-black";
-    case "VOLTOU": return "bg-red-600 text-white";
     default: return "bg-muted text-muted-foreground";
   }
 };
@@ -56,6 +55,7 @@ const RHPaymentsManager = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterUnit, setFilterUnit] = useState<string>("all");
   const [deleteConfirm, setDeleteConfirm] = useState<Payment | null>(null);
+  const [deleteCheckboxConfirmed, setDeleteCheckboxConfirmed] = useState(false);
   const [duplicateWeekOpen, setDuplicateWeekOpen] = useState(false);
   const [dupTargetWeek, setDupTargetWeek] = useState<number>(1);
   const [dupTargetRef, setDupTargetRef] = useState("");
@@ -130,9 +130,8 @@ const RHPaymentsManager = () => {
     const total = payments.length;
     const compensado = payments.filter(p => p.status === "COMPENSADO").length;
     const pendente = payments.filter(p => p.status === "PENDENDE").length;
-    const voltou = payments.filter(p => p.status === "VOLTOU").length;
     const semStatus = payments.filter(p => !p.status).length;
-    return { total, compensado, pendente, voltou, semStatus };
+    return { total, compensado, pendente, semStatus };
   }, [payments]);
 
   const updateField = async (id: string, field: string, value: any) => {
@@ -344,7 +343,6 @@ const RHPaymentsManager = () => {
       <option value="">—</option>
       <option value="COMPENSADO">COMPENSADO</option>
       <option value="PENDENDE">PENDENDE</option>
-      <option value="VOLTOU">VOLTOU</option>
     </select>
   );
 
@@ -400,12 +398,11 @@ const RHPaymentsManager = () => {
       </div>
 
       {/* Summary cards */}
-      <div className="grid grid-cols-5 gap-2 mb-3">
+      <div className="grid grid-cols-4 gap-2 mb-3">
         {[
           { label: "Total", value: stats.total },
           { label: "Compensado", value: stats.compensado, color: "text-green-500" },
           { label: "Pendente", value: stats.pendente, color: "text-amber-500" },
-          { label: "Voltou", value: stats.voltou, color: "text-red-500" },
           { label: "Sem Status", value: stats.semStatus, color: "text-muted-foreground" },
         ].map(c => (
           <div key={c.label} className="glass-strong rounded-lg p-2.5 border border-border/20">
@@ -545,29 +542,50 @@ const RHPaymentsManager = () => {
       </div>
 
       {/* Delete Confirmation Dialog */}
-      <AlertDialog open={!!deleteConfirm} onOpenChange={open => !open && setDeleteConfirm(null)}>
+      <AlertDialog open={!!deleteConfirm} onOpenChange={open => {
+        if (!open) {
+          setDeleteConfirm(null);
+          setDeleteCheckboxConfirmed(false);
+        }
+      }}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2">
               <AlertTriangle className="w-5 h-5 text-destructive" />
               Confirmar exclusão
             </AlertDialogTitle>
-            <AlertDialogDescription>
-              Tem certeza que deseja remover{" "}
-              <strong className="text-foreground">
-                {deleteConfirm?.employee_name || "este registro"}
-              </strong>
-              {deleteConfirm?.week_ref && (
-                <> da semana <strong className="text-foreground">{deleteConfirm.week_ref}</strong></>
-              )}
-              ? Esta ação não pode ser desfeita.
+            <AlertDialogDescription asChild>
+              <div className="space-y-4">
+                <p>
+                  Tem certeza que deseja remover{" "}
+                  <strong className="text-foreground">
+                    {deleteConfirm?.employee_name || "este registro"}
+                  </strong>
+                  {deleteConfirm?.week_ref && (
+                    <> da semana <strong className="text-foreground">{deleteConfirm.week_ref}</strong></>
+                  )}
+                  ? Esta ação não pode ser desfeita.
+                </p>
+                <label className="flex items-center gap-2 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={deleteCheckboxConfirmed}
+                    onChange={e => setDeleteCheckboxConfirmed(e.target.checked)}
+                    className="w-4 h-4 rounded border-border accent-destructive cursor-pointer"
+                  />
+                  <span className="text-sm text-foreground font-medium">
+                    Confirmo que desejo excluir este registro
+                  </span>
+                </label>
+              </div>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
             <AlertDialogAction
               onClick={deleteRow}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              disabled={!deleteCheckboxConfirmed}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90 disabled:opacity-40 disabled:cursor-not-allowed"
             >
               Excluir
             </AlertDialogAction>
