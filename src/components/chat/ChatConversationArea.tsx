@@ -139,10 +139,19 @@ const ChatConversationArea = ({ conversationId, conversationName, fetchMessages,
 
   const handleDelete = async (msgId: string) => { await (supabase as any).from("chat_messages").delete().eq("id", msgId); setMessages((prev) => prev.filter((m) => m.id !== msgId)); };
 
+  const [attentionCount, setAttentionCount] = useState(0);
+  const [attentionCooldown, setAttentionCooldown] = useState(false);
+
   const handleAttentionRequest = async () => {
-    if (!user) return;
+    if (!user || attentionCooldown) return;
     await (supabase as any).from("chat_messages").insert({ conversation_id: conversationId, sender_id: user.id, content: "⚠️ Pedido de atenção!", is_attention: true });
     await (supabase as any).from("chat_conversations").update({ updated_at: new Date().toISOString() }).eq("id", conversationId);
+    const newCount = attentionCount + 1;
+    setAttentionCount(newCount);
+    if (newCount >= 2) {
+      setAttentionCooldown(true);
+      setTimeout(() => { setAttentionCount(0); setAttentionCooldown(false); }, 5 * 60 * 1000);
+    }
   };
 
   const handleDownload = async (url: string, name: string, msgId: string) => {
@@ -174,7 +183,7 @@ const ChatConversationArea = ({ conversationId, conversationName, fetchMessages,
           {onBack && <button onClick={onBack} className="p-1 rounded hover:bg-secondary/50 text-muted-foreground hover:text-foreground transition-colors"><ArrowLeft className="w-3.5 h-3.5" /></button>}
           <span className="text-xs font-medium text-foreground">{conversationName}</span>
         </div>
-        <button onClick={handleAttentionRequest} className="p-1 rounded hover:bg-accent/20 text-muted-foreground hover:text-accent transition-colors" title="Pedido de atenção (MSN style!)"><AlertTriangle className="w-3.5 h-3.5" /></button>
+        <button onClick={handleAttentionRequest} disabled={attentionCooldown} className={`p-1 rounded hover:bg-accent/20 text-muted-foreground hover:text-accent transition-colors ${attentionCooldown ? "opacity-30 cursor-not-allowed" : ""}`} title={attentionCooldown ? "Aguarde 5 min (limite: 2 por vez)" : "Pedido de atenção (MSN style!)"}><AlertTriangle className="w-3.5 h-3.5" /></button>
       </div>
 
       {/* Messages */}
