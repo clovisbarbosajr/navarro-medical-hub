@@ -16,10 +16,11 @@ import NewsCarousel from "@/components/NewsCarousel";
 import GallerySection from "@/components/GallerySection";
 import useActiveTheme from "@/hooks/useActiveTheme";
 import navarroLogo from "@/assets/navarro-heart-logo.png";
-import { X } from "lucide-react";
+import { X, MessageCircle } from "lucide-react";
 import DeniseProceduresManager from "@/components/admin/DeniseProceduresManager";
 import RHPaymentsManager from "@/components/admin/RHPaymentsManager";
-
+import ChatWidget from "@/components/chat/ChatWidget";
+import { toast } from "sonner";
 
 const Index = () => {
   const { user, role } = useAuth();
@@ -28,6 +29,8 @@ const Index = () => {
   const [clovisOpen, setClovisOpen] = useState(false);
   const [proceduresOpen, setProceduresOpen] = useState(false);
   const [rhOpen, setRHOpen] = useState(false);
+  const [chatOpen, setChatOpen] = useState(false);
+  const isAdmin = role === "admin";
 
   useEffect(() => {
     const check = async () => {
@@ -213,6 +216,27 @@ const Index = () => {
 
       <FloatingClovisFab onClick={() => setClovisOpen(true)} />
       <BudgetAssistantPopup open={clovisOpen} onClose={() => setClovisOpen(false)} />
+
+      {/* Chat FAB — only visible when logged in */}
+      {user && !chatOpen && (
+        <button
+          onClick={() => {
+            if (isAdmin) {
+              setChatOpen(true);
+            } else {
+              toast.info("🚧 Navarro Connect — Em breve!", {
+                description: "O chat corporativo estará disponível em breve para todos os colaboradores.",
+              });
+            }
+          }}
+          style={{ position: 'fixed', bottom: '1.5rem', right: '1.5rem' }}
+          className="z-50 w-16 h-16 rounded-full shadow-lg hover:scale-105 transition-transform flex items-center justify-center bg-primary"
+          title="Navarro Connect"
+        >
+          <MessageCircle className="w-8 h-8 text-primary-foreground" />
+        </button>
+      )}
+      {chatOpen && isAdmin && <ChatWidget onClose={() => setChatOpen(false)} />}
 
 
       {/* Procedures fullscreen overlay */}
