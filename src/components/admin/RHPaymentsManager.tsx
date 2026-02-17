@@ -180,19 +180,22 @@ const RHPaymentsManager = () => {
     setPayments(prev => [...prev, data]);
   };
 
-  const deleteRow = async () => {
+  const deleteRow = async (e?: React.MouseEvent) => {
+    e?.preventDefault();
     if (!deleteConfirm) return;
+    const idToDelete = deleteConfirm.id;
     const { error } = await (supabase as any)
       .from("rh_payments")
       .delete()
-      .eq("id", deleteConfirm.id);
+      .eq("id", idToDelete);
 
     if (error) {
       toast.error("Erro ao remover");
       return;
     }
-    setPayments(prev => prev.filter(p => p.id !== deleteConfirm.id));
+    setPayments(prev => prev.filter(p => p.id !== idToDelete));
     setDeleteConfirm(null);
+    setDeleteCheckboxConfirmed(false);
     toast.success("Registro removido");
   };
 
@@ -582,13 +585,13 @@ const RHPaymentsManager = () => {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction
+            <button
               onClick={deleteRow}
               disabled={!deleteCheckboxConfirmed}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90 disabled:opacity-40 disabled:cursor-not-allowed"
+              className="inline-flex items-center justify-center rounded-md text-sm font-medium px-4 py-2 bg-destructive text-destructive-foreground hover:bg-destructive/90 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
             >
               Excluir
-            </AlertDialogAction>
+            </button>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

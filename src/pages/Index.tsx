@@ -65,6 +65,16 @@ const Index = () => {
     check();
   }, []);
 
+  // Lock body scroll when overlay is open
+  useEffect(() => {
+    if (proceduresOpen || rhOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => { document.body.style.overflow = ""; };
+  }, [proceduresOpen, rhOpen]);
+
   // Log access via edge function
   useEffect(() => {
     if (blocked === false) {
@@ -208,7 +218,7 @@ const Index = () => {
       {/* Procedures fullscreen overlay */}
       {proceduresOpen && (
         <div className="fixed inset-0 bg-background/95 backdrop-blur-sm" style={{ zIndex: 100 }}>
-          <div className="h-full overflow-auto">
+          <div className="h-full overflow-y-auto custom-overlay-scroll">
             <div className="max-w-7xl mx-auto px-4 md:px-6 py-6">
               <div className="flex justify-end mb-4">
                 <button
@@ -227,7 +237,7 @@ const Index = () => {
       {/* RH Payments fullscreen overlay */}
       {rhOpen && (
         <div className="fixed inset-0 bg-background/95 backdrop-blur-sm" style={{ zIndex: 100 }}>
-          <div className="h-full overflow-auto">
+          <div className="h-full overflow-y-auto custom-overlay-scroll">
             <div className="max-w-7xl mx-auto px-4 md:px-6 py-6">
               <div className="flex justify-end mb-4">
                 <button
