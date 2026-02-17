@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 import { X, MessageCircle, Minus, Settings } from "lucide-react";
+import chatLogo from "@/assets/chat-logo.png";
 import { useChat } from "@/hooks/useChat";
 import { useChatAuth } from "@/contexts/ChatAuthContext";
 import { useUserRole } from "@/hooks/useUserRole";
@@ -94,8 +95,8 @@ const ChatWidget = ({ onClose }: { onClose: () => void }) => {
   if (minimized) {
     return (
       <button onClick={() => setMinimized(false)} style={{ position: 'fixed', bottom: '1.5rem', right: '1.5rem' }}
-        className={`z-50 w-16 h-16 rounded-full shadow-lg hover:scale-105 transition-transform flex items-center justify-center relative bg-primary ${hasAnyAttention ? "mini-pulse-attention" : totalUnread > 0 ? "mini-pulse" : ""}`}>
-        <MessageCircle className="w-8 h-8 text-primary-foreground" />
+        className={`z-50 w-16 h-16 rounded-full shadow-lg hover:scale-105 transition-transform flex items-center justify-center relative overflow-hidden p-0 border-0 bg-transparent ${hasAnyAttention ? "mini-pulse-attention" : totalUnread > 0 ? "mini-pulse" : ""}`}>
+        <img src={chatLogo} alt="Chat" className="w-full h-full object-cover" />
         {totalUnread > 0 && (
           <span className={`absolute -top-1 -right-1 min-w-5 h-5 px-1 rounded-full text-[10px] flex items-center justify-center font-bold ${hasAnyAttention ? "bg-destructive text-destructive-foreground" : "bg-green-500 text-white"}`}>{totalUnread > 9 ? "9+" : totalUnread}</span>
         )}

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { MessageCircle } from "lucide-react";
+import chatLogo from "@/assets/chat-logo.png";
 import FlowFieldBackground from "@/components/FlowFieldBackground";
 import ThemedBackground from "@/components/ThemedBackground";
 import useActiveTheme from "@/hooks/useActiveTheme";
@@ -116,10 +116,10 @@ const Dashboard = () => {
       {!chatOpen && (
         <button
           onClick={() => setChatOpen(true)}
-          className="fixed bottom-24 right-6 z-50 w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 flex items-center justify-center hover:scale-110 transition-transform"
+          className="fixed bottom-24 right-6 z-50 w-14 h-14 rounded-full shadow-lg hover:scale-110 transition-transform flex items-center justify-center overflow-hidden p-0 border-0 bg-transparent"
           title="Abrir Chat"
         >
-          <MessageCircle className="w-7 h-7" />
+          <img src={chatLogo} alt="Chat" className="w-full h-full object-cover" />
         </button>
       )}
       {chatOpen && <ChatWidget onClose={() => setChatOpen(false)} />}
