@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { MessageCircle } from "lucide-react";
 import FlowFieldBackground from "@/components/FlowFieldBackground";
 import ThemedBackground from "@/components/ThemedBackground";
 import useActiveTheme from "@/hooks/useActiveTheme";
@@ -21,6 +22,7 @@ import AdminUsersTab from "@/components/admin/AdminUsersTab";
 import AdminDepartmentsTab from "@/components/admin/AdminDepartmentsTab";
 import AdminHistoryTab from "@/components/admin/AdminHistoryTab";
 import AdminBroadcastTab from "@/components/admin/AdminBroadcastTab";
+import ChatWidget from "@/components/chat/ChatWidget";
 
 interface AnnouncementPrefill {
   title: string;
@@ -33,6 +35,7 @@ const Dashboard = () => {
   const [activeSection, setActiveSection] = useState("news");
   const [announcementPrefill, setAnnouncementPrefill] = useState<AnnouncementPrefill | null>(null);
   const [clovisOpen, setClovisOpen] = useState(false);
+  const [chatOpen, setChatOpen] = useState(false);
 
   const handleCreateAnnouncement = (title: string, body: string) => {
     setAnnouncementPrefill({ title, body });
@@ -108,6 +111,18 @@ const Dashboard = () => {
       <FloatingClovisFab onClick={() => setClovisOpen(true)} label="Clovis — Assistente de Orçamentos (Modo Admin)" />
 
       <BudgetAssistantPopup open={clovisOpen} onClose={() => setClovisOpen(false)} />
+
+      {/* Chat floating button + widget */}
+      {!chatOpen && (
+        <button
+          onClick={() => setChatOpen(true)}
+          className="fixed bottom-24 right-6 z-50 w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 flex items-center justify-center hover:scale-110 transition-transform"
+          title="Abrir Chat"
+        >
+          <MessageCircle className="w-7 h-7" />
+        </button>
+      )}
+      {chatOpen && <ChatWidget onClose={() => setChatOpen(false)} />}
     </div>
   );
 };
