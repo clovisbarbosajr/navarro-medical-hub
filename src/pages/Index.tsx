@@ -17,6 +17,7 @@ import GallerySection from "@/components/GallerySection";
 import useActiveTheme from "@/hooks/useActiveTheme";
 import navarroLogo from "@/assets/navarro-heart-logo.png";
 import { X, MessageCircle } from "lucide-react";
+import chatLogo from "@/assets/chat-logo.png";
 import DeniseProceduresManager from "@/components/admin/DeniseProceduresManager";
 import RHPaymentsManager from "@/components/admin/RHPaymentsManager";
 import ChatWidget from "@/components/chat/ChatWidget";
@@ -230,10 +231,10 @@ const Index = () => {
             }
           }}
           style={{ position: 'fixed', bottom: '1.5rem', right: '1.5rem' }}
-          className="z-50 w-16 h-16 rounded-full shadow-lg hover:scale-105 transition-transform flex items-center justify-center bg-primary"
+          className="z-50 w-16 h-16 rounded-full shadow-lg hover:scale-105 transition-transform flex items-center justify-center overflow-hidden p-0 border-0 bg-transparent"
           title="Navarro Connect"
         >
-          <MessageCircle className="w-8 h-8 text-primary-foreground" />
+          <img src={chatLogo} alt="Chat" className="w-full h-full object-cover" />
         </button>
       )}
       {chatOpen && isAdmin && <ChatWidget onClose={() => setChatOpen(false)} />}
