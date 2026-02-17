@@ -67,12 +67,14 @@ const GallerySection = () => {
                 onClick={() => openViewer(i)}
                 className="group relative overflow-hidden rounded-2xl glass cursor-pointer hover:scale-[1.02] transition-transform duration-300"
               >
-                <img
-                  src={img.image_url}
-                  alt={img.title}
-                  className="w-full h-52 object-cover group-hover:scale-110 transition-transform duration-500"
-                  loading="lazy"
-                />
+                <div className="w-full h-52 bg-black/10 flex items-center justify-center overflow-hidden">
+                  <img
+                    src={img.image_url}
+                    alt={img.title}
+                    className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500"
+                    loading="lazy"
+                  />
+                </div>
                 <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/20 to-transparent flex flex-col justify-end p-4">
                   <p className="text-sm font-display font-semibold text-foreground">{img.title}</p>
                   {img.description && (
@@ -113,11 +115,13 @@ const GallerySection = () => {
 
             {/* Photo */}
             <div className="relative rounded-2xl overflow-hidden glass">
-              <img
-                src={images[viewerIndex].image_url}
-                alt={images[viewerIndex].title}
-                className="w-full h-[60vh] object-cover"
-              />
+                <div className="w-full h-[60vh] bg-black/20 flex items-center justify-center">
+                  <img
+                    src={images[viewerIndex].image_url}
+                    alt={images[viewerIndex].title}
+                    className="w-full h-full object-contain"
+                  />
+                </div>
 
               {/* Arrows */}
               {images.length > 1 && (
