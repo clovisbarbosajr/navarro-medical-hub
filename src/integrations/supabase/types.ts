@@ -515,6 +515,54 @@ export type Database = {
         }
         Relationships: []
       }
+      rh_payments: {
+        Row: {
+          check_number: string | null
+          created_at: string
+          delivery_date: string | null
+          employee_name: string
+          id: string
+          month_label: string
+          obs: string | null
+          sort_order: number
+          status: string | null
+          unit: string
+          updated_at: string
+          week_number: number | null
+          week_ref: string | null
+        }
+        Insert: {
+          check_number?: string | null
+          created_at?: string
+          delivery_date?: string | null
+          employee_name: string
+          id?: string
+          month_label: string
+          obs?: string | null
+          sort_order?: number
+          status?: string | null
+          unit?: string
+          updated_at?: string
+          week_number?: number | null
+          week_ref?: string | null
+        }
+        Update: {
+          check_number?: string | null
+          created_at?: string
+          delivery_date?: string | null
+          employee_name?: string
+          id?: string
+          month_label?: string
+          obs?: string | null
+          sort_order?: number
+          status?: string | null
+          unit?: string
+          updated_at?: string
+          week_number?: number | null
+          week_ref?: string | null
+        }
+        Relationships: []
+      }
       site_settings: {
         Row: {
           id: string

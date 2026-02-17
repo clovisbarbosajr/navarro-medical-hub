@@ -7,7 +7,7 @@ import BudgetAssistantPopup from "@/components/BudgetAssistantPopup";
 import NotificationBell from "@/components/NotificationBell";
 import navarroLogo from "@/assets/navarro-heart-logo.png";
 import type { MenuLink } from "@/types/database";
-import { FileSpreadsheet } from "lucide-react";
+import { FileSpreadsheet, DollarSign } from "lucide-react";
 
 const CATEGORY_LABELS: Record<string, string> = {
   sistemas: "Sistemas",
@@ -21,9 +21,10 @@ const BUDGET_ASSISTANT_LABEL = "IA NAVARRO";
 
 interface HeaderProps {
   onOpenProcedures?: () => void;
+  onOpenRH?: () => void;
 }
 
-const Header = ({ onOpenProcedures }: HeaderProps) => {
+const Header = ({ onOpenProcedures, onOpenRH }: HeaderProps) => {
   const { user, role, logout } = useAuth();
   const [links, setLinks] = useState<MenuLink[]>([]);
   const [iframeLink, setIframeLink] = useState<MenuLink | null>(null);
@@ -103,6 +104,16 @@ const Header = ({ onOpenProcedures }: HeaderProps) => {
                     >
                       <FileSpreadsheet className="w-3.5 h-3.5" />
                       Procedimentos
+                    </button>
+                  )}
+                  {/* Show RH for Inwise and Ligia in Sistemas */}
+                  {item.label === "Sistemas" && user && PROCEDURES_ALLOWED_EMAILS.includes(user.email || "") && onOpenRH && (
+                    <button
+                      onClick={onOpenRH}
+                      className="dropdown-item w-full text-left flex items-center gap-2"
+                    >
+                      <DollarSign className="w-3.5 h-3.5" />
+                      RH
                     </button>
                   )}
                 </div>
