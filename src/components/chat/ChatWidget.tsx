@@ -23,6 +23,7 @@ const ChatWidget = ({ onClose }: { onClose?: () => void }) => {
   const [soundEnabled, setSoundEnabled] = useState(false);
   const [shaking, setShaking] = useState(false);
   const [attentionConvIds, setAttentionConvIds] = useState<Set<string>>(new Set());
+  const [hiddenConvIds, setHiddenConvIds] = useState<Set<string>>(new Set());
   const prevUnreadRef = useRef(0);
 
   useEffect(() => {
@@ -37,7 +38,14 @@ const ChatWidget = ({ onClose }: { onClose?: () => void }) => {
   const openConversation = useCallback((id: string) => {
     setActiveTab(id); setMinimized(false);
     setAttentionConvIds((prev) => { const next = new Set(prev); next.delete(id); return next; });
+    // Unhide if hidden
+    setHiddenConvIds((prev) => { const next = new Set(prev); next.delete(id); return next; });
   }, []);
+
+  const hideConversation = useCallback((id: string) => {
+    setHiddenConvIds((prev) => new Set(prev).add(id));
+    if (activeTab === id) setActiveTab(undefined);
+  }, [activeTab]);
 
   const handleStartDirect = useCallback(async (userId: string) => {
     try { const convId = await startDirectConversation(userId); if (convId) openConversation(convId); } catch (err) { console.error("Failed to start conversation:", err); }
@@ -55,7 +63,8 @@ const ChatWidget = ({ onClose }: { onClose?: () => void }) => {
     return other?.display_name || "Conversa";
   };
 
-  const totalUnread = conversations.reduce((sum, c) => sum + c.unread_count, 0);
+  const visibleConversations = conversations.filter((c) => !hiddenConvIds.has(c.id));
+  const totalUnread = visibleConversations.reduce((sum, c) => sum + c.unread_count, 0);
   const hasAnyAttention = attentionConvIds.size > 0;
 
   useEffect(() => {
@@ -134,7 +143,7 @@ const ChatWidget = ({ onClose }: { onClose?: () => void }) => {
           </div>
         )}
         <div className="flex-1 flex min-h-0">
-          <ChatContactsList contacts={contacts} conversations={conversations} activeConversationId={activeTab} onSelectConversation={openConversation} onStartDirect={handleStartDirect} onCreateGroup={() => setShowGroupDialog(true)} onCloseConversation={() => setActiveTab(undefined)} isAdmin={isAdmin} attentionConvIds={attentionConvIds} />
+          <ChatContactsList contacts={contacts} conversations={visibleConversations} activeConversationId={activeTab} onSelectConversation={openConversation} onStartDirect={handleStartDirect} onCreateGroup={() => setShowGroupDialog(true)} onCloseConversation={() => setActiveTab(undefined)} isAdmin={isAdmin} attentionConvIds={attentionConvIds} onHideConversation={hideConversation} />
           <div className="flex-1 flex flex-col min-w-0">
             {activeTab ? (
               <ChatConversationArea key={activeTab} conversationId={activeTab} conversationName={getConversationName(activeTab)} fetchMessages={fetchMessages} sendMessage={sendMessage} markAsRead={markAsRead} onBack={() => setActiveTab(undefined)} />

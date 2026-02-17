@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Search, Users, MessageCircle } from "lucide-react";
+import { Search, Users, MessageCircle, X } from "lucide-react";
 import { useChatAuth } from "@/contexts/ChatAuthContext";
 import type { Profile, Conversation } from "@/hooks/useChat";
 
@@ -20,9 +20,10 @@ interface Props {
   onSelectConversation: (id: string) => void; onStartDirect: (userId: string) => void;
   onCreateGroup?: () => void; onCloseConversation?: () => void; isAdmin: boolean;
   attentionConvIds?: Set<string>;
+  onHideConversation?: (id: string) => void;
 }
 
-const ChatContactsList = ({ contacts, conversations, activeConversationId, onSelectConversation, onStartDirect, onCreateGroup, isAdmin, attentionConvIds = new Set() }: Props) => {
+const ChatContactsList = ({ contacts, conversations, activeConversationId, onSelectConversation, onStartDirect, onCreateGroup, isAdmin, attentionConvIds = new Set(), onHideConversation }: Props) => {
   const { user } = useChatAuth();
   const [search, setSearch] = useState("");
   const [tab, setTab] = useState<"chats" | "contacts">("contacts");
@@ -79,18 +80,29 @@ const ChatContactsList = ({ contacts, conversations, activeConversationId, onSel
               const dept = otherProfile?.department || "Geral";
               const deptColor = getDeptColor(dept);
               return (
-                <button key={conv.id} onClick={() => onSelectConversation(conv.id)} className={`w-full flex items-center gap-1.5 p-1.5 rounded-md text-left transition-all ${isActive ? "bg-primary/15 border border-primary/20" : attentionConvIds.has(conv.id) ? "tab-blink-attention" : hasUnread ? "contact-flash" : "hover:bg-secondary/50"}`}>
-                  <div className="relative flex-shrink-0">
-                    {conv.type === "group" ? <div className="w-6 h-6 rounded-full bg-secondary flex items-center justify-center"><Users className="w-3 h-3 text-secondary-foreground" /></div>
-                    : other?.avatar_url ? <img src={other.avatar_url} alt="" className="w-6 h-6 rounded-full object-cover" />
-                    : <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[8px] font-bold text-white ${deptColor.bg}`}>{initials(getConversationName(conv))}</div>}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex justify-between items-center"><span className={`text-[11px] truncate ${hasUnread ? deptColor.text + " font-semibold" : "text-foreground font-medium"}`}>{getConversationName(conv)}</span>
-                    {hasUnread && <span className={`ml-1 w-4 h-4 rounded-full text-[8px] flex items-center justify-center font-bold flex-shrink-0 ${deptColor.bg} text-white`}>{conv.unread_count}</span>}</div>
-                    {conv.last_message?.content && <p className="text-[9px] text-muted-foreground truncate">{conv.last_message.content}</p>}
-                  </div>
-                </button>
+                <div key={conv.id} className="relative group/conv">
+                  <button onClick={() => onSelectConversation(conv.id)} className={`w-full flex items-center gap-1.5 p-1.5 pr-5 rounded-md text-left transition-all ${isActive ? "bg-primary/15 border border-primary/20" : attentionConvIds.has(conv.id) ? "tab-blink-attention" : hasUnread ? "contact-flash" : "hover:bg-secondary/50"}`}>
+                    <div className="relative flex-shrink-0">
+                      {conv.type === "group" ? <div className="w-6 h-6 rounded-full bg-secondary flex items-center justify-center"><Users className="w-3 h-3 text-secondary-foreground" /></div>
+                      : other?.avatar_url ? <img src={other.avatar_url} alt="" className="w-6 h-6 rounded-full object-cover" />
+                      : <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[8px] font-bold text-white ${deptColor.bg}`}>{initials(getConversationName(conv))}</div>}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex justify-between items-center"><span className={`text-[11px] truncate ${hasUnread ? deptColor.text + " font-semibold" : "text-foreground font-medium"}`}>{getConversationName(conv)}</span>
+                      {hasUnread && <span className={`ml-1 w-4 h-4 rounded-full text-[8px] flex items-center justify-center font-bold flex-shrink-0 ${deptColor.bg} text-white`}>{conv.unread_count}</span>}</div>
+                      {conv.last_message?.content && <p className="text-[9px] text-muted-foreground truncate">{conv.last_message.content}</p>}
+                    </div>
+                  </button>
+                  {onHideConversation && (
+                    <button
+                      onClick={(e) => { e.stopPropagation(); onHideConversation(conv.id); }}
+                      className="absolute top-1/2 -translate-y-1/2 right-0.5 p-0.5 rounded opacity-0 group-hover/conv:opacity-100 hover:bg-destructive/20 text-muted-foreground hover:text-destructive transition-all"
+                      title="Fechar conversa"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  )}
+                </div>
               );
             })}
             {filteredConvs.length === 0 && <p className="text-center text-[10px] text-muted-foreground py-4">Nenhuma conversa</p>}
