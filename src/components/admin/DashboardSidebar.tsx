@@ -49,8 +49,8 @@ const DashboardSidebar = ({ activeSection, onSectionChange }: DashboardSidebarPr
         </div>
       </div>
 
-      {/* Navigation */}
-      <nav className="flex-1 p-3 space-y-1">
+      {/* Navigation + Actions */}
+      <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
         {filteredItems.map((item) => {
           const Icon = item.icon;
           const isActive = activeSection === item.id;
@@ -70,24 +70,24 @@ const DashboardSidebar = ({ activeSection, onSectionChange }: DashboardSidebarPr
             </button>
           );
         })}
-      </nav>
 
-      {/* Footer */}
-      <div className="p-3 border-t border-border/20">
-        <a
-          href="/"
-          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-all mb-1"
-        >
-          ← Voltar à Intranet
-        </a>
-        <button
-          onClick={logout}
-          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-destructive hover:bg-destructive/10 transition-all"
-        >
-          <LogOut className="w-4 h-4" />
-          Sair
-        </button>
-      </div>
+        {/* Voltar + Sair right after last menu item */}
+        <div className="pt-3 mt-3 border-t border-border/20 space-y-1">
+          <a
+            href="/"
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-all"
+          >
+            ← Voltar à Intranet
+          </a>
+          <button
+            onClick={logout}
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-destructive hover:bg-destructive/10 transition-all"
+          >
+            <LogOut className="w-4 h-4" />
+            Sair
+          </button>
+        </div>
+      </nav>
     </aside>
   );
 };
