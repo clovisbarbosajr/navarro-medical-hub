@@ -544,57 +544,67 @@ const RHPaymentsManager = () => {
         })}
       </div>
 
-      {/* Delete Confirmation Dialog */}
-      <AlertDialog open={!!deleteConfirm} onOpenChange={open => {
-        if (!open) {
-          setDeleteConfirm(null);
-          setDeleteCheckboxConfirmed(false);
-        }
-      }}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle className="flex items-center gap-2">
+      {/* Delete Confirmation Dialog — custom modal to avoid Radix auto-close */}
+      {deleteConfirm && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <div className="bg-popover border border-border rounded-2xl shadow-2xl w-full max-w-md p-6 mx-4">
+            <div className="flex items-center gap-2 mb-3">
               <AlertTriangle className="w-5 h-5 text-destructive" />
-              Confirmar exclusão
-            </AlertDialogTitle>
-            <AlertDialogDescription asChild>
-              <div className="space-y-4">
-                <p>
-                  Tem certeza que deseja remover{" "}
-                  <strong className="text-foreground">
-                    {deleteConfirm?.employee_name || "este registro"}
-                  </strong>
-                  {deleteConfirm?.week_ref && (
-                    <> da semana <strong className="text-foreground">{deleteConfirm.week_ref}</strong></>
-                  )}
-                  ? Esta ação não pode ser desfeita.
-                </p>
-                <label className="flex items-center gap-2 cursor-pointer select-none">
-                  <input
-                    type="checkbox"
-                    checked={deleteCheckboxConfirmed}
-                    onChange={e => setDeleteCheckboxConfirmed(e.target.checked)}
-                    className="w-4 h-4 rounded border-border accent-destructive cursor-pointer"
-                  />
-                  <span className="text-sm text-foreground font-medium">
-                    Confirmo que desejo excluir este registro
-                  </span>
-                </label>
-              </div>
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <button
-              onClick={deleteRow}
-              disabled={!deleteCheckboxConfirmed}
-              className="inline-flex items-center justify-center rounded-md text-sm font-medium px-4 py-2 bg-destructive text-destructive-foreground hover:bg-destructive/90 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-            >
-              Excluir
-            </button>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+              <h3 className="font-display font-bold text-lg text-foreground">Confirmar exclusão</h3>
+            </div>
+            <p className="text-sm text-muted-foreground mb-4">
+              Tem certeza que deseja remover{" "}
+              <strong className="text-foreground">
+                {deleteConfirm.employee_name || "este registro"}
+              </strong>
+              {deleteConfirm.week_ref && (
+                <> da semana <strong className="text-foreground">{deleteConfirm.week_ref}</strong></>
+              )}
+              ? Esta ação não pode ser desfeita.
+            </p>
+            <label className="flex items-center gap-2 cursor-pointer select-none mb-6">
+              <input
+                type="checkbox"
+                checked={deleteCheckboxConfirmed}
+                onChange={e => setDeleteCheckboxConfirmed(e.target.checked)}
+                className="w-4 h-4 rounded border-border accent-destructive cursor-pointer"
+              />
+              <span className="text-sm text-foreground font-medium">
+                Confirmo que desejo excluir este registro
+              </span>
+            </label>
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={() => { setDeleteConfirm(null); setDeleteCheckboxConfirmed(false); }}
+                className="px-4 py-2 text-sm rounded-lg border border-border text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-colors"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={async () => {
+                  const idToDelete = deleteConfirm.id;
+                  const { error } = await (supabase as any)
+                    .from("rh_payments")
+                    .delete()
+                    .eq("id", idToDelete);
+                  if (error) {
+                    toast.error("Erro ao remover");
+                    return;
+                  }
+                  setPayments(prev => prev.filter(p => p.id !== idToDelete));
+                  setDeleteConfirm(null);
+                  setDeleteCheckboxConfirmed(false);
+                  toast.success("Registro removido");
+                }}
+                disabled={!deleteCheckboxConfirmed}
+                className="px-4 py-2 text-sm font-medium rounded-lg bg-destructive text-destructive-foreground hover:bg-destructive/90 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              >
+                Excluir
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Duplicate Week Dialog */}
       <AlertDialog open={duplicateWeekOpen} onOpenChange={setDuplicateWeekOpen}>
