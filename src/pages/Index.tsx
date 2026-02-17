@@ -237,7 +237,7 @@ const Index = () => {
           <img src={chatLogo} alt="Chat" className="w-full h-full object-cover" />
         </button>
       )}
-      {chatOpen && isAdmin && <ChatWidget onClose={() => setChatOpen(false)} />}
+      {chatOpen && isAdmin && <ChatWidget />}
 
 
       {/* Procedures fullscreen overlay */}

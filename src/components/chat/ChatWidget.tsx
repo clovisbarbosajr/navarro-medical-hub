@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from "react";
-import { X, MessageCircle, Minus, Settings } from "lucide-react";
+import { MessageCircle, Minus, Settings } from "lucide-react";
 import chatLogo from "@/assets/chat-logo.png";
 import { useChat } from "@/hooks/useChat";
 import { useChatAuth } from "@/contexts/ChatAuthContext";
@@ -10,7 +10,7 @@ import ChatContactsList from "./ChatContactsList";
 import ChatConversationArea from "./ChatConversationArea";
 import CreateGroupDialog from "@/components/chat/CreateGroupDialog";
 
-const ChatWidget = ({ onClose }: { onClose: () => void }) => {
+const ChatWidget = ({ onClose }: { onClose?: () => void }) => {
   const { user, profile, refreshProfile } = useChatAuth();
   const { isAdmin } = useUserRole();
   const { playBeep, playAttention } = useNotificationSound();
@@ -109,14 +109,13 @@ const ChatWidget = ({ onClose }: { onClose: () => void }) => {
       <div style={{ position: 'fixed', bottom: '1rem', right: '1rem' }} className={`z-50 w-[420px] h-[600px] max-h-[80vh] max-w-[calc(100vw-2rem)] flex flex-col glass-strong rounded-2xl shadow-2xl overflow-hidden animate-in border border-border/30 ${shaking ? "msn-shake" : ""}`}>
         <div className="flex items-center justify-between px-4 py-2.5 border-b border-border/30 bg-secondary/30">
           <div className="flex items-center gap-2">
-            <MessageCircle className="w-4 h-4 text-primary" />
-            <span className="text-sm font-display font-semibold text-foreground">Navarro Connect</span>
+            {profile?.avatar_url ? <img src={profile.avatar_url} alt="" className="w-6 h-6 rounded-full object-cover" /> : <MessageCircle className="w-4 h-4 text-primary" />}
+            <span className="text-sm font-display font-semibold text-foreground">{profile?.display_name || "Navarro Connect"}</span>
             {totalUnread > 0 && <span className="w-5 h-5 rounded-full bg-primary text-primary-foreground text-[10px] flex items-center justify-center font-bold">{totalUnread}</span>}
           </div>
-          <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1">
             <button onClick={() => setShowSettings(!showSettings)} className="p-1.5 rounded-md hover:bg-secondary/50 text-muted-foreground hover:text-foreground transition-colors"><Settings className="w-4 h-4" /></button>
             <button onClick={() => setMinimized(true)} className="p-1.5 rounded-md hover:bg-secondary/50 text-muted-foreground hover:text-foreground transition-colors"><Minus className="w-4 h-4" /></button>
-            <button onClick={onClose} className="p-1.5 rounded-md hover:bg-destructive/20 text-muted-foreground hover:text-destructive transition-colors"><X className="w-4 h-4" /></button>
           </div>
         </div>
         {showSettings && (

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Search, Users, MessageCircle, Plus } from "lucide-react";
+import { Search, Users, MessageCircle } from "lucide-react";
 import { useChatAuth } from "@/contexts/ChatAuthContext";
 import type { Profile, Conversation } from "@/hooks/useChat";
 
@@ -18,7 +18,7 @@ const getDeptColor = (dept: string) => DEPT_COLORS[dept] || { bg: "bg-primary", 
 interface Props {
   contacts: Profile[]; conversations: Conversation[]; activeConversationId?: string;
   onSelectConversation: (id: string) => void; onStartDirect: (userId: string) => void;
-  onCreateGroup: () => void; onCloseConversation?: () => void; isAdmin: boolean;
+  onCreateGroup?: () => void; onCloseConversation?: () => void; isAdmin: boolean;
 }
 
 const ChatContactsList = ({ contacts, conversations, activeConversationId, onSelectConversation, onStartDirect, onCreateGroup, isAdmin }: Props) => {
@@ -43,7 +43,7 @@ const ChatContactsList = ({ contacts, conversations, activeConversationId, onSel
       <div className="flex-1 overflow-y-auto">
         {tab === "contacts" ? (
           <div className="p-1">
-            {isAdmin && <button onClick={onCreateGroup} className="w-full flex items-center gap-1 p-1.5 rounded-md text-[10px] text-primary hover:bg-primary/10 transition-colors mb-1"><Plus className="w-3 h-3" /> Novo grupo</button>}
+            {/* Group creation is done in admin panel only */}
             {Object.entries(filteredGrouped).map(([dept, profiles]) => (
               <div key={dept} className="mb-2">
                 <div className="flex items-center gap-1 px-1.5 mb-0.5"><div className={`w-2 h-2 rounded-full ${getDeptColor(dept).bg}`} /><span className={`text-[9px] font-semibold uppercase tracking-wider ${getDeptColor(dept).text}`}>{dept}</span></div>
