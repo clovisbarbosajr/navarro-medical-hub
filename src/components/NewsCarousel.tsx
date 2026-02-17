@@ -61,11 +61,11 @@ const NewsCarousel = () => {
         >
           <div className="flex flex-col sm:flex-row items-center gap-4">
             {item.image_url && (
-              <div className="w-full sm:w-1/3 h-32 sm:h-36 overflow-hidden">
+              <div className="w-full sm:w-1/3 h-32 sm:h-36 overflow-hidden bg-black/10 flex items-center justify-center">
                 <img
                   src={item.image_url}
                   alt={item.title}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-contain"
                   loading="lazy"
                 />
               </div>
