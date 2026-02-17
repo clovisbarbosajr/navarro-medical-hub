@@ -294,4 +294,21 @@
   ::-webkit-scrollbar-thumb:hover {
     background: hsla(var(--primary) / 0.5);
   }
+
+  /* ===== OVERLAY SCROLLBAR (more visible) ===== */
+  .custom-overlay-scroll::-webkit-scrollbar {
+    width: 10px;
+  }
+  .custom-overlay-scroll::-webkit-scrollbar-track {
+    background: hsla(var(--secondary) / 0.5);
+    border-radius: 5px;
+  }
+  .custom-overlay-scroll::-webkit-scrollbar-thumb {
+    background: hsla(var(--primary) / 0.6);
+    border-radius: 5px;
+    border: 2px solid hsla(var(--secondary) / 0.5);
+  }
+  .custom-overlay-scroll::-webkit-scrollbar-thumb:hover {
+    background: hsla(var(--primary) / 0.85);
+  }
 }
