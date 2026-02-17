@@ -1,0 +1,17 @@
+{
+  "name": "Navarro Connect",
+  "short_name": "NavConnect",
+  "description": "Chat corporativo Navarro Medical",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f1318",
+  "theme_color": "#1db8a0",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "64x64",
+      "type": "image/x-icon"
+    }
+  ]
+}
