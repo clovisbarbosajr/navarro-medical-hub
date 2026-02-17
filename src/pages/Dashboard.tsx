@@ -122,7 +122,7 @@ const Dashboard = () => {
           <img src={chatLogo} alt="Chat" className="w-full h-full object-cover" />
         </button>
       )}
-      {chatOpen && <ChatWidget onClose={() => setChatOpen(false)} />}
+      {chatOpen && <ChatWidget />}
     </div>
   );
 };
