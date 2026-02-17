@@ -124,20 +124,22 @@ const Header = ({ onOpenProcedures, onOpenRH }: HeaderProps) => {
           <div className="hidden md:flex items-center gap-3">
             <WeatherCard />
             <NotificationBell />
-            {user && (role === "admin" || role === "manager") ? (
+            {user ? (
               <div className="flex items-center gap-2">
-                <a href="/dashboard" className="menu-btn text-xs">
-                  Painel
-                </a>
+                {(role === "admin" || role === "manager") && (
+                  <a href="/dashboard" className="menu-btn text-xs">
+                    Painel
+                  </a>
+                )}
                 <button onClick={logout} className="menu-btn">
                   Sair
                 </button>
               </div>
-            ) : !user ? (
+            ) : (
               <a href="/login" className="px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-semibold hover:opacity-90 transition-opacity">
                 Login
               </a>
-            ) : null}
+            )}
           </div>
         </div>
       </header>
