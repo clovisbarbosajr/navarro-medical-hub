@@ -13,10 +13,10 @@ const useActiveTheme = () => {
     const fetchTheme = async () => {
       const today = new Date().toISOString().split("T")[0];
 
+      // Find any theme whose activation window covers today
       const { data, error } = await (supabase as any)
         .from("holiday_themes")
         .select("*")
-        .eq("enabled", true)
         .lte("activation_start", today)
         .gte("activation_end", today)
         .order("is_professional_date", { ascending: false })
