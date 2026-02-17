@@ -19,9 +19,10 @@ interface Props {
   contacts: Profile[]; conversations: Conversation[]; activeConversationId?: string;
   onSelectConversation: (id: string) => void; onStartDirect: (userId: string) => void;
   onCreateGroup?: () => void; onCloseConversation?: () => void; isAdmin: boolean;
+  attentionConvIds?: Set<string>;
 }
 
-const ChatContactsList = ({ contacts, conversations, activeConversationId, onSelectConversation, onStartDirect, onCreateGroup, isAdmin }: Props) => {
+const ChatContactsList = ({ contacts, conversations, activeConversationId, onSelectConversation, onStartDirect, onCreateGroup, isAdmin, attentionConvIds = new Set() }: Props) => {
   const { user } = useChatAuth();
   const [search, setSearch] = useState("");
   const [tab, setTab] = useState<"chats" | "contacts">("contacts");
@@ -32,6 +33,11 @@ const ChatContactsList = ({ contacts, conversations, activeConversationId, onSel
   const filteredConvs = conversations.filter((c) => getConversationName(c).toLowerCase().includes(search.toLowerCase()));
   const filteredGrouped = Object.entries(grouped).reduce<Record<string, Profile[]>>((acc, [dept, profs]) => { const f = profs.filter((p) => p.display_name.toLowerCase().includes(search.toLowerCase())); if (f.length) acc[dept] = f; return acc; }, {});
   const unreadConvUserIds = new Set(conversations.filter(c => c.unread_count > 0 && c.type === "direct").flatMap(c => c.participants.filter(p => p.user_id !== user?.id).map(p => p.user_id)));
+  // Build set of user IDs that have attention conversations
+  const attentionUserIds = new Set(
+    conversations.filter(c => attentionConvIds.has(c.id) && c.type === "direct")
+      .flatMap(c => c.participants.filter(p => p.user_id !== user?.id).map(p => p.user_id))
+  );
 
   return (
     <div className="w-44 flex-shrink-0 flex flex-col border-r border-border/30 bg-secondary/10">
@@ -49,8 +55,9 @@ const ChatContactsList = ({ contacts, conversations, activeConversationId, onSel
                 <div className="flex items-center gap-1 px-1.5 mb-0.5"><div className={`w-2 h-2 rounded-full ${getDeptColor(dept).bg}`} /><span className={`text-[9px] font-semibold uppercase tracking-wider ${getDeptColor(dept).text}`}>{dept}</span></div>
                 {profiles.map((p) => {
                   const hasUnread = unreadConvUserIds.has(p.user_id);
+                  const hasAttention = attentionUserIds.has(p.user_id);
                   return (
-                    <button key={p.user_id} onClick={() => onStartDirect(p.user_id)} className={`w-full flex items-center gap-1.5 px-1.5 py-1 rounded-md hover:bg-secondary/50 transition-colors ${hasUnread ? "contact-flash" : ""}`}>
+                    <button key={p.user_id} onClick={() => onStartDirect(p.user_id)} className={`w-full flex items-center gap-1.5 px-1.5 py-1 rounded-md hover:bg-secondary/50 transition-colors ${hasAttention ? "tab-blink-attention" : hasUnread ? "contact-flash" : ""}`}>
                       <div className="relative flex-shrink-0">
                         {p.avatar_url ? <img src={p.avatar_url} alt={p.display_name} className="w-6 h-6 rounded-full object-cover" /> : <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[8px] font-bold text-white ${getDeptColor(p.department).bg}`}>{initials(p.display_name)}</div>}
                         <div className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-card ${p.is_online ? getDeptColor(p.department).bg : "bg-muted-foreground/40"}`} />
@@ -72,7 +79,7 @@ const ChatContactsList = ({ contacts, conversations, activeConversationId, onSel
               const dept = otherProfile?.department || "Geral";
               const deptColor = getDeptColor(dept);
               return (
-                <button key={conv.id} onClick={() => onSelectConversation(conv.id)} className={`w-full flex items-center gap-1.5 p-1.5 rounded-md text-left transition-all ${isActive ? "bg-primary/15 border border-primary/20" : hasUnread ? "contact-flash" : "hover:bg-secondary/50"}`}>
+                <button key={conv.id} onClick={() => onSelectConversation(conv.id)} className={`w-full flex items-center gap-1.5 p-1.5 rounded-md text-left transition-all ${isActive ? "bg-primary/15 border border-primary/20" : attentionConvIds.has(conv.id) ? "tab-blink-attention" : hasUnread ? "contact-flash" : "hover:bg-secondary/50"}`}>
                   <div className="relative flex-shrink-0">
                     {conv.type === "group" ? <div className="w-6 h-6 rounded-full bg-secondary flex items-center justify-center"><Users className="w-3 h-3 text-secondary-foreground" /></div>
                     : other?.avatar_url ? <img src={other.avatar_url} alt="" className="w-6 h-6 rounded-full object-cover" />

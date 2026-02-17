@@ -340,7 +340,13 @@
     6% { transform: translate(-6px, 6px) rotate(-1deg); }
     8% { transform: translate(6px, -8px) rotate(1deg); }
     10% { transform: translate(-8px, 2px) rotate(-2deg); }
+    12% { transform: translate(8px, -4px) rotate(2deg); }
+    14% { transform: translate(-4px, 8px) rotate(-1deg); }
+    16% { transform: translate(6px, -6px) rotate(1deg); }
+    18% { transform: translate(-8px, -4px) rotate(-2deg); }
+    20% { transform: translate(4px, 6px) rotate(2deg); }
     50% { transform: translate(-4px, 4px) rotate(-2deg); }
+    75% { transform: translate(2px, -2px) rotate(0deg); }
     100% { transform: translate(0, 0) rotate(0deg); }
   }
   .msn-shake { animation: msn-shake 1.2s cubic-bezier(0.36, 0.07, 0.19, 0.97); }
@@ -354,7 +360,10 @@
   /* Minimized button pulse */
   @keyframes mini-pulse { 0%, 100% { box-shadow: 0 0 0 0 hsl(142 71% 45% / 0.6); } 50% { box-shadow: 0 0 0 10px hsl(142 71% 45% / 0); } }
   .mini-pulse { animation: mini-pulse 1.2s ease-in-out infinite; }
-  @keyframes mini-pulse-attention { 0%, 100% { box-shadow: 0 0 0 0 hsl(var(--destructive) / 0.7); } 50% { box-shadow: 0 0 0 12px hsl(var(--destructive) / 0); } }
+  @keyframes mini-pulse-attention { 
+    0%, 100% { box-shadow: 0 0 0 0 hsl(var(--destructive) / 0.7); background-color: hsl(var(--primary)); } 
+    50% { box-shadow: 0 0 0 12px hsl(var(--destructive) / 0); background-color: hsl(var(--destructive)); } 
+  }
   .mini-pulse-attention { animation: mini-pulse-attention 0.6s ease-in-out infinite; }
 
   .animate-in { animation: animate-in 0.4s ease-out; }

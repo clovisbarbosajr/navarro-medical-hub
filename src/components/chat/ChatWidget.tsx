@@ -134,7 +134,7 @@ const ChatWidget = ({ onClose }: { onClose?: () => void }) => {
           </div>
         )}
         <div className="flex-1 flex min-h-0">
-          <ChatContactsList contacts={contacts} conversations={conversations} activeConversationId={activeTab} onSelectConversation={openConversation} onStartDirect={handleStartDirect} onCreateGroup={() => setShowGroupDialog(true)} onCloseConversation={() => setActiveTab(undefined)} isAdmin={isAdmin} />
+          <ChatContactsList contacts={contacts} conversations={conversations} activeConversationId={activeTab} onSelectConversation={openConversation} onStartDirect={handleStartDirect} onCreateGroup={() => setShowGroupDialog(true)} onCloseConversation={() => setActiveTab(undefined)} isAdmin={isAdmin} attentionConvIds={attentionConvIds} />
           <div className="flex-1 flex flex-col min-w-0">
             {activeTab ? (
               <ChatConversationArea key={activeTab} conversationId={activeTab} conversationName={getConversationName(activeTab)} fetchMessages={fetchMessages} sendMessage={sendMessage} markAsRead={markAsRead} onBack={() => setActiveTab(undefined)} />
