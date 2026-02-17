@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { UserPlus, Trash2, Key, ArrowRightLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { useChatAuth } from "@/contexts/ChatAuthContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -11,7 +11,7 @@ interface UserRow { user_id: string; display_name: string; department: string; i
 interface Department { id: string; name: string; color: string; }
 
 const AdminUsersTab = () => {
-  const { user } = useChatAuth();
+  const { user } = useAuth();
   const { toast } = useToast();
   const [users, setUsers] = useState<UserRow[]>([]);
   const [departments, setDepartments] = useState<Department[]>([]);

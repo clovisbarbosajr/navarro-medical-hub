@@ -17,7 +17,10 @@ import EventsManager from "@/components/admin/EventsManager";
 import HolidayThemesManager from "@/components/admin/HolidayThemesManager";
 import MenuLinksManager from "@/components/admin/MenuLinksManager";
 import SiteSettingsManager from "@/components/admin/SiteSettingsManager";
-
+import AdminUsersTab from "@/components/admin/AdminUsersTab";
+import AdminDepartmentsTab from "@/components/admin/AdminDepartmentsTab";
+import AdminHistoryTab from "@/components/admin/AdminHistoryTab";
+import AdminBroadcastTab from "@/components/admin/AdminBroadcastTab";
 
 interface AnnouncementPrefill {
   title: string;
@@ -53,6 +56,10 @@ const Dashboard = () => {
       case "settings": return <SiteSettingsManager />;
       case "audit-log": return <AuditLogViewer />;
       case "access-logs": return <AccessLogsViewer />;
+      case "chat-users": return <AdminUsersTab />;
+      case "chat-departments": return <AdminDepartmentsTab />;
+      case "chat-history": return <AdminHistoryTab />;
+      case "chat-broadcast": return <AdminBroadcastTab />;
       default: return null;
     }
   };
