@@ -1,5 +1,6 @@
+import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { Newspaper, Bell, Cake, Image, Palette, Link2, Settings, LogOut, ChevronRight, ScrollText, Globe, CalendarDays, MessageCircle, Users, Send, Building2 } from "lucide-react";
+import { Newspaper, Bell, Cake, Image, Palette, Link2, Settings, LogOut, ChevronRight, ChevronDown, ScrollText, Globe, CalendarDays, MessageCircle, Users, Send, Building2 } from "lucide-react";
 import type { AppRole } from "@/types/database";
 
 interface SidebarItem {
@@ -20,10 +21,13 @@ const sidebarItems: SidebarItem[] = [
   { id: "settings", label: "Configurações", icon: Settings, roles: ["admin"] },
   { id: "audit-log", label: "Log de Atividades", icon: ScrollText, roles: ["admin"] },
   { id: "access-logs", label: "Acessos & IPs", icon: Globe, roles: ["admin"] },
-  { id: "chat-users", label: "Chat — Usuários", icon: Users, roles: ["admin"] },
-  { id: "chat-departments", label: "Chat — Departamentos", icon: Building2, roles: ["admin"] },
-  { id: "chat-history", label: "Chat — Histórico", icon: MessageCircle, roles: ["admin"] },
-  { id: "chat-broadcast", label: "Chat — Broadcast", icon: Send, roles: ["admin"] },
+];
+
+const chatSubItems: SidebarItem[] = [
+  { id: "chat-users", label: "Usuários", icon: Users, roles: ["admin"] },
+  { id: "chat-departments", label: "Departamentos", icon: Building2, roles: ["admin"] },
+  { id: "chat-history", label: "Histórico", icon: MessageCircle, roles: ["admin"] },
+  { id: "chat-broadcast", label: "Broadcast", icon: Send, roles: ["admin"] },
 ];
 
 interface DashboardSidebarProps {
@@ -33,10 +37,14 @@ interface DashboardSidebarProps {
 
 const DashboardSidebar = ({ activeSection, onSectionChange }: DashboardSidebarProps) => {
   const { role, logout } = useAuth();
+  const isChatActive = activeSection.startsWith("chat-");
+  const [chatOpen, setChatOpen] = useState(isChatActive);
 
   const filteredItems = sidebarItems.filter(
     (item) => role && item.roles.includes(role)
   );
+
+  const showChat = role === "admin";
 
   return (
     <aside className="w-64 min-h-screen glass-strong border-r border-border/30 flex flex-col" style={{ zIndex: 2 }}>
@@ -74,6 +82,47 @@ const DashboardSidebar = ({ activeSection, onSectionChange }: DashboardSidebarPr
             </button>
           );
         })}
+
+        {/* Chat dropdown section */}
+        {showChat && (
+          <div className="pt-2 mt-2 border-t border-border/20">
+            <button
+              onClick={() => setChatOpen(!chatOpen)}
+              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 ${
+                isChatActive
+                  ? "bg-primary/15 text-primary border border-primary/20"
+                  : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
+              }`}
+            >
+              <MessageCircle className="w-4 h-4 flex-shrink-0" />
+              <span className="flex-1 text-left">Chat</span>
+              <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${chatOpen ? "rotate-180" : ""}`} />
+            </button>
+            {chatOpen && (
+              <div className="ml-4 mt-1 space-y-0.5 border-l-2 border-primary/20 pl-3">
+                {chatSubItems.map((item) => {
+                  const Icon = item.icon;
+                  const isActive = activeSection === item.id;
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() => onSectionChange(item.id)}
+                      className={`w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-[13px] font-medium transition-all duration-200 ${
+                        isActive
+                          ? "bg-primary/15 text-primary"
+                          : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
+                      }`}
+                    >
+                      <Icon className="w-3.5 h-3.5 flex-shrink-0" />
+                      <span className="flex-1 text-left">{item.label}</span>
+                      {isActive && <ChevronRight className="w-3 h-3" />}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Voltar + Sair right after last menu item */}
         <div className="pt-3 mt-3 border-t border-border/20 space-y-1">
