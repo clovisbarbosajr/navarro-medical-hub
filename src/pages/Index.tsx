@@ -18,6 +18,7 @@ import useActiveTheme from "@/hooks/useActiveTheme";
 import navarroLogo from "@/assets/navarro-heart-logo.png";
 import { X } from "lucide-react";
 import DeniseProceduresManager from "@/components/admin/DeniseProceduresManager";
+import RHPaymentsManager from "@/components/admin/RHPaymentsManager";
 
 
 const Index = () => {
@@ -26,7 +27,7 @@ const Index = () => {
   const [blocked, setBlocked] = useState<boolean | null>(null);
   const [clovisOpen, setClovisOpen] = useState(false);
   const [proceduresOpen, setProceduresOpen] = useState(false);
-  
+  const [rhOpen, setRHOpen] = useState(false);
 
   useEffect(() => {
     const check = async () => {
@@ -152,7 +153,10 @@ const Index = () => {
       ) : (
         <FlowFieldBackground />
       )}
-      <Header onOpenProcedures={user && PROCEDURES_ALLOWED_EMAILS.includes(user.email || "") ? () => setProceduresOpen(true) : undefined} />
+      <Header
+        onOpenProcedures={user && PROCEDURES_ALLOWED_EMAILS.includes(user.email || "") ? () => setProceduresOpen(true) : undefined}
+        onOpenRH={user && PROCEDURES_ALLOWED_EMAILS.includes(user.email || "") ? () => setRHOpen(true) : undefined}
+      />
       <AnnouncementPopup />
       <BirthdayPopup />
 
@@ -201,7 +205,7 @@ const Index = () => {
       <BudgetAssistantPopup open={clovisOpen} onClose={() => setClovisOpen(false)} />
 
 
-      {/* Procedures fullscreen overlay for Inwise */}
+      {/* Procedures fullscreen overlay */}
       {proceduresOpen && (
         <div className="fixed inset-0 bg-background/95 backdrop-blur-sm" style={{ zIndex: 100 }}>
           <div className="h-full overflow-auto">
@@ -215,6 +219,25 @@ const Index = () => {
                 </button>
               </div>
               <DeniseProceduresManager />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* RH Payments fullscreen overlay */}
+      {rhOpen && (
+        <div className="fixed inset-0 bg-background/95 backdrop-blur-sm" style={{ zIndex: 100 }}>
+          <div className="h-full overflow-auto">
+            <div className="max-w-7xl mx-auto px-4 md:px-6 py-6">
+              <div className="flex justify-end mb-4">
+                <button
+                  onClick={() => setRHOpen(false)}
+                  className="p-2 rounded-xl hover:bg-secondary/50 text-muted-foreground hover:text-foreground transition-all"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              <RHPaymentsManager />
             </div>
           </div>
         </div>
