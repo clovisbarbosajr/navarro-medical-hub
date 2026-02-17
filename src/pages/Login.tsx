@@ -11,7 +11,7 @@ const Login = () => {
   const navigate = useNavigate();
   const { user, login, loading } = useAuth();
   const activeTheme = useActiveTheme();
-  const [username, setUsername] = useState("Inwise");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [remember, setRemember] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -37,16 +37,17 @@ const Login = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    if (!username.trim()) { setError("Digite seu primeiro nome."); return; }
     setSubmitting(true);
 
-    const result = await login(username, password);
+    const result = await login(username.trim(), password);
 
     if (result.error) {
       setError(result.error);
       setSubmitting(false);
     } else {
       if (remember) {
-        setRememberedUser(username);
+        setRememberedUser(username.trim());
       } else {
         clearRememberedUser();
       }
@@ -69,7 +70,6 @@ const Login = () => {
         <FlowFieldBackground />
       )}
 
-      {/* Back to home */}
       <Link
         to="/"
         className="fixed top-6 left-6 flex items-center gap-2 px-4 py-2 rounded-full glass-strong text-foreground hover:text-primary transition-colors text-sm font-medium"
@@ -79,7 +79,6 @@ const Login = () => {
         Voltar à Intranet
       </Link>
 
-      {/* Login Card */}
       <div
         className={`relative w-full max-w-md mx-4 transition-all duration-700 ${
           mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
@@ -87,7 +86,6 @@ const Login = () => {
         style={{ zIndex: 10 }}
       >
         <div className="glass-strong rounded-3xl p-8 sm:p-10 shadow-2xl animate-pulse-glow">
-          {/* Header */}
           <div className="text-center mb-8">
             <div className="w-16 h-16 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center mx-auto mb-4 overflow-hidden">
               <img src={navarroLogo} alt="Navarro Medical" className="w-12 h-12 object-contain" />
@@ -96,37 +94,27 @@ const Login = () => {
               Navarro Medical
             </h1>
             <p className="text-muted-foreground text-sm">
-              Acesso Administrativo
+              Acesso à Intranet
             </p>
           </div>
 
-          {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-5">
-            {/* Username Select */}
             <div className="space-y-2">
               <label className="text-sm font-medium text-foreground flex items-center gap-2">
                 <User className="w-4 h-4 text-primary" />
-                Usuário
+                Primeiro nome
               </label>
-              <div className="relative">
-                <select
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  className="w-full h-12 rounded-xl border border-input bg-secondary/50 px-4 text-foreground text-sm appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
-                >
-                  <option value="Inwise">🛡️ Inwise</option>
-                  <option value="Geovana">📋 Geovana Ignácio</option>
-                  <option value="Ligia">📋 Ligia Andreati</option>
-                </select>
-                <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
-                  <svg className="w-4 h-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                </div>
-              </div>
+              <input
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="Ex: Inwise"
+                autoFocus
+                className="w-full h-12 rounded-xl border border-input bg-secondary/50 px-4 text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+                required
+              />
             </div>
 
-            {/* Password */}
             <div className="space-y-2">
               <label className="text-sm font-medium text-foreground flex items-center gap-2">
                 <Lock className="w-4 h-4 text-primary" />
@@ -152,7 +140,6 @@ const Login = () => {
               </div>
             </div>
 
-            {/* Remember Me */}
             <div className="checkbox-wrapper flex items-center gap-3">
               <input
                 type="checkbox"
@@ -165,19 +152,17 @@ const Login = () => {
               </label>
             </div>
 
-            {/* Error */}
             {error && (
               <div className="bg-destructive/10 border border-destructive/30 rounded-xl px-4 py-3 text-sm text-destructive animate-fade-slide-up">
                 {error}
               </div>
             )}
 
-            {/* Submit */}
             <button
               type="submit"
-              disabled={submitting || !password}
+              disabled={submitting || !password || !username.trim()}
               className={`menu-btn w-full h-12 text-center text-base font-semibold transition-all ${
-                submitting || !password ? "opacity-50 cursor-not-allowed" : ""
+                submitting || !password || !username.trim() ? "opacity-50 cursor-not-allowed" : ""
               }`}
             >
               {submitting ? (
@@ -191,7 +176,6 @@ const Login = () => {
             </button>
           </form>
 
-          {/* Footer */}
           <p className="text-center text-xs text-muted-foreground mt-6">
             © 2026 INWISEPRO — Acesso restrito
           </p>

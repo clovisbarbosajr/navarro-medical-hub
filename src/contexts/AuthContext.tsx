@@ -13,10 +13,8 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const USERNAME_MAP: Record<string, string> = {
-  Inwise: "inwise@navarro.med",
-  Geovana: "manager@navarro.med",
-  Ligia: "ligia@navarro.med",
+const nameToEmail = (name: string) => {
+  return name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, ".").replace(/[^a-z0-9.]/g, "") + "@navarro.med";
 };
 
 // Emails that have access to Procedimentos (besides admin role)
@@ -79,16 +77,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const login = async (username: string, password: string) => {
-    const email = USERNAME_MAP[username];
-    if (!email) {
-      return { error: "Usuário inválido. Selecione Admin ou Manager." };
-    }
+    const trimmed = username.trim();
+    if (!trimmed) return { error: "Digite seu primeiro nome." };
 
+    const email = nameToEmail(trimmed);
     const { error } = await supabase.auth.signInWithPassword({ email, password });
 
     if (error) {
       if (error.message.includes("Invalid login")) {
-        return { error: "Senha incorreta." };
+        return { error: "Usuário ou senha incorretos." };
       }
       return { error: error.message };
     }

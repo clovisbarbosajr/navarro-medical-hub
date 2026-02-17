@@ -39,7 +39,7 @@ Deno.serve(async (req) => {
       }
       const email = displayName.toLowerCase()
         .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-        .replace(/\s+/g, ".").replace(/[^a-z0-9.]/g, "") + "@navarro.com";
+        .replace(/\s+/g, ".").replace(/[^a-z0-9.]/g, "") + "@navarro.med";
 
       const { data: newUser, error: createError } = await supabaseAdmin.auth.admin.createUser({
         email, password, email_confirm: true,
