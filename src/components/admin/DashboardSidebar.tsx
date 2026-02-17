@@ -1,5 +1,5 @@
 import { useAuth } from "@/contexts/AuthContext";
-import { Newspaper, Bell, Cake, Image, Palette, Link2, Settings, LogOut, ChevronRight, ScrollText, Globe, CalendarDays } from "lucide-react";
+import { Newspaper, Bell, Cake, Image, Palette, Link2, Settings, LogOut, ChevronRight, ScrollText, Globe, CalendarDays, MessageCircle, Users, Send, Building2 } from "lucide-react";
 import type { AppRole } from "@/types/database";
 
 interface SidebarItem {
@@ -20,6 +20,10 @@ const sidebarItems: SidebarItem[] = [
   { id: "settings", label: "Configurações", icon: Settings, roles: ["admin"] },
   { id: "audit-log", label: "Log de Atividades", icon: ScrollText, roles: ["admin"] },
   { id: "access-logs", label: "Acessos & IPs", icon: Globe, roles: ["admin"] },
+  { id: "chat-users", label: "Chat — Usuários", icon: Users, roles: ["admin"] },
+  { id: "chat-departments", label: "Chat — Departamentos", icon: Building2, roles: ["admin"] },
+  { id: "chat-history", label: "Chat — Histórico", icon: MessageCircle, roles: ["admin"] },
+  { id: "chat-broadcast", label: "Chat — Broadcast", icon: Send, roles: ["admin"] },
 ];
 
 interface DashboardSidebarProps {

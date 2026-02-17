@@ -136,7 +136,7 @@ const Header = ({ onOpenProcedures, onOpenRH }: HeaderProps) => {
                 </button>
               </div>
             ) : (
-              <a href="/login" className="px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-semibold hover:opacity-90 transition-opacity">
+              <a href="/login" className="menu-btn">
                 Login
               </a>
             )}
