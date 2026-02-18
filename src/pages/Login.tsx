@@ -102,17 +102,28 @@ const Login = () => {
             <div className="space-y-2">
               <label className="text-sm font-medium text-foreground flex items-center gap-2">
                 <User className="w-4 h-4 text-primary" />
-                Primeiro nome
+                Selecione seu login
               </label>
-              <input
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder="Ex: Inwise"
-                autoFocus
-                className="w-full h-12 rounded-xl border border-input bg-secondary/50 px-4 text-foreground text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
-                required
-              />
+              <div className="grid grid-cols-3 gap-2">
+                {[
+                  { name: "Inwise", label: "Inwise" },
+                  { name: "Ligia", label: "Ligia" },
+                  { name: "Geovana", label: "Geovana" },
+                ].map((u) => (
+                  <button
+                    key={u.name}
+                    type="button"
+                    onClick={() => setUsername(u.name)}
+                    className={`h-11 rounded-xl border text-sm font-medium transition-all ${
+                      username === u.name
+                        ? "border-primary bg-primary/15 text-primary ring-2 ring-primary/30"
+                        : "border-input bg-secondary/50 text-foreground hover:border-primary/50"
+                    }`}
+                  >
+                    {u.label}
+                  </button>
+                ))}
+              </div>
             </div>
 
             <div className="space-y-2">
