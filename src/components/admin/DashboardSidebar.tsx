@@ -24,10 +24,10 @@ const sidebarItems: SidebarItem[] = [
 ];
 
 const chatSubItems: SidebarItem[] = [
-  { id: "chat-users", label: "Usuários", icon: Users, roles: ["admin"] },
+  { id: "chat-users", label: "Usuários", icon: Users, roles: ["admin", "manager"] },
   { id: "chat-departments", label: "Departamentos", icon: Building2, roles: ["admin"] },
   { id: "chat-history", label: "Histórico", icon: MessageCircle, roles: ["admin"] },
-  { id: "chat-broadcast", label: "Broadcast", icon: Send, roles: ["admin"] },
+  { id: "chat-broadcast", label: "Broadcast", icon: Send, roles: ["admin", "manager"] },
 ];
 
 interface DashboardSidebarProps {
@@ -44,7 +44,7 @@ const DashboardSidebar = ({ activeSection, onSectionChange }: DashboardSidebarPr
     (item) => role && item.roles.includes(role)
   );
 
-  const showChat = role === "admin";
+  const showChat = role === "admin" || role === "manager";
 
   return (
     <aside className="w-64 min-h-screen glass-strong border-r border-border/30 flex flex-col" style={{ zIndex: 2 }}>
@@ -100,7 +100,7 @@ const DashboardSidebar = ({ activeSection, onSectionChange }: DashboardSidebarPr
             </button>
             {chatOpen && (
               <div className="ml-4 mt-1 space-y-0.5 border-l-2 border-primary/20 pl-3">
-                {chatSubItems.map((item) => {
+                {chatSubItems.filter(item => role && item.roles.includes(role)).map((item) => {
                   const Icon = item.icon;
                   const isActive = activeSection === item.id;
                   return (

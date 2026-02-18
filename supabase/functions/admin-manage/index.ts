@@ -24,9 +24,13 @@ Deno.serve(async (req) => {
   const { data: { user }, error: authError } = await anonClient.auth.getUser();
   if (authError || !user) return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: corsHeaders });
 
+  // Check if user is admin or manager
   const { data: roleData } = await supabaseAdmin
-    .from("user_roles").select("role").eq("user_id", user.id).eq("role", "admin").maybeSingle();
-  if (!roleData) return new Response(JSON.stringify({ error: "Admin access required" }), { status: 403, headers: corsHeaders });
+    .from("user_roles").select("role").eq("user_id", user.id).in("role", ["admin", "manager"]).maybeSingle();
+  if (!roleData) return new Response(JSON.stringify({ error: "Admin/Manager access required" }), { status: 403, headers: corsHeaders });
+
+  const isAdmin = roleData.role === "admin";
+  const isManager = roleData.role === "manager";
 
   const body = await req.json();
   const { action } = body;
@@ -131,6 +135,7 @@ Deno.serve(async (req) => {
     }
 
     if (action === "delete_conversation_messages") {
+      if (!isAdmin) return new Response(JSON.stringify({ error: "Admin access required" }), { status: 403, headers: corsHeaders });
       const { conversationId } = body;
       if (!conversationId) return new Response(JSON.stringify({ error: "conversationId obrigatório" }), { status: 400, headers: corsHeaders });
       const { data: msgs } = await supabaseAdmin.from("chat_messages").select("id").eq("conversation_id", conversationId);

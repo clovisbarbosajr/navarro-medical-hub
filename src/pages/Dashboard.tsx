@@ -60,8 +60,8 @@ const Dashboard = () => {
       case "audit-log": return <AuditLogViewer />;
       case "access-logs": return <AccessLogsViewer />;
       case "chat-users": return <AdminUsersTab />;
-      case "chat-departments": return <AdminDepartmentsTab />;
-      case "chat-history": return <AdminHistoryTab />;
+      case "chat-departments": return role === "admin" ? <AdminDepartmentsTab /> : null;
+      case "chat-history": return role === "admin" ? <AdminHistoryTab /> : null;
       case "chat-broadcast": return <AdminBroadcastTab />;
       default: return null;
     }
@@ -116,10 +116,10 @@ const Dashboard = () => {
       {!chatOpen && (
         <button
           onClick={() => setChatOpen(true)}
-          className="fixed bottom-24 right-6 z-50 w-[4.5rem] h-[4.5rem] rounded-2xl shadow-lg hover:scale-110 transition-transform flex items-center justify-center overflow-hidden p-1 border-0 bg-transparent"
+          className="fixed bottom-24 right-6 z-50 w-[4.5rem] h-[4.5rem] rounded-2xl shadow-lg hover:scale-110 transition-transform flex items-center justify-center overflow-hidden p-2 border-0 bg-white/80 backdrop-blur-sm"
           title="Abrir Chat"
         >
-          <img src={chatLogo} alt="Chat" className="w-full h-full object-contain" />
+          <img src={chatLogo} alt="Chat" className="w-full h-full object-contain rounded-lg" />
         </button>
       )}
       {chatOpen && <ChatWidget />}
