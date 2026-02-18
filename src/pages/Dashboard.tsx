@@ -116,10 +116,10 @@ const Dashboard = () => {
       {!chatOpen && (
         <button
           onClick={() => setChatOpen(true)}
-          className="fixed bottom-24 right-6 z-50 w-14 h-14 rounded-full shadow-lg hover:scale-110 transition-transform flex items-center justify-center overflow-hidden p-0 border-0 bg-transparent"
+          className="fixed bottom-24 right-6 z-50 w-[4.5rem] h-[4.5rem] rounded-2xl shadow-lg hover:scale-110 transition-transform flex items-center justify-center overflow-hidden p-1 border-0 bg-transparent"
           title="Abrir Chat"
         >
-          <img src={chatLogo} alt="Chat" className="w-full h-full object-cover" />
+          <img src={chatLogo} alt="Chat" className="w-full h-full object-contain" />
         </button>
       )}
       {chatOpen && <ChatWidget />}

@@ -140,8 +140,8 @@ const ChatWidget = ({ onClose }: { onClose?: () => void }) => {
   if (minimized) {
     return (
       <button onClick={() => setMinimized(false)} style={{ position: 'fixed', bottom: '1.5rem', right: '1.5rem' }}
-        className={`z-50 w-16 h-16 rounded-full shadow-lg hover:scale-105 transition-transform flex items-center justify-center relative overflow-hidden p-0 border-0 bg-transparent ${hasAnyAttention ? "mini-pulse-attention" : totalUnread > 0 ? "mini-pulse" : ""}`}>
-        <img src={chatLogo} alt="Chat" className="w-full h-full object-cover" />
+        className={`z-50 w-[4.5rem] h-[4.5rem] rounded-2xl shadow-lg hover:scale-105 transition-transform flex items-center justify-center relative overflow-hidden p-1 border-0 bg-transparent ${hasAnyAttention ? "mini-pulse-attention" : totalUnread > 0 ? "mini-pulse" : ""}`}>
+        <img src={chatLogo} alt="Chat" className="w-full h-full object-contain" />
         {totalUnread > 0 && (
           <span className={`absolute -top-1 -right-1 min-w-5 h-5 px-1 rounded-full text-[10px] flex items-center justify-center font-bold ${hasAnyAttention ? "bg-destructive text-destructive-foreground" : "bg-green-500 text-white"}`}>{totalUnread > 9 ? "9+" : totalUnread}</span>
         )}

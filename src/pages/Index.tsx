@@ -234,10 +234,10 @@ const Index = () => {
             }
           }}
           style={{ position: 'fixed', bottom: '1.5rem', right: '1.5rem' }}
-          className="z-50 w-16 h-16 rounded-full shadow-lg hover:scale-105 transition-transform flex items-center justify-center overflow-hidden p-0 border-0 bg-transparent"
+          className="z-50 w-[4.5rem] h-[4.5rem] rounded-2xl shadow-lg hover:scale-105 transition-transform flex items-center justify-center overflow-hidden p-1 border-0 bg-transparent"
           title="Navarro Connect"
         >
-          <img src={chatLogo} alt="Chat" className="w-full h-full object-cover" />
+          <img src={chatLogo} alt="Chat" className="w-full h-full object-contain" />
         </button>
       )}
       {chatOpen && isAdmin && <ChatWidget />}

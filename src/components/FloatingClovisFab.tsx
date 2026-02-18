@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import clovisIcon from "@/assets/clovis-ai-icon.png";
 
 interface FloatingClovisFabProps {
   onClick: () => void;
@@ -104,7 +105,7 @@ const FloatingClovisFab = ({ onClick, label = "Clovis — Assistente IA Navarro"
       onClick={onClick}
       onMouseEnter={() => { setHovered(true); hoveredRef.current = true; }}
       onMouseLeave={() => { setHovered(false); hoveredRef.current = false; }}
-      className={`fixed w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 flex items-center justify-center transition-colors hover:scale-110 group ${hovered ? "cursor-pointer" : ""}`}
+      className={`fixed w-16 h-16 rounded-full shadow-lg flex items-center justify-center transition-colors hover:scale-110 group overflow-hidden p-0 border-0 bg-transparent ${hovered ? "cursor-pointer" : ""}`}
       style={{
         zIndex: 50,
         left: `${pos.x}px`,
@@ -113,7 +114,7 @@ const FloatingClovisFab = ({ onClick, label = "Clovis — Assistente IA Navarro"
       }}
       title={label}
     >
-      <span className="text-2xl group-hover:animate-bounce">🤖</span>
+      <img src={clovisIcon} alt="Clovis IA" className="w-full h-full object-contain" />
       {/* Glow ring */}
       <span className="absolute inset-0 rounded-full border-2 border-primary/40 animate-ping opacity-30 pointer-events-none" />
     </button>
