@@ -15,7 +15,7 @@ import PasswordChangeDialog from "@/components/chat/PasswordChangeDialog";
 
 const ChatWidget = ({ onClose }: { onClose?: () => void }) => {
   const { user, profile, refreshProfile } = useChatAuth();
-  const { isAdmin } = useUserRole();
+  const { isAdmin, isManager } = useUserRole();
   const { playBeep, playAttention } = useNotificationSound();
   const { contacts, conversations, fetchMessages, sendMessage, markAsRead, startDirectConversation, createGroupConversation } = useChat();
 
@@ -140,8 +140,8 @@ const ChatWidget = ({ onClose }: { onClose?: () => void }) => {
   if (minimized) {
     return (
       <button onClick={() => setMinimized(false)} style={{ position: 'fixed', bottom: '1.5rem', right: '1.5rem' }}
-        className={`z-50 w-[4.5rem] h-[4.5rem] rounded-2xl shadow-lg hover:scale-105 transition-transform flex items-center justify-center relative overflow-hidden p-2 border-0 bg-white/80 backdrop-blur-sm ${hasAnyAttention ? "mini-pulse-attention" : totalUnread > 0 ? "mini-pulse" : ""}`}>
-        <img src={chatLogo} alt="Chat" className="w-full h-full object-contain rounded-lg" />
+        className={`z-50 w-[4.5rem] h-[4.5rem] rounded-full shadow-lg hover:scale-105 transition-transform flex items-center justify-center relative overflow-hidden p-1 border-0 bg-transparent ${hasAnyAttention ? "mini-pulse-attention" : totalUnread > 0 ? "mini-pulse" : ""}`}>
+        <img src={chatLogo} alt="Chat" className="w-full h-full object-contain drop-shadow-lg" />
         {totalUnread > 0 && (
           <span className={`absolute -top-1 -right-1 min-w-5 h-5 px-1 rounded-full text-[10px] flex items-center justify-center font-bold ${hasAnyAttention ? "bg-destructive text-destructive-foreground" : "bg-green-500 text-white"}`}>{totalUnread > 9 ? "9+" : totalUnread}</span>
         )}
@@ -179,7 +179,7 @@ const ChatWidget = ({ onClose }: { onClose?: () => void }) => {
           </div>
         )}
         <div className="flex-1 flex min-h-0">
-          <ChatContactsList contacts={contacts} conversations={visibleConversations} activeConversationId={activeTab} onSelectConversation={openConversation} onStartDirect={handleStartDirect} onCreateGroup={() => setShowGroupDialog(true)} onCloseConversation={() => setActiveTab(undefined)} isAdmin={isAdmin} attentionConvIds={attentionConvIds} onHideConversation={hideConversation} />
+          <ChatContactsList contacts={contacts} conversations={visibleConversations} activeConversationId={activeTab} onSelectConversation={openConversation} onStartDirect={handleStartDirect} onCreateGroup={() => setShowGroupDialog(true)} onCloseConversation={() => setActiveTab(undefined)} isAdmin={isAdmin || isManager} attentionConvIds={attentionConvIds} onHideConversation={hideConversation} />
           <div className="flex-1 flex flex-col min-w-0">
             {activeTab ? (
               <ChatConversationArea key={activeTab} conversationId={activeTab} conversationName={getConversationName(activeTab)} fetchMessages={fetchMessages} sendMessage={sendMessage} markAsRead={markAsRead} onBack={() => setActiveTab(undefined)} />

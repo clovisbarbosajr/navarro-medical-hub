@@ -5,16 +5,18 @@ import { useChatAuth } from "@/contexts/ChatAuthContext";
 export const useUserRole = () => {
   const { user } = useChatAuth();
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isManager, setIsManager] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const checkRole = useCallback(async () => {
-    if (!user) { setIsAdmin(false); setLoading(false); return; }
+    if (!user) { setIsAdmin(false); setIsManager(false); setLoading(false); return; }
     const { data } = await (supabase as any)
-      .from("user_roles").select("role").eq("user_id", user.id).eq("role", "admin").maybeSingle();
-    setIsAdmin(!!data);
+      .from("user_roles").select("role").eq("user_id", user.id).maybeSingle();
+    setIsAdmin(data?.role === "admin");
+    setIsManager(data?.role === "manager");
     setLoading(false);
   }, [user]);
 
   useEffect(() => { checkRole(); }, [checkRole]);
-  return { isAdmin, loading };
+  return { isAdmin, isManager, loading };
 };

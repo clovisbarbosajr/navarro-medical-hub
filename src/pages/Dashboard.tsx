@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import useInactivityLogout from "@/hooks/useInactivityLogout";
 import chatLogo from "@/assets/chat-logo.png";
 import FlowFieldBackground from "@/components/FlowFieldBackground";
 import ThemedBackground from "@/components/ThemedBackground";
@@ -31,6 +32,7 @@ interface AnnouncementPrefill {
 
 const Dashboard = () => {
   const { role } = useAuth();
+  useInactivityLogout();
   const activeTheme = useActiveTheme();
   const [activeSection, setActiveSection] = useState("news");
   const [announcementPrefill, setAnnouncementPrefill] = useState<AnnouncementPrefill | null>(null);
@@ -116,10 +118,10 @@ const Dashboard = () => {
       {!chatOpen && (
         <button
           onClick={() => setChatOpen(true)}
-          className="fixed bottom-24 right-6 z-50 w-[4.5rem] h-[4.5rem] rounded-2xl shadow-lg hover:scale-110 transition-transform flex items-center justify-center overflow-hidden p-2 border-0 bg-white/80 backdrop-blur-sm"
+          className="fixed bottom-24 right-6 z-50 w-[4.5rem] h-[4.5rem] rounded-full shadow-lg hover:scale-110 transition-transform flex items-center justify-center overflow-hidden p-1 border-0 bg-transparent"
           title="Abrir Chat"
         >
-          <img src={chatLogo} alt="Chat" className="w-full h-full object-contain rounded-lg" />
+          <img src={chatLogo} alt="Chat" className="w-full h-full object-contain drop-shadow-lg" />
         </button>
       )}
       {chatOpen && <ChatWidget />}

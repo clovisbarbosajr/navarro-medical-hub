@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import useInactivityLogout from "@/hooks/useInactivityLogout";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth, PROCEDURES_ALLOWED_EMAILS } from "@/contexts/AuthContext";
 import { useChatAuth } from "@/contexts/ChatAuthContext";
@@ -34,6 +35,7 @@ const Index = () => {
   const [rhOpen, setRHOpen] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
   const isAdmin = role === "admin";
+  useInactivityLogout();
 
   useEffect(() => {
     const check = async () => {
@@ -234,10 +236,10 @@ const Index = () => {
             }
           }}
           style={{ position: 'fixed', bottom: '1.5rem', right: '1.5rem' }}
-          className="z-50 w-[4.5rem] h-[4.5rem] rounded-2xl shadow-lg hover:scale-105 transition-transform flex items-center justify-center overflow-hidden p-2 border-0 bg-white/80 backdrop-blur-sm"
+          className="z-50 w-[4.5rem] h-[4.5rem] rounded-full shadow-lg hover:scale-105 transition-transform flex items-center justify-center overflow-hidden p-1 border-0 bg-transparent"
           title="Navarro Connect"
         >
-          <img src={chatLogo} alt="Chat" className="w-full h-full object-contain rounded-lg" />
+          <img src={chatLogo} alt="Chat" className="w-full h-full object-contain drop-shadow-lg" />
         </button>
       )}
       {chatOpen && isAdmin && <ChatWidget />}

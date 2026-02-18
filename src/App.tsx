@@ -9,6 +9,7 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
+import ChatPage from "./pages/ChatPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,6 +27,7 @@ const App = () => (
               <Route path="/" element={<Index />} />
               <Route path="/dashboard" element={<ProtectedRoute requiredRole="manager"><Dashboard /></ProtectedRoute>} />
               <Route path="/admin" element={<ProtectedRoute requiredRole="manager"><Dashboard /></ProtectedRoute>} />
+              <Route path="/chat" element={<ChatPage />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </ChatAuthProvider>
