@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { resizeAndUpload } from "@/lib/imageResize";
 import type { Birthday } from "@/types/database";
-import { Plus, Pencil, Trash2, X, Save, ImageIcon } from "lucide-react";
+import { Plus, Pencil, Trash2, X, Save, ImageIcon, AlertTriangle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { logAction } from "@/lib/auditLog";
 
@@ -26,11 +26,28 @@ const BirthdaysManager = () => {
 
   useEffect(() => { fetchItems(); }, []);
 
+  // Find birthdays missing surname (only one word in name)
+  const missingSurname = items.filter(i => i.name.trim().split(/\s+/).length < 2);
+
+  const validateName = (name: string): string | null => {
+    const trimmed = name.trim();
+    if (!trimmed) return "Nome é obrigatório.";
+    if (trimmed.includes("-")) return "Hífens não são permitidos no nome.";
+    if (trimmed.split(/\s+/).length < 2) return "Adicione o sobrenome do colaborador.";
+    return null;
+  };
+
   const handleSave = async () => {
     if (!editing?.name || !editing?.birth_date) return;
 
+    const nameError = validateName(editing.name);
+    if (nameError) {
+      toast({ title: "Atenção", description: nameError, variant: "destructive" });
+      return;
+    }
+
     const payload = {
-      name: editing.name,
+      name: editing.name.trim(),
       birth_date: editing.birth_date,
       photo_url: editing.photo_url || null,
       created_by: user?.id,
@@ -46,10 +63,38 @@ const BirthdaysManager = () => {
     if (error) {
       toast({ title: "Erro", description: error.message, variant: "destructive" });
     } else {
+      // Try to match birthday name to a chat user profile and sync the photo
+      await syncPhotoWithUserProfile(editing.name.trim(), editing.photo_url || null);
+
       await logAction(editing.id ? "editou" : "criou", "aniversariante", editing.name);
       toast({ title: editing.id ? "Atualizado!" : "Cadastrado!" });
       setEditing(null);
       fetchItems();
+    }
+  };
+
+  const syncPhotoWithUserProfile = async (birthdayName: string, photoUrl: string | null) => {
+    if (!photoUrl) return;
+    try {
+      // Match by first name + last name
+      const nameParts = birthdayName.trim().split(/\s+/);
+      if (nameParts.length < 2) return;
+      const firstName = nameParts[0].toLowerCase();
+      const lastName = nameParts[nameParts.length - 1].toLowerCase();
+
+      const { data: profiles } = await supabase.from("user_profiles").select("user_id, display_name, avatar_url");
+      if (!profiles) return;
+
+      const match = profiles.find(p => {
+        const pParts = p.display_name.toLowerCase().split(/\s+/);
+        return pParts[0] === firstName && pParts[pParts.length - 1] === lastName;
+      });
+
+      if (match && !match.avatar_url) {
+        await (supabase as any).from("user_profiles").update({ avatar_url: photoUrl }).eq("user_id", match.user_id);
+      }
+    } catch (err) {
+      console.error("Sync photo error:", err);
     }
   };
 
@@ -97,6 +142,21 @@ const BirthdaysManager = () => {
         </button>
       </div>
 
+      {/* Alert for missing surnames */}
+      {missingSurname.length > 0 && (
+        <div className="mb-6 p-4 rounded-xl border border-yellow-500/30 bg-yellow-500/10 flex items-start gap-3 animate-pulse-subtle">
+          <AlertTriangle className="w-5 h-5 text-yellow-500 flex-shrink-0 mt-0.5" />
+          <div>
+            <p className="text-sm font-semibold text-foreground">⚠️ Sobrenome faltando!</p>
+            <p className="text-xs text-muted-foreground mt-1">
+              Os seguintes aniversariantes precisam de sobrenome:{" "}
+              <strong>{missingSurname.map(m => m.name).join(", ")}</strong>.
+              Clique no ícone de edição para corrigir.
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Editor Modal */}
       {editing && (
         <div className="fixed inset-0 flex items-center justify-center p-4" style={{ zIndex: 60 }}>
@@ -128,13 +188,16 @@ const BirthdaysManager = () => {
                 </label>
               </div>
               <div>
-                <label className="text-sm text-muted-foreground mb-1 block">Nome completo</label>
+                <label className="text-sm text-muted-foreground mb-1 block">Nome e sobrenome</label>
                 <input
                   value={editing.name || ""}
                   onChange={(e) => setEditing({ ...editing, name: e.target.value })}
                   className="w-full h-10 rounded-xl border border-input bg-secondary/50 px-3 text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
-                  placeholder="Nome do colaborador"
+                  placeholder="Ex: Maria Silva"
                 />
+                {editing.name && validateName(editing.name) && (
+                  <p className="text-xs text-destructive mt-1">{validateName(editing.name)}</p>
+                )}
               </div>
               <div>
                 <label className="text-sm text-muted-foreground mb-1 block">Data de nascimento</label>
@@ -163,15 +226,19 @@ const BirthdaysManager = () => {
             <div className="space-y-2">
               {people.map((person) => {
                 const day = new Date(person.birth_date + "T00:00:00").getDate();
+                const needsSurname = person.name.trim().split(/\s+/).length < 2;
                 return (
-                  <div key={person.id} className="glass rounded-xl p-3 flex items-center gap-3">
+                  <div key={person.id} className={`glass rounded-xl p-3 flex items-center gap-3 ${needsSurname ? "ring-2 ring-yellow-500/50" : ""}`}>
                     {person.photo_url ? (
                       <img src={person.photo_url} alt={person.name} className="w-10 h-10 rounded-full object-cover ring-2 ring-primary/30 flex-shrink-0" />
                     ) : (
                       <div className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-lg flex-shrink-0">🎂</div>
                     )}
                     <div className="flex-1 min-w-0">
-                      <p className="font-medium text-sm text-foreground truncate">{person.name}</p>
+                      <div className="flex items-center gap-2">
+                        <p className="font-medium text-sm text-foreground truncate">{person.name}</p>
+                        {needsSurname && <AlertTriangle className="w-3.5 h-3.5 text-yellow-500 flex-shrink-0" />}
+                      </div>
                       <p className="text-xs text-muted-foreground">Dia {day}</p>
                     </div>
                     <div className="flex items-center gap-1 flex-shrink-0">

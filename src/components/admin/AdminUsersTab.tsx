@@ -1,11 +1,12 @@
-import { useState, useEffect, useCallback } from "react";
-import { UserPlus, Trash2, Key, ArrowRightLeft } from "lucide-react";
+import { useState, useEffect, useCallback, useRef } from "react";
+import { UserPlus, Trash2, Key, ArrowRightLeft, Pencil, Camera, X, Save } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import defaultAvatar from "@/assets/default-avatar.png";
 
 interface UserRow { user_id: string; display_name: string; department: string; is_online: boolean; last_seen: string | null; avatar_url: string | null; }
 interface Department { id: string; name: string; color: string; }
@@ -25,6 +26,12 @@ const AdminUsersTab = () => {
   const [resetPassword, setResetPassword] = useState("");
   const [changeDeptUserId, setChangeDeptUserId] = useState<string | null>(null);
   const [changeDeptValue, setChangeDeptValue] = useState("");
+  const [editingUser, setEditingUser] = useState<UserRow | null>(null);
+  const [editName, setEditName] = useState("");
+  const [editAvatarPreview, setEditAvatarPreview] = useState<string | null>(null);
+  const [editAvatarFile, setEditAvatarFile] = useState<File | null>(null);
+  const [saving, setSaving] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
 
   const callAdmin = async (body: any) => {
     const { data: session } = await supabase.auth.getSession();
@@ -78,6 +85,57 @@ const AdminUsersTab = () => {
     else { const result = await res.json(); toast({ title: "Erro", description: result.error, variant: "destructive" }); }
   };
 
+  const openEdit = (u: UserRow) => {
+    setEditingUser(u);
+    setEditName(u.display_name);
+    setEditAvatarPreview(u.avatar_url || null);
+    setEditAvatarFile(null);
+  };
+
+  const handleEditAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setEditAvatarFile(file);
+    const reader = new FileReader();
+    reader.onload = (ev) => setEditAvatarPreview(ev.target?.result as string);
+    reader.readAsDataURL(file);
+    e.target.value = "";
+  };
+
+  const handleEditSave = async () => {
+    if (!editingUser || !editName.trim()) return;
+    setSaving(true);
+    let avatarUrl = editingUser.avatar_url;
+
+    // Upload new avatar if selected
+    if (editAvatarFile) {
+      const blob = await resizeAvatar(editAvatarFile, 256);
+      const ext = editAvatarFile.type === "image/png" ? "png" : "jpg";
+      const filePath = `${editingUser.user_id}/avatar_${Date.now()}.${ext}`;
+      const { error } = await supabase.storage.from("avatars").upload(filePath, blob, { upsert: true, contentType: `image/${ext}` });
+      if (!error) {
+        const { data: urlData } = supabase.storage.from("avatars").getPublicUrl(filePath);
+        avatarUrl = urlData.publicUrl;
+      }
+    }
+
+    const { error } = await (supabase as any).from("user_profiles").update({
+      display_name: editName.trim(),
+      avatar_url: avatarUrl,
+    }).eq("user_id", editingUser.user_id);
+
+    setSaving(false);
+    if (error) {
+      toast({ title: "Erro", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Usuário atualizado!" });
+      setEditingUser(null);
+      fetchData();
+    }
+  };
+
+  const getAvatarSrc = (url: string | null) => url || defaultAvatar;
+
   const initials = (name: string) => name.split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
   const getDeptColor = (dept: string) => departments.find(dd => dd.name === dept)?.color || "#14b8a6";
 
@@ -103,11 +161,48 @@ const AdminUsersTab = () => {
           </div>
         </div>
       )}
+
+      {/* Edit User Modal */}
+      {editingUser && (
+        <div className="fixed inset-0 flex items-center justify-center p-4" style={{ zIndex: 60 }}>
+          <div className="absolute inset-0 bg-background/60 backdrop-blur-sm" onClick={() => setEditingUser(null)} />
+          <div className="relative glass-strong rounded-2xl p-6 max-w-md w-full shadow-2xl animate-fade-slide-up">
+            <button onClick={() => setEditingUser(null)} className="absolute top-4 right-4 text-muted-foreground hover:text-foreground">
+              <X className="w-5 h-5" />
+            </button>
+            <h3 className="font-display font-bold text-lg text-foreground mb-4">Editar Colaborador</h3>
+            <div className="space-y-4">
+              <div className="flex flex-col items-center gap-3">
+                <div
+                  onClick={() => fileRef.current?.click()}
+                  className="w-24 h-24 rounded-full border-2 border-dashed border-primary/40 flex items-center justify-center cursor-pointer hover:border-primary/70 transition-colors overflow-hidden bg-secondary/30"
+                >
+                  <img src={editAvatarPreview || getAvatarSrc(editingUser.avatar_url)} alt="Avatar" className="w-full h-full object-cover" />
+                </div>
+                <input ref={fileRef} type="file" accept="image/jpeg,image/jpg,image/png" className="hidden" onChange={handleEditAvatarChange} />
+                <button onClick={() => fileRef.current?.click()} className="flex items-center gap-2 text-sm text-primary hover:underline">
+                  <Camera className="w-4 h-4" />
+                  {editAvatarFile ? "Trocar foto" : "Alterar foto"}
+                </button>
+              </div>
+              <div>
+                <label className="text-sm text-muted-foreground mb-1 block">Nome completo</label>
+                <Input value={editName} onChange={e => setEditName(e.target.value)} placeholder="Nome do colaborador" />
+              </div>
+              <Button onClick={handleEditSave} disabled={saving || !editName.trim()} className="w-full">
+                <Save className="w-4 h-4 mr-2" />
+                {saving ? "Salvando..." : "Salvar"}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="space-y-2">
         {users.map(u => (
           <div key={u.user_id} className="glass rounded-xl p-4 flex items-center gap-4">
             <div className="relative flex-shrink-0">
-              {u.avatar_url ? <img src={u.avatar_url} alt={u.display_name} className="w-10 h-10 rounded-full object-cover" /> : <div className="w-10 h-10 rounded-full flex items-center justify-center text-xs font-bold text-white" style={{ backgroundColor: getDeptColor(u.department) }}>{initials(u.display_name)}</div>}
+              <img src={getAvatarSrc(u.avatar_url)} alt={u.display_name} className="w-10 h-10 rounded-full object-cover" />
               <div className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-card ${u.is_online ? "bg-green-500" : "bg-muted-foreground/40"}`} />
             </div>
             <div className="flex-1 min-w-0">
@@ -118,6 +213,7 @@ const AdminUsersTab = () => {
               </div>
             </div>
             <div className="flex items-center gap-1 flex-shrink-0">
+              <Button size="sm" variant="ghost" className="h-8" onClick={() => openEdit(u)} title="Editar colaborador"><Pencil className="w-3.5 h-3.5" /></Button>
               {changeDeptUserId === u.user_id ? (
                 <div className="flex items-center gap-1">
                   <Select value={changeDeptValue} onValueChange={setChangeDeptValue}><SelectTrigger className="w-[130px] h-8 text-xs"><SelectValue placeholder="Departamento" /></SelectTrigger><SelectContent>{departments.map(d => <SelectItem key={d.id} value={d.name}>{d.name}</SelectItem>)}</SelectContent></Select>
@@ -140,5 +236,31 @@ const AdminUsersTab = () => {
     </div>
   );
 };
+
+function resizeAvatar(file: File, maxSize: number): Promise<Blob> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d")!;
+        let w = img.width, h = img.height;
+        if (w > maxSize || h > maxSize) {
+          if (w > h) { h = Math.round(h * maxSize / w); w = maxSize; }
+          else { w = Math.round(w * maxSize / h); h = maxSize; }
+        }
+        canvas.width = w;
+        canvas.height = h;
+        ctx.drawImage(img, 0, 0, w, h);
+        canvas.toBlob((blob) => blob ? resolve(blob) : reject(new Error("Blob fail")), file.type === "image/png" ? "image/png" : "image/jpeg", 0.9);
+      };
+      img.onerror = () => reject(new Error("Image load fail"));
+      img.src = e.target?.result as string;
+    };
+    reader.onerror = () => reject(new Error("Read fail"));
+    reader.readAsDataURL(file);
+  });
+}
 
 export default AdminUsersTab;
