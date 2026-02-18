@@ -102,28 +102,20 @@ const Login = () => {
             <div className="space-y-2">
               <label className="text-sm font-medium text-foreground flex items-center gap-2">
                 <User className="w-4 h-4 text-primary" />
-                Selecione seu login
+                Quem é você?
               </label>
-              <div className="grid grid-cols-3 gap-2">
-                {[
-                  { name: "Inwise", label: "Inwise" },
-                  { name: "Ligia", label: "Ligia" },
-                  { name: "Geovana", label: "Geovana" },
-                ].map((u) => (
-                  <button
-                    key={u.name}
-                    type="button"
-                    onClick={() => setUsername(u.name)}
-                    className={`h-11 rounded-xl border text-sm font-medium transition-all ${
-                      username === u.name
-                        ? "border-primary bg-primary/15 text-primary ring-2 ring-primary/30"
-                        : "border-input bg-secondary/50 text-foreground hover:border-primary/50"
-                    }`}
-                  >
-                    {u.label}
-                  </button>
-                ))}
-              </div>
+              <select
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                className="w-full h-12 rounded-xl border border-input bg-secondary/50 px-4 text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all appearance-none cursor-pointer"
+                style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 16px center' }}
+                required
+              >
+                <option value="">Selecione seu nome...</option>
+                <option value="Inwise">👨‍💻 Inwise</option>
+                <option value="Ligia">👩‍⚕️ Ligia</option>
+                <option value="Geovana">👩‍💼 Geovana</option>
+              </select>
             </div>
 
             <div className="space-y-2">
