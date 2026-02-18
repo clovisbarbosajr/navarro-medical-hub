@@ -177,7 +177,7 @@ const Login = () => {
           </form>
 
           <p className="text-center text-xs text-muted-foreground mt-6">
-            © 2026 INWISEPRO — Acesso restrito
+            © 2026 INWISEPRO
           </p>
         </div>
       </div>
