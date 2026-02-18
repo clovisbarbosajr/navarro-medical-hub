@@ -9,6 +9,9 @@ import { supabase } from "@/integrations/supabase/client";
 import ChatContactsList from "./ChatContactsList";
 import ChatConversationArea from "./ChatConversationArea";
 import CreateGroupDialog from "@/components/chat/CreateGroupDialog";
+import FirstLoginSetup from "@/components/FirstLoginSetup";
+import OnboardingTour from "@/components/OnboardingTour";
+import PasswordChangeDialog from "@/components/chat/PasswordChangeDialog";
 
 const ChatWidget = ({ onClose }: { onClose?: () => void }) => {
   const { user, profile, refreshProfile } = useChatAuth();
@@ -26,6 +29,34 @@ const ChatWidget = ({ onClose }: { onClose?: () => void }) => {
   const [hiddenConvIds, setHiddenConvIds] = useState<Set<string>>(new Set());
   const prevUnreadRef = useRef(0);
 
+  // Onboarding state
+  const [onboardingStep, setOnboardingStep] = useState<"loading" | "photo" | "password" | "tour" | "done">("loading");
+
+  useEffect(() => {
+    if (!user) return;
+    const checkOnboarding = async () => {
+      const { data } = await (supabase as any).from("user_profiles").select("onboarding_completed, password_changed").eq("user_id", user.id).maybeSingle();
+      if (!data) { setOnboardingStep("done"); return; }
+      if (!data.onboarding_completed) {
+        setOnboardingStep("photo");
+      } else if (!data.password_changed) {
+        setOnboardingStep("password");
+      } else {
+        setOnboardingStep("done");
+      }
+    };
+    checkOnboarding();
+  }, [user]);
+
+  const handlePhotoDone = () => setOnboardingStep("password");
+  const handlePasswordDone = () => setOnboardingStep("tour");
+  const handleTourDone = async () => {
+    setOnboardingStep("done");
+    if (user) {
+      await (supabase as any).from("user_profiles").update({ onboarding_completed: true }).eq("user_id", user.id);
+    }
+  };
+
   useEffect(() => {
     if (user) { supabase.from("user_profiles").select("sound_enabled").eq("user_id", user.id).maybeSingle().then(({ data }) => { if (data) setSoundEnabled(data.sound_enabled); }); }
   }, [user]);
@@ -38,7 +69,6 @@ const ChatWidget = ({ onClose }: { onClose?: () => void }) => {
   const openConversation = useCallback((id: string) => {
     setActiveTab(id); setMinimized(false);
     setAttentionConvIds((prev) => { const next = new Set(prev); next.delete(id); return next; });
-    // Unhide if hidden
     setHiddenConvIds((prev) => { const next = new Set(prev); next.delete(id); return next; });
   }, []);
 
@@ -100,6 +130,12 @@ const ChatWidget = ({ onClose }: { onClose?: () => void }) => {
     }
     e.target.value = "";
   };
+
+  // Show onboarding overlays
+  if (onboardingStep === "loading") return null;
+  if (onboardingStep === "photo") return <FirstLoginSetup onComplete={handlePhotoDone} />;
+  if (onboardingStep === "password") return <PasswordChangeDialog onComplete={handlePasswordDone} />;
+  if (onboardingStep === "tour") return <OnboardingTour onComplete={handleTourDone} />;
 
   if (minimized) {
     return (

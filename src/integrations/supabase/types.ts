@@ -750,6 +750,7 @@ export type Database = {
           is_online: boolean
           last_seen: string | null
           onboarding_completed: boolean
+          password_changed: boolean
           sound_enabled: boolean
           updated_at: string
           user_id: string
@@ -763,6 +764,7 @@ export type Database = {
           is_online?: boolean
           last_seen?: string | null
           onboarding_completed?: boolean
+          password_changed?: boolean
           sound_enabled?: boolean
           updated_at?: string
           user_id: string
@@ -776,6 +778,7 @@ export type Database = {
           is_online?: boolean
           last_seen?: string | null
           onboarding_completed?: boolean
+          password_changed?: boolean
           sound_enabled?: boolean
           updated_at?: string
           user_id?: string
