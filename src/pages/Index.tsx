@@ -22,8 +22,6 @@ import chatLogo from "@/assets/chat-logo.png";
 import DeniseProceduresManager from "@/components/admin/DeniseProceduresManager";
 import RHPaymentsManager from "@/components/admin/RHPaymentsManager";
 import ChatWidget from "@/components/chat/ChatWidget";
-import FirstLoginSetup from "@/components/FirstLoginSetup";
-import OnboardingTour from "@/components/OnboardingTour";
 import { toast } from "sonner";
 
 const Index = () => {
@@ -35,8 +33,6 @@ const Index = () => {
   const [proceduresOpen, setProceduresOpen] = useState(false);
   const [rhOpen, setRHOpen] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
-  const [showFirstLogin, setShowFirstLogin] = useState(false);
-  const [showOnboarding, setShowOnboarding] = useState(false);
   const isAdmin = role === "admin";
 
   useEffect(() => {
@@ -104,29 +100,6 @@ const Index = () => {
     }
   }, [blocked]);
 
-  // Check onboarding status for logged-in users
-  useEffect(() => {
-    if (!user) return;
-    const checkOnboarding = async () => {
-      const { data } = await (supabase as any).from("user_profiles").select("onboarding_completed").eq("user_id", user.id).maybeSingle();
-      if (data && !data.onboarding_completed) {
-        setShowFirstLogin(true);
-      }
-    };
-    checkOnboarding();
-  }, [user]);
-
-  const handleFirstLoginDone = () => {
-    setShowFirstLogin(false);
-    setShowOnboarding(true);
-  };
-
-  const handleOnboardingDone = async () => {
-    setShowOnboarding(false);
-    if (user) {
-      await (supabase as any).from("user_profiles").update({ onboarding_completed: true }).eq("user_id", user.id);
-    }
-  };
 
   if (blocked === null) return null;
 
@@ -269,9 +242,6 @@ const Index = () => {
       )}
       {chatOpen && isAdmin && <ChatWidget />}
 
-      {/* Onboarding flow */}
-      {user && showFirstLogin && <FirstLoginSetup onComplete={handleFirstLoginDone} />}
-      {user && showOnboarding && <OnboardingTour onComplete={handleOnboardingDone} />}
 
 
       {/* Procedures fullscreen overlay */}

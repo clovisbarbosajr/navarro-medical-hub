@@ -41,8 +41,8 @@ const FirstLoginSetup = ({ onComplete }: { onComplete: () => void }) => {
     <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-background/80 backdrop-blur-md">
       <div className="glass-strong rounded-3xl p-8 max-w-sm w-full mx-4 space-y-6 animate-in text-center">
         <div>
-          <h2 className="font-display text-xl font-bold text-foreground">Bem-vindo(a)!</h2>
-          <p className="text-sm text-muted-foreground mt-1">{profile?.display_name}</p>
+          <h2 className="font-display text-xl font-bold text-foreground">Bem-vindo ao Navarro Chat!</h2>
+          <p className="text-sm text-muted-foreground mt-1">Configure seu perfil para começar</p>
         </div>
 
         <div className="flex flex-col items-center gap-4">
