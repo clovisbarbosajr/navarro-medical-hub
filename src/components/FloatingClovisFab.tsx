@@ -105,7 +105,7 @@ const FloatingClovisFab = ({ onClick, label = "Clovis — Assistente IA Navarro"
       onClick={onClick}
       onMouseEnter={() => { setHovered(true); hoveredRef.current = true; }}
       onMouseLeave={() => { setHovered(false); hoveredRef.current = false; }}
-      className={`fixed w-[4.5rem] h-[4.5rem] rounded-2xl shadow-lg flex items-center justify-center transition-colors hover:scale-110 group overflow-hidden p-1.5 border-0 bg-white/80 backdrop-blur-sm ${hovered ? "cursor-pointer" : ""}`}
+      className={`fixed w-[4.5rem] h-[4.5rem] rounded-full shadow-lg flex items-center justify-center transition-all hover:scale-110 group overflow-hidden p-1 border-0 bg-transparent ${hovered ? "cursor-pointer" : ""}`}
       style={{
         zIndex: 50,
         left: `${pos.x}px`,
@@ -114,9 +114,9 @@ const FloatingClovisFab = ({ onClick, label = "Clovis — Assistente IA Navarro"
       }}
       title={label}
     >
-      <img src={clovisIcon} alt="Clovis IA" className="w-full h-full object-contain rounded-xl" />
+      <img src={clovisIcon} alt="Clovis IA" className="w-full h-full object-contain drop-shadow-lg" />
       {/* Glow ring */}
-      <span className="absolute inset-0 rounded-full border-2 border-primary/40 animate-ping opacity-30 pointer-events-none" />
+      <span className="absolute inset-0 rounded-full border-2 border-primary/30 animate-ping opacity-20 pointer-events-none" />
     </button>
   );
 };

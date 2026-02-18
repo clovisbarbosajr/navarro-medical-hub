@@ -2,8 +2,9 @@ import { useEffect, useRef, useCallback } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 
 const INACTIVITY_TIMEOUTS: Record<string, number> = {
-  "inwise@navarro.med": 5 * 60 * 1000,   // 5 minutes
-  "ligia@navarro.med": 30 * 60 * 1000,    // 30 minutes
+  "inwise@navarro.med": 5 * 60 * 1000,    // 5 minutes
+  "ligia@navarro.med": 30 * 60 * 1000,     // 30 minutes
+  "geovana@navarro.med": 30 * 60 * 1000,   // 30 minutes
 };
 
 const ACTIVITY_EVENTS = ["mousemove", "mousedown", "keydown", "scroll", "touchstart", "click"];
