@@ -17,6 +17,7 @@ const useActiveTheme = () => {
       const { data, error } = await (supabase as any)
         .from("holiday_themes")
         .select("*")
+        .eq("enabled", true)
         .lte("activation_start", today)
         .gte("activation_end", today)
         .order("is_professional_date", { ascending: false })
