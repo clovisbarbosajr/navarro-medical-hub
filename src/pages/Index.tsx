@@ -39,36 +39,23 @@ const Index = () => {
 
   useEffect(() => {
     const check = async () => {
-      const [maintRes, ipsRes] = await Promise.all([
-        (supabase as any).from("site_settings").select("value").eq("key", "maintenance_mode").single(),
-        (supabase as any).from("site_settings").select("value").eq("key", "allowed_ips").single(),
-      ]);
-
-      const maintenanceOn = maintRes.data?.value === "true";
-      const allowedIps = (ipsRes.data?.value || "").split(",").map((ip: string) => ip.trim()).filter(Boolean);
-
-      if (!maintenanceOn && allowedIps.length === 0) {
+      try {
+        const res = await fetch(
+          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/check-ip`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "apikey": import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+            },
+          }
+        );
+        const data = await res.json();
+        setBlocked(data.blocked === true);
+      } catch {
+        // If edge function fails, allow access
         setBlocked(false);
-        return;
       }
-
-      if (maintenanceOn && allowedIps.length === 0) {
-        setBlocked(true);
-        return;
-      }
-
-      if (allowedIps.length > 0) {
-        try {
-          const res = await fetch("https://api.ipify.org?format=json");
-          const { ip } = await res.json();
-          setBlocked(!allowedIps.includes(ip));
-        } catch {
-          setBlocked(false);
-        }
-        return;
-      }
-
-      setBlocked(false);
     };
     check();
   }, []);
