@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.log-access]
 verify_jwt = false
+
+[functions.check-ip]
+verify_jwt = false

@@ -85,7 +85,7 @@ const BirthdayPopup = () => {
         </button>
         <p className="text-4xl mb-4">🎉</p>
         <h2 className="font-display text-2xl font-bold text-foreground mb-6">
-          Happy Birthday!
+          Feliz Aniversário!
         </h2>
 
         <div className="flex items-center justify-center gap-6 flex-wrap mb-4">

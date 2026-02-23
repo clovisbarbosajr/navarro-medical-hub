@@ -5,6 +5,7 @@ import type { HolidayTheme } from "@/types/database";
 /**
  * Reads the currently active holiday theme from the DB
  * and applies its CSS overrides to the document root.
+ * Also auto-disables themes that are past their activation_end.
  */
 const useActiveTheme = () => {
   const [activeTheme, setActiveTheme] = useState<HolidayTheme | null>(null);
@@ -12,6 +13,13 @@ const useActiveTheme = () => {
   useEffect(() => {
     const fetchTheme = async () => {
       const today = new Date().toISOString().split("T")[0];
+
+      // Auto-disable expired themes that are still enabled
+      await (supabase as any)
+        .from("holiday_themes")
+        .update({ enabled: false })
+        .eq("enabled", true)
+        .lt("activation_end", today);
 
       // Find any theme whose activation window covers today
       const { data, error } = await (supabase as any)
