@@ -39,8 +39,6 @@ const BirthdayPopup = () => {
   const [people, setPeople] = useState<{ name: string; photo_url: string | null }[]>([]);
 
   useEffect(() => {
-    const key = "navarro_birthday_popup_shown";
-    if (sessionStorage.getItem(key)) return;
 
     const fetchBirthdays = async () => {
       const today = new Date();
@@ -66,7 +64,6 @@ const BirthdayPopup = () => {
   }, []);
 
   const handleClose = () => {
-    sessionStorage.setItem("navarro_birthday_popup_shown", "true");
     setVisible(false);
   };
 
