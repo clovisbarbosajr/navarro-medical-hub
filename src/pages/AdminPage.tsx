@@ -82,6 +82,7 @@ const AdminPage = () => {
         {activeTab === "users" && <AdminUsersTab />}
         {activeTab === "departments" && <AdminDepartmentsTab />}
         {activeTab === "broadcast" && <AdminBroadcastTab />}
+        {activeTab === "network" && <NetworkManager />}
       </main>
     </div>
   );
