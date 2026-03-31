@@ -66,6 +66,7 @@ const Dashboard = () => {
       case "chat-departments": return role === "admin" ? <AdminDepartmentsTab /> : null;
       case "chat-history": return role === "admin" ? <AdminHistoryTab /> : null;
       case "chat-broadcast": return <AdminBroadcastTab />;
+      case "network": return <NetworkManager />;
       default: return null;
     }
   };
