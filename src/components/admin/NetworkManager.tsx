@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -11,13 +12,15 @@ import { toast } from "sonner";
 import {
   MapPin, ChevronDown, ChevronRight, Plus, Pencil, Trash2, Settings2,
   Eye, EyeOff, Upload, Download, Printer, Monitor, Phone, Wifi,
-  Globe, Server, Cloud, Camera, Hash, Cable, Network, FileUp, X
+  Globe, Server, Cloud, Camera, Hash, Cable, Network, FileUp, X,
+  MessageSquarePlus, StickyNote
 } from "lucide-react";
 
 interface Location { id: string; name: string; sort_order: number; }
 interface Category { id: string; location_id: string; name: string; icon: string; sort_order: number; }
 interface Field { id: string; category_id: string; field_name: string; field_type: string; is_required: boolean; sort_order: number; }
 interface Item { id: string; category_id: string; field_values: Record<string, string>; sort_order: number; created_at: string; }
+interface ItemNote { id: string; item_id: string; note_text: string; created_by: string; created_at: string; }
 
 const ICON_MAP: Record<string, React.ComponentType<any>> = {
   printer: Printer, monitor: Monitor, phone: Phone, wifi: Wifi, globe: Globe,
@@ -43,9 +46,13 @@ const NetworkManager = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [fields, setFields] = useState<Field[]>([]);
   const [items, setItems] = useState<Item[]>([]);
+  const [itemNotes, setItemNotes] = useState<ItemNote[]>([]);
   const [loading, setLoading] = useState(true);
   const [openLocs, setOpenLocs] = useState<Set<string>>(new Set());
   const [initialized, setInitialized] = useState(false);
+
+  // Expanded notes rows
+  const [expandedNotes, setExpandedNotes] = useState<Set<string>>(new Set());
 
   // Item dialog
   const [itemDialog, setItemDialog] = useState(false);
@@ -68,18 +75,25 @@ const NetworkManager = () => {
   // Password visibility
   const [visiblePasswords, setVisiblePasswords] = useState<Set<string>>(new Set());
 
+  // Add note dialog
+  const [noteDialog, setNoteDialog] = useState(false);
+  const [noteItemId, setNoteItemId] = useState("");
+  const [newNoteText, setNewNoteText] = useState("");
+
   const fetchAll = useCallback(async () => {
     setLoading(true);
-    const [l, c, f, i] = await Promise.all([
+    const [l, c, f, i, n] = await Promise.all([
       (supabase as any).from('network_locations').select('*').order('sort_order'),
       (supabase as any).from('network_categories').select('*').order('sort_order'),
       (supabase as any).from('network_category_fields').select('*').order('sort_order'),
       (supabase as any).from('network_items').select('*').order('sort_order'),
+      (supabase as any).from('network_item_notes').select('*').order('created_at', { ascending: false }),
     ]);
     if (l.data) setLocations(l.data);
     if (c.data) setCategories(c.data);
     if (f.data) setFields(f.data);
     if (i.data) setItems(i.data);
+    if (n.data) setItemNotes(n.data);
     if (l.data?.length && !initialized) {
       setOpenLocs(new Set([l.data[0].id]));
       setInitialized(true);
@@ -92,11 +106,20 @@ const NetworkManager = () => {
   const getFields = (catId: string) => fields.filter(f => f.category_id === catId);
   const getItems = (catId: string) => items.filter(i => i.category_id === catId);
   const getCatsForLoc = (locId: string) => categories.filter(c => c.location_id === locId);
+  const getNotesForItem = (itemId: string) => itemNotes.filter(n => n.item_id === itemId);
 
   const toggleLocation = (id: string) => {
     setOpenLocs(prev => {
       const next = new Set(prev);
       if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  };
+
+  const toggleNotes = (itemId: string) => {
+    setExpandedNotes(prev => {
+      const next = new Set(prev);
+      if (next.has(itemId)) next.delete(itemId); else next.add(itemId);
       return next;
     });
   };
@@ -219,6 +242,35 @@ const NetworkManager = () => {
     });
   };
 
+  // NOTES
+  const openAddNote = (itemId: string) => {
+    setNoteItemId(itemId);
+    setNewNoteText("");
+    setNoteDialog(true);
+  };
+
+  const saveNote = async () => {
+    if (!newNoteText.trim()) return;
+    try {
+      await (supabase as any).from('network_item_notes').insert({
+        item_id: noteItemId,
+        note_text: newNoteText.trim(),
+        created_by: "Admin",
+      });
+      toast.success("Nota adicionada");
+      setNoteDialog(false);
+      setExpandedNotes(prev => new Set(prev).add(noteItemId));
+      fetchAll();
+    } catch { toast.error("Erro ao salvar nota"); }
+  };
+
+  const deleteNote = async (noteId: string) => {
+    if (!confirm("Excluir esta nota?")) return;
+    await (supabase as any).from('network_item_notes').delete().eq('id', noteId);
+    toast.success("Nota excluída");
+    fetchAll();
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -292,84 +344,129 @@ const NetworkManager = () => {
                               {catFields.map(f => (
                                 <TableHead key={f.id} className="text-xs whitespace-nowrap">{f.field_name}</TableHead>
                               ))}
-                              <TableHead className="w-20" />
+                              <TableHead className="w-28" />
                             </TableRow>
                           </TableHeader>
                           <TableBody>
-                            {catItems.map(item => (
-                              <TableRow key={item.id}>
-                                {catFields.map(f => {
-                                  const val = item.field_values[f.field_name] || "";
-                                  const visKey = `${item.id}-${f.field_name}`;
+                            {catItems.map(item => {
+                              const notes = getNotesForItem(item.id);
+                              const isNotesExpanded = expandedNotes.has(item.id);
+                              return (
+                                <>
+                                  <TableRow key={item.id}>
+                                    {catFields.map(f => {
+                                      const val = item.field_values[f.field_name] || "";
+                                      const visKey = `${item.id}-${f.field_name}`;
 
-                                  if (f.field_type === "password") {
-                                    return (
-                                      <TableCell key={f.id} className="text-xs">
-                                        <div className="flex items-center gap-1">
-                                          <span className="font-mono">{visiblePasswords.has(visKey) ? val : "••••••"}</span>
-                                          <button onClick={() => togglePassword(visKey)} className="text-muted-foreground hover:text-foreground">
-                                            {visiblePasswords.has(visKey) ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
-                                          </button>
+                                      if (f.field_type === "password") {
+                                        return (
+                                          <TableCell key={f.id} className="text-xs">
+                                            <div className="flex items-center gap-1">
+                                              <span className="font-mono">{visiblePasswords.has(visKey) ? val : "••••••"}</span>
+                                              <button onClick={() => togglePassword(visKey)} className="text-muted-foreground hover:text-foreground">
+                                                {visiblePasswords.has(visKey) ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
+                                              </button>
+                                            </div>
+                                          </TableCell>
+                                        );
+                                      }
+
+                                      if (f.field_type === "file") {
+                                        const fileName = item.field_values[`${f.field_name}_name`] || "";
+                                        const fileDate = item.field_values[`${f.field_name}_date`] || "";
+                                        return (
+                                          <TableCell key={f.id} className="text-xs">
+                                            {val ? (
+                                              <div className="space-y-1">
+                                                <button onClick={() => handleFileDownload(val, fileName)}
+                                                  className="text-primary hover:underline flex items-center gap-1">
+                                                  <Download className="w-3 h-3" /> {fileName || "Download"}
+                                                </button>
+                                                {fileDate && (
+                                                  <p className="text-[10px] text-muted-foreground">
+                                                    {new Date(fileDate).toLocaleDateString("pt-BR")}
+                                                  </p>
+                                                )}
+                                                <label className="cursor-pointer text-[10px] text-muted-foreground hover:text-foreground flex items-center gap-1">
+                                                  <Upload className="w-3 h-3" /> Atualizar
+                                                  <input type="file" className="hidden" onChange={(e) => {
+                                                    const file = e.target.files?.[0];
+                                                    if (file) handleFileUpload(cat.id, item.id, f.field_name, file);
+                                                  }} />
+                                                </label>
+                                              </div>
+                                            ) : (
+                                              <label className="cursor-pointer text-muted-foreground hover:text-foreground flex items-center gap-1">
+                                                <FileUp className="w-3 h-3" /> Upload
+                                                <input type="file" className="hidden" onChange={(e) => {
+                                                  const file = e.target.files?.[0];
+                                                  if (file) handleFileUpload(cat.id, item.id, f.field_name, file);
+                                                }} />
+                                              </label>
+                                            )}
+                                          </TableCell>
+                                        );
+                                      }
+
+                                      return (
+                                        <TableCell key={f.id} className="text-xs">
+                                          {val || <span className="text-muted-foreground">—</span>}
+                                        </TableCell>
+                                      );
+                                    })}
+                                    <TableCell>
+                                      <div className="flex gap-1">
+                                        <Button variant="ghost" size="icon" className="h-6 w-6" title="Adicionar nota"
+                                          onClick={() => openAddNote(item.id)}>
+                                          <MessageSquarePlus className="w-3 h-3" />
+                                        </Button>
+                                        {notes.length > 0 && (
+                                          <Button variant="ghost" size="icon" className="h-6 w-6 relative" title="Ver notas"
+                                            onClick={() => toggleNotes(item.id)}>
+                                            <StickyNote className="w-3 h-3" />
+                                            <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-[9px] rounded-full w-3.5 h-3.5 flex items-center justify-center">
+                                              {notes.length}
+                                            </span>
+                                          </Button>
+                                        )}
+                                        <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => openEditItem(item)}>
+                                          <Pencil className="w-3 h-3" />
+                                        </Button>
+                                        <Button variant="ghost" size="icon" className="h-6 w-6 text-destructive" onClick={() => deleteItem(item.id)}>
+                                          <Trash2 className="w-3 h-3" />
+                                        </Button>
+                                      </div>
+                                    </TableCell>
+                                  </TableRow>
+                                  {isNotesExpanded && notes.length > 0 && (
+                                    <TableRow key={`${item.id}-notes`}>
+                                      <TableCell colSpan={catFields.length + 1} className="bg-muted/20 p-0">
+                                        <div className="px-4 py-2 space-y-2">
+                                          <div className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground mb-1">
+                                            <StickyNote className="w-3 h-3" /> Histórico de Notas
+                                          </div>
+                                          {notes.map(note => (
+                                            <div key={note.id} className="flex items-start gap-2 p-2 rounded-md bg-background/80 border border-border/20 text-xs">
+                                              <div className="flex-1">
+                                                <p className="text-foreground whitespace-pre-wrap">{note.note_text}</p>
+                                                <p className="text-[10px] text-muted-foreground mt-1">
+                                                  {note.created_by && `${note.created_by} · `}
+                                                  {new Date(note.created_at).toLocaleString("pt-BR")}
+                                                </p>
+                                              </div>
+                                              <Button variant="ghost" size="icon" className="h-5 w-5 text-destructive shrink-0"
+                                                onClick={() => deleteNote(note.id)}>
+                                                <X className="w-3 h-3" />
+                                              </Button>
+                                            </div>
+                                          ))}
                                         </div>
                                       </TableCell>
-                                    );
-                                  }
-
-                                  if (f.field_type === "file") {
-                                    const fileName = item.field_values[`${f.field_name}_name`] || "";
-                                    const fileDate = item.field_values[`${f.field_name}_date`] || "";
-                                    return (
-                                      <TableCell key={f.id} className="text-xs">
-                                        {val ? (
-                                          <div className="space-y-1">
-                                            <button onClick={() => handleFileDownload(val, fileName)}
-                                              className="text-primary hover:underline flex items-center gap-1">
-                                              <Download className="w-3 h-3" /> {fileName || "Download"}
-                                            </button>
-                                            {fileDate && (
-                                              <p className="text-[10px] text-muted-foreground">
-                                                {new Date(fileDate).toLocaleDateString("pt-BR")}
-                                              </p>
-                                            )}
-                                            <label className="cursor-pointer text-[10px] text-muted-foreground hover:text-foreground flex items-center gap-1">
-                                              <Upload className="w-3 h-3" /> Atualizar
-                                              <input type="file" className="hidden" onChange={(e) => {
-                                                const file = e.target.files?.[0];
-                                                if (file) handleFileUpload(cat.id, item.id, f.field_name, file);
-                                              }} />
-                                            </label>
-                                          </div>
-                                        ) : (
-                                          <label className="cursor-pointer text-muted-foreground hover:text-foreground flex items-center gap-1">
-                                            <FileUp className="w-3 h-3" /> Upload
-                                            <input type="file" className="hidden" onChange={(e) => {
-                                              const file = e.target.files?.[0];
-                                              if (file) handleFileUpload(cat.id, item.id, f.field_name, file);
-                                            }} />
-                                          </label>
-                                        )}
-                                      </TableCell>
-                                    );
-                                  }
-
-                                  return (
-                                    <TableCell key={f.id} className="text-xs">
-                                      {val || <span className="text-muted-foreground">—</span>}
-                                    </TableCell>
-                                  );
-                                })}
-                                <TableCell>
-                                  <div className="flex gap-1">
-                                    <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => openEditItem(item)}>
-                                      <Pencil className="w-3 h-3" />
-                                    </Button>
-                                    <Button variant="ghost" size="icon" className="h-6 w-6 text-destructive" onClick={() => deleteItem(item.id)}>
-                                      <Trash2 className="w-3 h-3" />
-                                    </Button>
-                                  </div>
-                                </TableCell>
-                              </TableRow>
-                            ))}
+                                    </TableRow>
+                                  )}
+                                </>
+                              );
+                            })}
                           </TableBody>
                         </Table>
                       </div>
@@ -484,6 +581,28 @@ const NetworkManager = () => {
               </Select>
             </div>
             <Button onClick={addCategory} className="w-full">Criar Categoria</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add Note Dialog */}
+      <Dialog open={noteDialog} onOpenChange={setNoteDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <StickyNote className="w-4 h-4" /> Adicionar Nota
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            <Textarea
+              value={newNoteText}
+              onChange={(e) => setNewNoteText(e.target.value)}
+              placeholder="Digite a nota sobre este dispositivo..."
+              rows={4}
+            />
+            <Button onClick={saveNote} className="w-full" disabled={!newNoteText.trim()}>
+              Salvar Nota
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
