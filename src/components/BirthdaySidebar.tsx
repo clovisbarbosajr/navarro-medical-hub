@@ -49,7 +49,7 @@ const BirthdaySidebar = () => {
       birthdays.length <= 1 ? "" : "max-h-[360px] md:max-h-[480px]"
     }`} style={{ zIndex: 1 }}>
       <h3 className="font-display font-bold text-foreground text-base mb-4 flex items-center gap-2">
-        🎂 Aniversariantes — <span className="capitalize">{currentMonth}</span>
+        🎂 Aniversariantes — <span className="capitalize">{displayMonth}</span>
       </h3>
       <div className="flex-1 overflow-y-auto space-y-3 pr-1">
         {birthdays.map((person) => {
