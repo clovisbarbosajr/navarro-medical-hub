@@ -1,0 +1,1 @@
+DELETE FROM birthdays WHERE name IN ('Denise', 'Karla', 'Sabrina', 'Giuliana Vieira', 'Karen Carpenter', 'Ana Pinon', 'Alejandro Delgado', 'Fernanda Valentini');
