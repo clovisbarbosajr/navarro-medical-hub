@@ -23,6 +23,7 @@ import AdminUsersTab from "@/components/admin/AdminUsersTab";
 import AdminDepartmentsTab from "@/components/admin/AdminDepartmentsTab";
 import AdminHistoryTab from "@/components/admin/AdminHistoryTab";
 import AdminBroadcastTab from "@/components/admin/AdminBroadcastTab";
+import NetworkManager from "@/components/admin/NetworkManager";
 import ChatWidget from "@/components/chat/ChatWidget";
 
 interface AnnouncementPrefill {
@@ -65,6 +66,7 @@ const Dashboard = () => {
       case "chat-departments": return role === "admin" ? <AdminDepartmentsTab /> : null;
       case "chat-history": return role === "admin" ? <AdminHistoryTab /> : null;
       case "chat-broadcast": return <AdminBroadcastTab />;
+      case "network": return <NetworkManager />;
       default: return null;
     }
   };

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { Newspaper, Bell, Cake, Image, Palette, Link2, Settings, LogOut, ChevronRight, ChevronDown, ScrollText, Globe, CalendarDays, MessageCircle, Users, Send, Building2 } from "lucide-react";
+import { Newspaper, Bell, Cake, Image, Palette, Link2, Settings, LogOut, ChevronRight, ChevronDown, ScrollText, Globe, CalendarDays, MessageCircle, Users, Send, Building2, Network } from "lucide-react";
 import type { AppRole } from "@/types/database";
 
 interface SidebarItem {
@@ -21,6 +21,7 @@ const sidebarItems: SidebarItem[] = [
   { id: "settings", label: "Configurações", icon: Settings, roles: ["admin"] },
   { id: "audit-log", label: "Log de Atividades", icon: ScrollText, roles: ["admin"] },
   { id: "access-logs", label: "Acessos & IPs", icon: Globe, roles: ["admin"] },
+  { id: "network", label: "Network", icon: Network, roles: ["admin"] },
 ];
 
 const chatSubItems: SidebarItem[] = [
