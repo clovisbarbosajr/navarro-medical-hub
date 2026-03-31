@@ -18,10 +18,16 @@ const BirthdaySidebar = () => {
         const currentDay = today.getDate();
 
         // Try current month (today and upcoming days only)
-        const currentMonthBirthdays = data.filter((b: Birthday) => {
-          const d = new Date(b.birth_date + "T00:00:00");
-          return d.getMonth() + 1 === currentMonth && d.getDate() >= currentDay;
-        });
+        const currentMonthBirthdays = data
+          .filter((b: Birthday) => {
+            const d = new Date(b.birth_date + "T00:00:00");
+            return d.getMonth() + 1 === currentMonth && d.getDate() >= currentDay;
+          })
+          .sort((a: Birthday, b: Birthday) => {
+            const dayA = new Date(a.birth_date + "T00:00:00").getDate();
+            const dayB = new Date(b.birth_date + "T00:00:00").getDate();
+            return dayA - dayB;
+          });
 
         if (currentMonthBirthdays.length > 0) {
           setBirthdays(currentMonthBirthdays);
