@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { Newspaper, Bell, Cake, Image, Palette, Link2, Settings, LogOut, ChevronRight, ChevronDown, ScrollText, Globe, CalendarDays, MessageCircle, Users, Send, Building2 } from "lucide-react";
+import { Newspaper, Bell, Cake, Image, Palette, Link2, Settings, LogOut, ChevronRight, ChevronDown, ScrollText, Globe, CalendarDays, MessageCircle, Users, Send, Building2, Network } from "lucide-react";
 import type { AppRole } from "@/types/database";
 
 interface SidebarItem {
