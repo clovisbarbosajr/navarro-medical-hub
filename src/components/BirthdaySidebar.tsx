@@ -4,8 +4,7 @@ import type { Birthday } from "@/types/database";
 
 const BirthdaySidebar = () => {
   const [birthdays, setBirthdays] = useState<Birthday[]>([]);
-  const currentMonth = new Date().toLocaleDateString("pt-BR", { month: "long" });
-  const month = new Date().getMonth() + 1;
+  const [displayMonth, setDisplayMonth] = useState<string>("");
 
   useEffect(() => {
     const fetchBirthdays = async () => {
@@ -15,17 +14,33 @@ const BirthdaySidebar = () => {
         .order("birth_date", { ascending: true });
       if (data) {
         const today = new Date();
+        const currentMonth = today.getMonth() + 1;
         const currentDay = today.getDate();
-        // Filter to current month AND today or upcoming days only
-        const filtered = data.filter((b: Birthday) => {
+
+        // Try current month (today and upcoming days only)
+        const currentMonthBirthdays = data.filter((b: Birthday) => {
           const d = new Date(b.birth_date + "T00:00:00");
-          return d.getMonth() + 1 === month && d.getDate() >= currentDay;
+          return d.getMonth() + 1 === currentMonth && d.getDate() >= currentDay;
         });
-        setBirthdays(filtered);
+
+        if (currentMonthBirthdays.length > 0) {
+          setBirthdays(currentMonthBirthdays);
+          setDisplayMonth(today.toLocaleDateString("pt-BR", { month: "long" }));
+        } else {
+          // No remaining birthdays this month — show next month
+          const nextMonth = currentMonth === 12 ? 1 : currentMonth + 1;
+          const nextMonthBirthdays = data.filter((b: Birthday) => {
+            const d = new Date(b.birth_date + "T00:00:00");
+            return d.getMonth() + 1 === nextMonth;
+          });
+          setBirthdays(nextMonthBirthdays);
+          const nextMonthDate = new Date(today.getFullYear(), nextMonth - 1, 1);
+          setDisplayMonth(nextMonthDate.toLocaleDateString("pt-BR", { month: "long" }));
+        }
       }
     };
     fetchBirthdays();
-  }, [month]);
+  }, []);
 
   if (birthdays.length === 0) return null;
 
