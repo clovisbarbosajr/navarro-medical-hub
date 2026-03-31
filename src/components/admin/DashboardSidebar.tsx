@@ -21,6 +21,7 @@ const sidebarItems: SidebarItem[] = [
   { id: "settings", label: "Configurações", icon: Settings, roles: ["admin"] },
   { id: "audit-log", label: "Log de Atividades", icon: ScrollText, roles: ["admin"] },
   { id: "access-logs", label: "Acessos & IPs", icon: Globe, roles: ["admin"] },
+  { id: "network", label: "Network", icon: Network, roles: ["admin"] },
 ];
 
 const chatSubItems: SidebarItem[] = [
