@@ -35,10 +35,16 @@ const BirthdaySidebar = () => {
         } else {
           // No remaining birthdays this month — show next month
           const nextMonth = currentMonth === 12 ? 1 : currentMonth + 1;
-          const nextMonthBirthdays = data.filter((b: Birthday) => {
-            const d = new Date(b.birth_date + "T00:00:00");
-            return d.getMonth() + 1 === nextMonth;
-          });
+          const nextMonthBirthdays = data
+            .filter((b: Birthday) => {
+              const d = new Date(b.birth_date + "T00:00:00");
+              return d.getMonth() + 1 === nextMonth;
+            })
+            .sort((a: Birthday, b: Birthday) => {
+              const dayA = new Date(a.birth_date + "T00:00:00").getDate();
+              const dayB = new Date(b.birth_date + "T00:00:00").getDate();
+              return dayA - dayB;
+            });
           setBirthdays(nextMonthBirthdays);
           const nextMonthDate = new Date(today.getFullYear(), nextMonth - 1, 1);
           setDisplayMonth(nextMonthDate.toLocaleDateString("pt-BR", { month: "long" }));
