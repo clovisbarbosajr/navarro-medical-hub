@@ -65,7 +65,7 @@ const AdminPage = () => {
       </header>
       <div className="border-b border-border/30 bg-background/50">
         <div className="max-w-7xl mx-auto px-4 flex gap-1 overflow-x-auto">
-          {TABS.map(tab => {
+          {tabs.map(tab => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
             return (
