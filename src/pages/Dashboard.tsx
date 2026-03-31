@@ -23,6 +23,7 @@ import AdminUsersTab from "@/components/admin/AdminUsersTab";
 import AdminDepartmentsTab from "@/components/admin/AdminDepartmentsTab";
 import AdminHistoryTab from "@/components/admin/AdminHistoryTab";
 import AdminBroadcastTab from "@/components/admin/AdminBroadcastTab";
+import NetworkManager from "@/components/admin/NetworkManager";
 import ChatWidget from "@/components/chat/ChatWidget";
 
 interface AnnouncementPrefill {
