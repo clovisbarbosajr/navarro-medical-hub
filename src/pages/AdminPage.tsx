@@ -23,6 +23,9 @@ const AdminPage = () => {
   const navigate = useNavigate();
   const { user } = useChatAuth();
   const { isAdmin, loading: roleLoading } = useUserRole();
+  const tabs = useMemo(() => isAdmin
+    ? [...BASE_TABS, { id: "network", label: "Network", icon: Network }]
+    : BASE_TABS, [isAdmin]);
   const [activeTab, setActiveTab] = useState<TabId>("history");
 
   if (roleLoading) {
