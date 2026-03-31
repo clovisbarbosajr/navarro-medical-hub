@@ -551,6 +551,132 @@ export type Database = {
         }
         Relationships: []
       }
+      network_categories: {
+        Row: {
+          created_at: string
+          icon: string
+          id: string
+          location_id: string
+          name: string
+          sort_order: number
+        }
+        Insert: {
+          created_at?: string
+          icon?: string
+          id?: string
+          location_id: string
+          name: string
+          sort_order?: number
+        }
+        Update: {
+          created_at?: string
+          icon?: string
+          id?: string
+          location_id?: string
+          name?: string
+          sort_order?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "network_categories_location_id_fkey"
+            columns: ["location_id"]
+            isOneToOne: false
+            referencedRelation: "network_locations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      network_category_fields: {
+        Row: {
+          category_id: string
+          field_name: string
+          field_type: string
+          id: string
+          is_required: boolean
+          sort_order: number
+        }
+        Insert: {
+          category_id: string
+          field_name: string
+          field_type?: string
+          id?: string
+          is_required?: boolean
+          sort_order?: number
+        }
+        Update: {
+          category_id?: string
+          field_name?: string
+          field_type?: string
+          id?: string
+          is_required?: boolean
+          sort_order?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "network_category_fields_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "network_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      network_items: {
+        Row: {
+          category_id: string
+          created_at: string
+          field_values: Json
+          id: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          category_id: string
+          created_at?: string
+          field_values?: Json
+          id?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          category_id?: string
+          created_at?: string
+          field_values?: Json
+          id?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "network_items_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "network_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      network_locations: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          sort_order: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          sort_order?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          sort_order?: number
+        }
+        Relationships: []
+      }
       news: {
         Row: {
           category: string

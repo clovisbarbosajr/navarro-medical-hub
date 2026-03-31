@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { ArrowLeft, History, Users, Building2, Megaphone } from "lucide-react";
+import { useState, useMemo } from "react";
+import { ArrowLeft, History, Users, Building2, Megaphone, Network } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useChatAuth } from "@/contexts/ChatAuthContext";
 import { useUserRole } from "@/hooks/useUserRole";
@@ -8,20 +8,24 @@ import AdminHistoryTab from "@/components/admin/AdminHistoryTab";
 import AdminUsersTab from "@/components/admin/AdminUsersTab";
 import AdminDepartmentsTab from "@/components/admin/AdminDepartmentsTab";
 import AdminBroadcastTab from "@/components/admin/AdminBroadcastTab";
+import NetworkManager from "@/components/admin/NetworkManager";
 
-const TABS = [
+const BASE_TABS = [
   { id: "history", label: "Histórico", icon: History },
   { id: "users", label: "Usuários", icon: Users },
   { id: "departments", label: "Departamentos", icon: Building2 },
   { id: "broadcast", label: "Broadcast", icon: Megaphone },
-] as const;
+];
 
-type TabId = typeof TABS[number]["id"];
+type TabId = string;
 
 const AdminPage = () => {
   const navigate = useNavigate();
   const { user } = useChatAuth();
   const { isAdmin, loading: roleLoading } = useUserRole();
+  const tabs = useMemo(() => isAdmin
+    ? [...BASE_TABS, { id: "network", label: "Network", icon: Network }]
+    : BASE_TABS, [isAdmin]);
   const [activeTab, setActiveTab] = useState<TabId>("history");
 
   if (roleLoading) {
@@ -61,7 +65,7 @@ const AdminPage = () => {
       </header>
       <div className="border-b border-border/30 bg-background/50">
         <div className="max-w-7xl mx-auto px-4 flex gap-1 overflow-x-auto">
-          {TABS.map(tab => {
+          {tabs.map(tab => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
             return (
@@ -78,6 +82,7 @@ const AdminPage = () => {
         {activeTab === "users" && <AdminUsersTab />}
         {activeTab === "departments" && <AdminDepartmentsTab />}
         {activeTab === "broadcast" && <AdminBroadcastTab />}
+        {activeTab === "network" && <NetworkManager />}
       </main>
     </div>
   );
