@@ -621,6 +621,38 @@ export type Database = {
           },
         ]
       }
+      network_item_notes: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          item_id: string
+          note_text: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          item_id: string
+          note_text: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          item_id?: string
+          note_text?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "network_item_notes_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "network_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       network_items: {
         Row: {
           category_id: string
