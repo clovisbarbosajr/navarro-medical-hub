@@ -14,10 +14,12 @@ const BirthdaySidebar = () => {
         .select("*")
         .order("birth_date", { ascending: true });
       if (data) {
-        // Filter to current month
+        const today = new Date();
+        const currentDay = today.getDate();
+        // Filter to current month AND today or upcoming days only
         const filtered = data.filter((b: Birthday) => {
           const d = new Date(b.birth_date + "T00:00:00");
-          return d.getMonth() + 1 === month;
+          return d.getMonth() + 1 === month && d.getDate() >= currentDay;
         });
         setBirthdays(filtered);
       }
