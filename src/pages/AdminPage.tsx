@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { ArrowLeft, History, Users, Building2, Megaphone } from "lucide-react";
+import { useState, useMemo } from "react";
+import { ArrowLeft, History, Users, Building2, Megaphone, Network } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useChatAuth } from "@/contexts/ChatAuthContext";
 import { useUserRole } from "@/hooks/useUserRole";
@@ -8,15 +8,16 @@ import AdminHistoryTab from "@/components/admin/AdminHistoryTab";
 import AdminUsersTab from "@/components/admin/AdminUsersTab";
 import AdminDepartmentsTab from "@/components/admin/AdminDepartmentsTab";
 import AdminBroadcastTab from "@/components/admin/AdminBroadcastTab";
+import NetworkManager from "@/components/admin/NetworkManager";
 
-const TABS = [
+const BASE_TABS = [
   { id: "history", label: "Histórico", icon: History },
   { id: "users", label: "Usuários", icon: Users },
   { id: "departments", label: "Departamentos", icon: Building2 },
   { id: "broadcast", label: "Broadcast", icon: Megaphone },
-] as const;
+];
 
-type TabId = typeof TABS[number]["id"];
+type TabId = string;
 
 const AdminPage = () => {
   const navigate = useNavigate();
